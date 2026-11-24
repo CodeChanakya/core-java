@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATM Menu Simulation | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 02 · Core Fundamentals · Program 05 of 43</p>
+    <h1>ATM Menu Simulation</h1>
+    <div class="tags">
+      <span class="tag">Beginner to intermediate</span>
+      <span class="chip" style="background:#fff">Scanner</span>
+      <span class="chip" style="background:#fff">while</span>
+      <span class="chip" style="background:#fff">switch</span>
+      <span class="chip" style="background:#fff">Validation</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A customer enters a PIN, then uses a menu to check the balance, deposit, withdraw or quit. Bad input must not crash the program.</p>
+        <p>The program reads from the keyboard, so <span class="mono">run.sh --check</span> feeds it a prepared <span class="mono">sample-input.txt</span>.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>AtmSimulator.java</b><span class="d">The PIN loop, then the menu loop with a switch.</span></span></li>
+          <li><span class="badge">2</span><span><b>sample-input.txt</b><span class="d">The keystrokes used by --check.</span></span></li>
+          <li><span class="badge">3</span><span><b>expected-output.txt</b><span class="d">What those keystrokes produce.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/AtmSimulator.java</b></div>
+<pre class="code"><span class="k">import</span> java.util.<span class="t">Scanner</span>;
+
+<span class="c">/**
+ * A console ATM: check the PIN, then offer a menu until the customer exits.
+ *
+ * Balances are whole rupees to keep the focus on the menu logic. Program 3
+ * explains what real money handling needs.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">AtmSimulator</span> {
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="k">int</span> CORRECT_PIN = <span class="n">1234</span>;
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="k">int</span> MAX_PIN_ATTEMPTS = <span class="n">3</span>;
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="k">int</span> NOTE_VALUE = <span class="n">100</span>;   <span class="c">// the machine only holds 100-rupee notes</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> main(<span class="k">String</span>[] args) {
+        <span class="t">Scanner</span> scanner = <span class="k">new</span> <span class="t">Scanner</span>(<span class="t">System</span>.in);
+        <span class="k">int</span> balance = <span class="n">10000</span>;
+
+        <span class="k">if</span> (!pinAccepted(scanner)) {
+            <span class="t">System</span>.out.println(<span class="n">&quot;Card blocked. Please contact your bank.&quot;</span>);
+            <span class="k">return</span>;
+        }
+
+        <span class="k">boolean</span> running = <span class="k">true</span>;
+        <span class="k">while</span> (running) {
+            <span class="k">if</span> (!scanner.hasNext()) {
+                <span class="t">System</span>.out.println(<span class="n">&quot;Input ended. Session closed.&quot;</span>);
+                <span class="k">break</span>;
+            }
+            printMenu();
+            <span class="k">int</span> choice = readInt(scanner);
+
+            <span class="c">// The arrow form of switch runs only the matching case, so there is</span>
+            <span class="c">// no break to forget. The older &quot;case 1: ... break;&quot; form is shown</span>
+            <span class="c">// in broken/FallThrough.java.</span>
+            <span class="k">switch</span> (choice) {
+                <span class="k">case</span> <span class="n">1</span> -&gt; <span class="t">System</span>.out.println(<span class="n">&quot;Balance: &quot;</span> + balance);
+                <span class="k">case</span> <span class="n">2</span> -&gt; balance = deposit(scanner, balance);
+                <span class="k">case</span> <span class="n">3</span> -&gt; balance = withdraw(scanner, balance);
+                <span class="k">case</span> <span class="n">4</span> -&gt; {
+                    <span class="t">System</span>.out.println(<span class="n">&quot;Thank you. Please take your card.&quot;</span>);
+                    running = <span class="k">false</span>;
+                }
+                <span class="k">default</span> -&gt; <span class="t">System</span>.out.println(<span class="n">&quot;Invalid choice. Enter a number from 1 to 4.&quot;</span>);
+            }
+        }
+    }
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">boolean</span> pinAccepted(<span class="t">Scanner</span> scanner) {
+        <span class="k">for</span> (<span class="k">int</span> attempt = <span class="n">1</span>; attempt &lt;= MAX_PIN_ATTEMPTS; attempt++) {
+            <span class="t">System</span>.out.println(<span class="n">&quot;Enter PIN:&quot;</span>);
+            <span class="k">int</span> pin = readInt(scanner);
+            <span class="k">if</span> (pin == CORRECT_PIN) {
+                <span class="t">System</span>.out.println(<span class="n">&quot;PIN accepted.&quot;</span>);
+                <span class="k">return</span> <span class="k">true</span>;
+            }
+            <span class="t">System</span>.out.println(<span class="n">&quot;Wrong PIN. Attempts left: &quot;</span> + (MAX_PIN_ATTEMPTS - attempt));
+        }
+        <span class="k">return</span> <span class="k">false</span>;
+    }
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> printMenu() {
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;1. Check balance&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;2. Deposit&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;3. Withdraw&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;4. Exit&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;Choose an option:&quot;</span>);
+    }
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">int</span> deposit(<span class="t">Scanner</span> scanner, <span class="k">int</span> balance) {
+        <span class="t">System</span>.out.println(<span class="n">&quot;Amount to deposit:&quot;</span>);
+        <span class="k">int</span> amount = readInt(scanner);
+        <span class="k">if</span> (amount &lt;= <span class="n">0</span>) {
+            <span class="t">System</span>.out.println(<span class="n">&quot;Enter a positive whole number.&quot;</span>);
+            <span class="k">return</span> balance;
+        }
+        <span class="k">int</span> updated = balance + amount;
+        <span class="t">System</span>.out.println(<span class="n">&quot;Deposited &quot;</span> + amount + <span class="n">&quot;. New balance: &quot;</span> + updated);
+        <span class="k">return</span> updated;
+    }
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">int</span> withdraw(<span class="t">Scanner</span> scanner, <span class="k">int</span> balance) {
+        <span class="t">System</span>.out.println(<span class="n">&quot;Amount to withdraw:&quot;</span>);
+        <span class="k">int</span> amount = readInt(scanner);
+        <span class="k">if</span> (amount &lt;= <span class="n">0</span>) {
+            <span class="t">System</span>.out.println(<span class="n">&quot;Enter a positive whole number.&quot;</span>);
+        } <span class="k">else</span> <span class="k">if</span> (amount % NOTE_VALUE != <span class="n">0</span>) {
+            <span class="t">System</span>.out.println(<span class="n">&quot;Amount must be a multiple of &quot;</span> + NOTE_VALUE + <span class="n">&quot;.&quot;</span>);
+        } <span class="k">else</span> <span class="k">if</span> (amount &gt; balance) {
+            <span class="t">System</span>.out.println(<span class="n">&quot;Insufficient funds. Balance: &quot;</span> + balance);
+        } <span class="k">else</span> {
+            balance = balance - amount;
+            <span class="t">System</span>.out.println(<span class="n">&quot;Please collect &quot;</span> + amount + <span class="n">&quot;. New balance: &quot;</span> + balance);
+        }
+        <span class="k">return</span> balance;
+    }
+
+    <span class="c">/**
+     * Reads one whole number. If the next word is not a number, it is thrown
+     * away (otherwise the program would read it again forever) and -1 is
+     * returned. -1 is also returned when the input has run out.
+     */</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">int</span> readInt(<span class="t">Scanner</span> scanner) {
+        <span class="k">if</span> (!scanner.hasNext()) {
+            <span class="k">return</span> -<span class="n">1</span>;
+        }
+        <span class="k">if</span> (scanner.hasNextInt()) {
+            <span class="k">return</span> scanner.nextInt();
+        }
+        scanner.next();
+        <span class="k">return</span> -<span class="n">1</span>;
+    }
+}</pre>
+</div>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+Enter PIN:
+Wrong PIN. Attempts left: 2
+Enter PIN:
+PIN accepted.
+
+1. Check balance
+2. Deposit
+3. Withdraw
+4. Exit
+Choose an option:
+Balance: 10000
+
+1. Check balance
+2. Deposit
+3. Withdraw
+4. Exit
+Choose an option:
+Amount to deposit:
+Deposited 500. New balance: 10500
+
+1. Check balance
+2. Deposit
+3. Withdraw
+4. Exit
+Choose an option:
+Amount to withdraw:
+Amount must be a multiple of 100.
+
+1. Check balance
+2. Deposit
+3. Withdraw
+4. Exit
+Choose an option:
+Amount to withdraw:
+Insufficient funds. Balance: 10500
+
+1. Check balance
+2. Deposit
+3. Withdraw
+4. Exit
+Choose an option:
+Amount to withdraw:
+Please collect 2300. New balance: 8200
+
+1. Check balance
+2. Deposit
+3. Withdraw
+4. Exit
+Choose an option:
+Invalid choice. Enter a number from 1 to 4.
+
+1. Check balance
+2. Deposit
+3. Withdraw
+4. Exit
+Choose an option:
+Invalid choice. Enter a number from 1 to 4.
+
+1. Check balance
+2. Deposit
+3. Withdraw
+4. Exit
+Choose an option:
+Balance: 8200
+
+1. Check balance
+2. Deposit
+3. Withdraw
+4. Exit
+Choose an option:
+Thank you. Please take your card.
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Change the PIN.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Change the opening balance.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add a menu option that prints a thank-you message.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Limit a single withdrawal to 20000.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Count and print the number of transactions.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Lock the card after three wrong PINs.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a switch that falls through, a Scanner loop that never reads, and strings compared with ==. The README in the broken folder shows the real compiler messages.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">02-core-fundamentals/05-atm-menu-simulation</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-06.html"><span class="k2">Next</span><span class="v">06 Student Marks Analyzer</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · [YOUR WEBSITE URL]</span>
+    <span class="mono">[YOUR GITHUB URL]</span>
+  </div>
+</footer>
+
+</body>
+</html>

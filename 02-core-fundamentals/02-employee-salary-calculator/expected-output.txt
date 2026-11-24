@@ -1,0 +1,18 @@
+===== SALARY SLIP =====
+Basic salary      : 50000
+HRA (40%)         : 20000.00
+Special allowance : 5000
+Gross salary      : 75000.00
+Provident fund    : 6000.00
+Professional tax  : 200
+Net salary        : 68800.00
+
+===== ATTENDANCE =====
+Days worked       : 26 of 30
+Wrong percentage  : 0
+Right percentage  : 86
+Payable amount    : 59626.67
+Cut off to whole  : 59626
+Rounded to whole  : 59627
+
+Net salary, 12 months: 825600.00

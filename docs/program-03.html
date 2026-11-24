@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Money Handling Mini-Lab | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 02 · Core Fundamentals · Program 03 of 43</p>
+    <h1>Money Handling Mini-Lab</h1>
+    <div class="tags">
+      <span class="tag">Beginner</span>
+      <span class="chip" style="background:#fff">BigDecimal</span>
+      <span class="chip" style="background:#fff">Rounding</span>
+      <span class="chip" style="background:#fff">compareTo</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>Add 0.1 and 0.2 with <span class="mono">double</span> and you do not get 0.3. For a shop, a bank or a payroll, a paisa out is a bug.</p>
+        <p>The lab runs five short experiments that show the problem and the fix: <span class="mono">BigDecimal</span> built from Strings, with explicit rounding.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>MoneyLab.java</b><span class="d">Five numbered parts, each with a printed result.</span></span></li>
+          <li><span class="badge">2</span><span><b>expected-output.txt</b><span class="d">The invoice total is 1769.96.</span></span></li>
+          <li><span class="badge">3</span><span><b>broken/</b><span class="d">Three BigDecimal mistakes.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/MoneyLab.java</b></div>
+<pre class="code"><span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.math.<span class="t">RoundingMode</span>;
+
+<span class="c">/**
+ * A short lab on why money must not be stored in double, and what to use
+ * instead. Read the output top to bottom: each part answers a question the
+ * part before it raised.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">MoneyLab</span> {
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> main(<span class="k">String</span>[] args) {
+        <span class="c">// Part 1: the problem. double stores numbers in binary, and a value</span>
+        <span class="c">// like 0.1 has no exact binary form, just as 1/3 has no exact decimal form.</span>
+        <span class="k">double</span> a = <span class="n">0.1</span>;
+        <span class="k">double</span> b = <span class="n">0.2</span>;
+        <span class="k">double</span> price = <span class="n">1.10</span>;
+        <span class="t">System</span>.out.println(<span class="n">&quot;PART 1: double&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;0.1 + 0.2        = &quot;</span> + (a + b));
+        <span class="t">System</span>.out.println(<span class="n">&quot;0.1 + 0.2 == 0.3 : &quot;</span> + (a + b == <span class="n">0.3</span>));
+        <span class="t">System</span>.out.println(<span class="n">&quot;1.10 x 3         = &quot;</span> + (price * <span class="n">3</span>));
+        <span class="t">System</span>.out.println();
+
+        <span class="c">// Part 2: BigDecimal keeps the digits you give it. Always build one</span>
+        <span class="c">// from a String. Building it from a double copies the double&#x27;s error.</span>
+        <span class="t">BigDecimal</span> x = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;0.1&quot;</span>);
+        <span class="t">BigDecimal</span> y = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;0.2&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;PART 2: BigDecimal&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;0.1 + 0.2        = &quot;</span> + x.add(y));
+        <span class="t">System</span>.out.println(<span class="n">&quot;From a String    : &quot;</span> + <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;0.1&quot;</span>));
+        <span class="t">System</span>.out.println(<span class="n">&quot;From a double    : &quot;</span> + <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">0.1</span>));
+        <span class="t">System</span>.out.println();
+
+        <span class="c">// Part 3: an invoice. Every amount is rounded to 2 places exactly once,</span>
+        <span class="c">// at the moment it becomes a real charge.</span>
+        <span class="t">BigDecimal</span> unitPrice = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;499.99&quot;</span>);
+        <span class="k">int</span> quantity = <span class="n">3</span>;
+        <span class="t">BigDecimal</span> gstRate = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;0.18&quot;</span>);
+
+        <span class="t">BigDecimal</span> subtotal = unitPrice.multiply(<span class="t">BigDecimal</span>.valueOf(quantity));
+        <span class="t">BigDecimal</span> gstExact = subtotal.multiply(gstRate);
+        <span class="t">BigDecimal</span> gst = gstExact.setScale(<span class="n">2</span>, <span class="t">RoundingMode</span>.HALF_UP);
+        <span class="t">BigDecimal</span> total = subtotal.add(gst);
+
+        <span class="t">System</span>.out.println(<span class="n">&quot;PART 3: invoice&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;Subtotal         : &quot;</span> + subtotal);
+        <span class="t">System</span>.out.println(<span class="n">&quot;GST before round : &quot;</span> + gstExact);
+        <span class="t">System</span>.out.println(<span class="n">&quot;GST (18%)        : &quot;</span> + gst);
+        <span class="t">System</span>.out.println(<span class="n">&quot;Total            : &quot;</span> + total);
+        <span class="t">System</span>.out.println();
+
+        <span class="c">// Part 4: comparing. equals() also compares the scale (the number of</span>
+        <span class="c">// decimal places), so 2.0 and 2.00 are not &quot;equal&quot;. compareTo() only</span>
+        <span class="c">// compares the value.</span>
+        <span class="t">BigDecimal</span> twoPointZero = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;2.0&quot;</span>);
+        <span class="t">BigDecimal</span> twoPointZeroZero = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;2.00&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;PART 4: comparing&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;2.0 equals 2.00    : &quot;</span> + twoPointZero.equals(twoPointZeroZero));
+        <span class="t">System</span>.out.println(<span class="n">&quot;2.0 compareTo 2.00 : &quot;</span> + twoPointZero.compareTo(twoPointZeroZero));
+        <span class="t">System</span>.out.println();
+
+        <span class="c">// Part 5: dividing. 1000 / 3 never ends, so you must say how many</span>
+        <span class="c">// places to keep and how to round.</span>
+        <span class="t">BigDecimal</span> share = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;1000&quot;</span>).divide(<span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;3&quot;</span>), <span class="n">2</span>, <span class="t">RoundingMode</span>.HALF_UP);
+        <span class="t">System</span>.out.println(<span class="n">&quot;PART 5: dividing&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;1000 / 3         = &quot;</span> + share);
+        <span class="t">System</span>.out.println(<span class="n">&quot;Three shares     = &quot;</span> + share.multiply(<span class="t">BigDecimal</span>.valueOf(<span class="n">3</span>)));
+    }
+}</pre>
+</div>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+PART 1: double
+0.1 + 0.2        = 0.30000000000000004
+0.1 + 0.2 == 0.3 : false
+1.10 x 3         = 3.3000000000000003
+
+PART 2: BigDecimal
+0.1 + 0.2        = 0.3
+From a String    : 0.1
+From a double    : 0.1000000000000000055511151231257827021181583404541015625
+
+PART 3: invoice
+Subtotal         : 1499.97
+GST before round : 269.9946
+GST (18%)        : 269.99
+Total            : 1769.96
+
+PART 4: comparing
+2.0 equals 2.00    : false
+2.0 compareTo 2.00 : 0
+
+PART 5: dividing
+1000 / 3         = 333.33
+Three shares     = 999.99
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Change the item price and recompute the invoice by hand.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Change the GST rate to 12%.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add a second item to the invoice.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Divide 100 by 7 with three different rounding modes and compare.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Show a case where equals and compareTo disagree.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Write a method that splits an amount among n people so the shares add back to the total.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: adding BigDecimal with <span class="mono">+</span>, dividing without a scale, and building from a double. The README in the broken folder shows the real compiler messages.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">02-core-fundamentals/03-money-handling-mini-lab</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-04.html"><span class="k2">Next</span><span class="v">04 Electricity Bill Generator</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · [YOUR WEBSITE URL]</span>
+    <span class="mono">[YOUR GITHUB URL]</span>
+  </div>
+</footer>
+
+</body>
+</html>

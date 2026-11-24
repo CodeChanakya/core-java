@@ -7,7 +7,7 @@
 
 <p align="center">
   <img alt="Java 21 or newer" src="https://img.shields.io/badge/Java-21%2B-B83A0E">
-  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-1%20of%2043-0F766E">
+  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-7%20of%2043-0F766E">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-0E1726">
   <a href="https://github.com/OWNER/Core-Java/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/OWNER/Core-Java/actions/workflows/ci.yml/badge.svg"></a>
 </p>
@@ -23,7 +23,7 @@
 
 It follows a fixed path: smallest building block first, then the next concept that depends on it, until you can design and test a small system yourself.
 
-> **Status:** Phase 1 is ready. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
+> **Status:** Phases 1 and 2 are ready (7 of 43 programs). The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
 
 ## Start here
 
@@ -73,12 +73,12 @@ Each phase ends with a project that uses everything taught before it. Frameworks
 
 | No. | Program | Concepts | Status |
 |---|---|---|---|
-| 02 | Employee Salary Calculator | variables, operators, casting | Planned |
-| 03 | Money Handling Mini-Lab | `BigDecimal`, rounding | Planned |
-| 04 | Electricity Bill Generator | `if` / `else`, constants, methods | Planned |
-| 05 | ATM Menu Simulation | `switch`, loops, `Scanner` | Planned |
-| 06 | Student Marks Analyzer | arrays, method overloading | Planned |
-| 07 | Shopping Cart Calculator | strings, `StringBuilder` | Planned |
+| 02 | [Employee Salary Calculator](02-core-fundamentals/02-employee-salary-calculator) | variables, operators, casting | Ready |
+| 03 | [Money Handling Mini-Lab](02-core-fundamentals/03-money-handling-mini-lab) | `BigDecimal`, rounding | Ready |
+| 04 | [Electricity Bill Generator](02-core-fundamentals/04-electricity-bill-generator) | `if` / `else`, constants, methods | Ready |
+| 05 | [ATM Menu Simulation](02-core-fundamentals/05-atm-menu-simulation) | `switch`, loops, `Scanner` | Ready |
+| 06 | [Student Marks Analyzer](02-core-fundamentals/06-student-marks-analyzer) | arrays, method overloading | Ready |
+| 07 | [Shopping Cart Calculator](02-core-fundamentals/07-shopping-cart-calculator) | strings, `StringBuilder` | Ready |
 
 </details>
 

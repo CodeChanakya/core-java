@@ -1,0 +1,7 @@
+Units  Slab    Bill
+0  slab 1  0.00
+50  slab 1  175.00
+100  slab 1  350.00
+101  slab 2  355.25
+150  slab 2  612.50
+250  slab 3  1265.00

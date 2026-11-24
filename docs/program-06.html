@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Marks Analyzer | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 02 · Core Fundamentals · Program 06 of 43</p>
+    <h1>Student Marks Analyzer</h1>
+    <div class="tags">
+      <span class="tag">Beginner to intermediate</span>
+      <span class="chip" style="background:#fff">Arrays</span>
+      <span class="chip" style="background:#fff">2D arrays</span>
+      <span class="chip" style="background:#fff">Overloading</span>
+      <span class="chip" style="background:#fff">for-each</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A teacher has four students and four subjects. She wants a row for each student, the class average, the topper and the average of each subject.</p>
+        <p>One variable per mark stops working at four students. Arrays hold many values under one name.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>MarksAnalyzer.java</b><span class="d">The two arrays, then the small methods below main.</span></span></li>
+          <li><span class="badge">2</span><span><b>expected-output.txt</b><span class="d">Check Asha: 92 + 88 + 95 + 90.</span></span></li>
+          <li><span class="badge">3</span><span><b>broken/</b><span class="d">Three array mistakes.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/MarksAnalyzer.java</b></div>
+<pre class="code"><span class="k">import</span> java.util.<span class="t">Locale</span>;
+
+<span class="c">/**
+ * Analyses the marks of a small class: a report card per student, then
+ * figures for the whole class.
+ *
+ * The marks live in a two-dimensional array: one row per student, one column
+ * per subject. Both arrays are matched by position, so students[1] and
+ * marks[1] describe the same person. Phase 3 replaces this with objects.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">MarksAnalyzer</span> {
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="k">String</span>[] SUBJECTS = {<span class="n">&quot;Maths&quot;</span>, <span class="n">&quot;Science&quot;</span>, <span class="n">&quot;English&quot;</span>, <span class="n">&quot;History&quot;</span>};
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> main(<span class="k">String</span>[] args) {
+        <span class="k">String</span>[] students = {<span class="n">&quot;Asha&quot;</span>, <span class="n">&quot;Rahul&quot;</span>, <span class="n">&quot;Meera&quot;</span>, <span class="n">&quot;Kiran&quot;</span>};
+        <span class="k">int</span>[][] marks = {
+            {<span class="n">92</span>, <span class="n">88</span>, <span class="n">95</span>, <span class="n">90</span>},
+            {<span class="n">67</span>, <span class="n">54</span>, <span class="n">71</span>, <span class="n">60</span>},
+            {<span class="n">81</span>, <span class="n">79</span>, <span class="n">85</span>, <span class="n">77</span>},
+            {<span class="n">45</span>, <span class="n">38</span>, <span class="n">52</span>, <span class="n">41</span>}
+        };
+
+        printHeader();
+        <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; students.length; i++) {
+            printReportRow(students[i], marks[i]);
+        }
+
+        <span class="k">int</span> topper = topperIndex(marks);
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;Class average : %.2f%n&quot;</span>, average(marks));
+        <span class="t">System</span>.out.println(<span class="n">&quot;Highest mark  : &quot;</span> + highest(marks));
+        <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;Topper        : %s (average %.2f)%n&quot;</span>, students[topper], average(marks[topper]));
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;Average per subject&quot;</span>);
+        <span class="k">for</span> (<span class="k">int</span> subject = <span class="n">0</span>; subject &lt; SUBJECTS.length; subject++) {
+            <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;  %-8s %.2f%n&quot;</span>, SUBJECTS[subject], subjectAverage(marks, subject));
+        }
+    }
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> printHeader() {
+        <span class="t">System</span>.out.printf(<span class="n">&quot;%-8s&quot;</span>, <span class="n">&quot;Name&quot;</span>);
+        <span class="k">for</span> (<span class="k">String</span> subject : SUBJECTS) {
+            <span class="t">System</span>.out.printf(<span class="n">&quot;%9s&quot;</span>, subject);
+        }
+        <span class="t">System</span>.out.printf(<span class="n">&quot;%7s%9s%7s%n&quot;</span>, <span class="n">&quot;Total&quot;</span>, <span class="n">&quot;Average&quot;</span>, <span class="n">&quot;Grade&quot;</span>);
+    }
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> printReportRow(<span class="k">String</span> name, <span class="k">int</span>[] marks) {
+        <span class="t">System</span>.out.printf(<span class="n">&quot;%-8s&quot;</span>, name);
+        <span class="k">for</span> (<span class="k">int</span> mark : marks) {
+            <span class="t">System</span>.out.printf(<span class="n">&quot;%9d&quot;</span>, mark);
+        }
+        <span class="k">double</span> average = average(marks);
+        <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;%7d%9.2f%7s%n&quot;</span>, total(marks), average, gradeFor(average));
+    }
+
+    <span class="k">static</span> <span class="k">int</span> total(<span class="k">int</span>[] marks) {
+        <span class="k">int</span> sum = <span class="n">0</span>;
+        <span class="k">for</span> (<span class="k">int</span> mark : marks) {
+            sum += mark;
+        }
+        <span class="k">return</span> sum;
+    }
+
+    <span class="c">// Two methods with the same name but different parameter types: Java picks</span>
+    <span class="c">// the right one by looking at the argument you pass. This is overloading.</span>
+    <span class="k">static</span> <span class="k">double</span> average(<span class="k">int</span>[] marks) {
+        <span class="k">return</span> (<span class="k">double</span>) total(marks) / marks.length;
+    }
+
+    <span class="k">static</span> <span class="k">double</span> average(<span class="k">int</span>[][] table) {
+        <span class="k">int</span> sum = <span class="n">0</span>;
+        <span class="k">int</span> count = <span class="n">0</span>;
+        <span class="k">for</span> (<span class="k">int</span>[] row : table) {
+            sum += total(row);
+            count += row.length;
+        }
+        <span class="k">return</span> (<span class="k">double</span>) sum / count;
+    }
+
+    <span class="k">static</span> <span class="k">int</span> highest(<span class="k">int</span>[] marks) {
+        <span class="k">int</span> best = marks[<span class="n">0</span>];
+        <span class="k">for</span> (<span class="k">int</span> mark : marks) {
+            <span class="k">if</span> (mark &gt; best) {
+                best = mark;
+            }
+        }
+        <span class="k">return</span> best;
+    }
+
+    <span class="c">// Overloaded again: the whole table, found by asking each row for its best.</span>
+    <span class="k">static</span> <span class="k">int</span> highest(<span class="k">int</span>[][] table) {
+        <span class="k">int</span> best = table[<span class="n">0</span>][<span class="n">0</span>];
+        <span class="k">for</span> (<span class="k">int</span>[] row : table) {
+            best = <span class="t">Math</span>.max(best, highest(row));
+        }
+        <span class="k">return</span> best;
+    }
+
+    <span class="k">static</span> <span class="k">double</span> subjectAverage(<span class="k">int</span>[][] table, <span class="k">int</span> subject) {
+        <span class="k">int</span> sum = <span class="n">0</span>;
+        <span class="k">for</span> (<span class="k">int</span>[] row : table) {
+            sum += row[subject];
+        }
+        <span class="k">return</span> (<span class="k">double</span>) sum / table.length;
+    }
+
+    <span class="c">/** Returns the row number of the student with the best average. */</span>
+    <span class="k">static</span> <span class="k">int</span> topperIndex(<span class="k">int</span>[][] table) {
+        <span class="k">int</span> best = <span class="n">0</span>;
+        <span class="k">for</span> (<span class="k">int</span> i = <span class="n">1</span>; i &lt; table.length; i++) {
+            <span class="k">if</span> (average(table[i]) &gt; average(table[best])) {
+                best = i;
+            }
+        }
+        <span class="k">return</span> best;
+    }
+
+    <span class="k">static</span> <span class="k">String</span> gradeFor(<span class="k">double</span> average) {
+        <span class="k">if</span> (average &gt;= <span class="n">90</span>) {
+            <span class="k">return</span> <span class="n">&quot;A&quot;</span>;
+        } <span class="k">else</span> <span class="k">if</span> (average &gt;= <span class="n">75</span>) {
+            <span class="k">return</span> <span class="n">&quot;B&quot;</span>;
+        } <span class="k">else</span> <span class="k">if</span> (average &gt;= <span class="n">60</span>) {
+            <span class="k">return</span> <span class="n">&quot;C&quot;</span>;
+        } <span class="k">else</span> <span class="k">if</span> (average &gt;= <span class="n">40</span>) {
+            <span class="k">return</span> <span class="n">&quot;D&quot;</span>;
+        } <span class="k">else</span> {
+            <span class="k">return</span> <span class="n">&quot;F&quot;</span>;
+        }
+    }
+}</pre>
+</div>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+Name        Maths  Science  English  History  Total  Average  Grade
+Asha           92       88       95       90    365    91.25      A
+Rahul          67       54       71       60    252    63.00      C
+Meera          81       79       85       77    322    80.50      B
+Kiran          45       38       52       41    176    44.00      D
+
+Class average : 69.69
+Highest mark  : 95
+Topper        : Asha (average 91.25)
+
+Average per subject
+  Maths    71.25
+  Science  64.75
+  English  75.75
+  History  67.00
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a fifth student.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print each student&#x27;s lowest mark.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print the topper&#x27;s name.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add a Pass/Fail column.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Print how many students failed.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Rank the students by average without Arrays.sort.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a loop one step too far, length with brackets, and a decimal inside an int array. The README in the broken folder shows the real compiler messages.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">02-core-fundamentals/06-student-marks-analyzer</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-07.html"><span class="k2">Next</span><span class="v">07 Shopping Cart Calculator</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · [YOUR WEBSITE URL]</span>
+    <span class="mono">[YOUR GITHUB URL]</span>
+  </div>
+</footer>
+
+</body>
+</html>
