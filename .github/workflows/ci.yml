@@ -17,4 +17,4 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java }}
       - name: Compile and check every program
-        run: ./scripts/check-all.sh
+        run: bash scripts/check-all.sh

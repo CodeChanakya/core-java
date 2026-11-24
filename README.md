@@ -7,7 +7,7 @@
 
 <p align="center">
   <img alt="Java 21 or newer" src="https://img.shields.io/badge/Java-21%2B-B83A0E">
-  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-7%20of%2043-0F766E">
+  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-13%20of%2043-0F766E">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-0E1726">
   <a href="https://github.com/OWNER/Core-Java/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/OWNER/Core-Java/actions/workflows/ci.yml/badge.svg"></a>
 </p>
@@ -23,7 +23,7 @@
 
 It follows a fixed path: smallest building block first, then the next concept that depends on it, until you can design and test a small system yourself.
 
-> **Status:** Phases 1 and 2 are ready (7 of 43 programs). The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
+> **Status:** Phases 1, 2 and 3 are ready (13 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
 
 ## Start here
 
@@ -87,12 +87,12 @@ Each phase ends with a project that uses everything taught before it. Frameworks
 
 | No. | Program | Concepts | Status |
 |---|---|---|---|
-| 08 | Banking Application | classes, encapsulation | Planned |
-| 09 | JUnit Starter Lab | JUnit 5, assertions | Planned |
-| 10 | Employee Management System | inheritance, polymorphism | Planned |
-| 11 | Vehicle Rental System | abstract classes, interfaces | Planned |
-| 12 | Payment Processing System | interfaces, composition | Planned |
-| 13 | E-commerce Order Management | object relationships | Planned |
+| 08 | [Banking Application](03-object-oriented-programming/08-banking-application) | classes, encapsulation | Ready |
+| 09 | [JUnit Starter Lab](03-object-oriented-programming/09-junit-starter-lab) | JUnit 5, assertions | Ready |
+| 10 | [Employee Management System](03-object-oriented-programming/10-employee-management-system) | inheritance, polymorphism | Ready |
+| 11 | [Vehicle Rental System](03-object-oriented-programming/11-vehicle-rental-system) | abstract classes, interfaces | Ready |
+| 12 | [Payment Processing System](03-object-oriented-programming/12-payment-processing-system) | interfaces, composition | Ready |
+| 13 | [E-commerce Order Management](03-object-oriented-programming/13-ecommerce-order-management) | object relationships | Ready |
 
 </details>
 

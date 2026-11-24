@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Employee Management System | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 03 · Object-Oriented Programming · Program 10 of 43</p>
+    <h1>Employee Management System</h1>
+    <div class="tags">
+      <span class="tag">Intermediate</span>
+      <span class="chip" style="background:#fff">Inheritance</span>
+      <span class="chip" style="background:#fff">super</span>
+      <span class="chip" style="background:#fff">Overriding</span>
+      <span class="chip" style="background:#fff">Polymorphism</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>Developers, managers and interns are paid by different rules, yet HR wants one payroll report and one raise that apply to all of them.</p>
+        <p>Each kind of employee becomes a subclass that overrides only what differs, and the payroll code never asks which kind it is dealing with.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Employee.java</b><span class="d">The general case.</span></span></li>
+          <li><span class="badge">2</span><span><b>Developer.java, Manager.java, Intern.java</b><span class="d">What differs, and nothing more.</span></span></li>
+          <li><span class="badge">3</span><span><b>Payroll.java</b><span class="d">An Employee[] holding every kind.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/employees/Employee.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.employees;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.math.<span class="t">RoundingMode</span>;
+
+<span class="c">/**
+ * The general employee: an id, a name and a base salary.
+ *
+ * Every other kind of employee in this program extends this class, so
+ * everything written here is inherited for free. A subclass only writes what
+ * is different about it, usually by overriding monthlyPay() or role().
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Employee</span> {
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> HUNDRED = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;100&quot;</span>);
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> id;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> name;
+    <span class="k">private</span> <span class="t">BigDecimal</span> baseSalary;
+
+    <span class="k">public</span> <span class="t">Employee</span>(<span class="t">String</span> id, <span class="t">String</span> name, <span class="t">BigDecimal</span> baseSalary) {
+        <span class="k">this</span>.id = id;
+        <span class="k">this</span>.name = name;
+        <span class="k">this</span>.baseSalary = baseSalary.setScale(<span class="n">2</span>, <span class="t">RoundingMode</span>.HALF_UP);
+    }
+
+    <span class="c">/** What this person is paid for a month. Subclasses add to it or replace it. */</span>
+    <span class="k">public</span> <span class="t">BigDecimal</span> monthlyPay() {
+        <span class="k">return</span> baseSalary;
+    }
+
+    <span class="c">/** A short job title for reports. Subclasses override it. */</span>
+    <span class="k">public</span> <span class="t">String</span> role() {
+        <span class="k">return</span> <span class="n">&quot;Employee&quot;</span>;
+    }
+
+    <span class="c">/** Raises the base salary by a percentage, for example 10 for ten percent. */</span>
+    <span class="k">public</span> <span class="k">void</span> applyRaise(<span class="t">BigDecimal</span> percent) {
+        <span class="t">BigDecimal</span> factor = <span class="t">BigDecimal</span>.ONE.add(percent.divide(HUNDRED, <span class="n">4</span>, <span class="t">RoundingMode</span>.HALF_UP));
+        baseSalary = baseSalary.multiply(factor).setScale(<span class="n">2</span>, <span class="t">RoundingMode</span>.HALF_UP);
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getId() {
+        <span class="k">return</span> id;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getName() {
+        <span class="k">return</span> name;
+    }
+
+    <span class="k">public</span> <span class="t">BigDecimal</span> getBaseSalary() {
+        <span class="k">return</span> baseSalary;
+    }
+
+    <span class="c">/**
+     * One report line. Notice that role() and monthlyPay() are called without
+     * knowing which subclass this object really is. Java picks the right
+     * version when the program runs, which is polymorphism.
+     */</span>
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">String</span> toString() {
+        <span class="k">return</span> <span class="t">String</span>.format(<span class="n">&quot;%-6s %-13s %-10s %11s&quot;</span>, id, name, role(), monthlyPay().toPlainString());
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/employees/Manager.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.employees;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+
+<span class="c">/** A manager earns the base salary plus a fixed bonus for every person in the team. */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Manager</span> <span class="k">extends</span> <span class="t">Employee</span> {
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> BONUS_PER_REPORT = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;1500.00&quot;</span>);
+
+    <span class="k">private</span> <span class="k">final</span> <span class="k">int</span> teamSize;
+
+    <span class="k">public</span> <span class="t">Manager</span>(<span class="t">String</span> id, <span class="t">String</span> name, <span class="t">BigDecimal</span> baseSalary, <span class="k">int</span> teamSize) {
+        <span class="k">super</span>(id, name, baseSalary);
+        <span class="k">this</span>.teamSize = teamSize;
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">BigDecimal</span> monthlyPay() {
+        <span class="k">return</span> <span class="k">super</span>.monthlyPay().add(BONUS_PER_REPORT.multiply(<span class="t">BigDecimal</span>.valueOf(teamSize)));
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">String</span> role() {
+        <span class="k">return</span> <span class="n">&quot;Manager&quot;</span>;
+    }
+
+    <span class="c">/** Only managers have a team, so only the Manager class offers this method. */</span>
+    <span class="k">public</span> <span class="k">int</span> getTeamSize() {
+        <span class="k">return</span> teamSize;
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/employees/Payroll.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.employees;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+
+<span class="c">/**
+ * Prepares the monthly payroll for a group of employees.
+ *
+ * The array is declared as Employee[], yet it holds developers, managers and
+ * interns. A subclass object can always be used where its parent is expected.
+ * Payroll never checks which kind it is dealing with; each object knows how to
+ * work out its own pay.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Payroll</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Employee</span>[] staff;
+
+    <span class="k">public</span> <span class="t">Payroll</span>(<span class="t">Employee</span>[] staff) {
+        <span class="k">this</span>.staff = staff;
+    }
+
+    <span class="k">public</span> <span class="t">BigDecimal</span> total() {
+        <span class="t">BigDecimal</span> total = <span class="t">BigDecimal</span>.ZERO.setScale(<span class="n">2</span>);
+        <span class="k">for</span> (<span class="t">Employee</span> employee : staff) {
+            total = total.add(employee.monthlyPay());
+        }
+        <span class="k">return</span> total;
+    }
+
+    <span class="k">public</span> <span class="t">Employee</span> highestPaid() {
+        <span class="t">Employee</span> best = staff[<span class="n">0</span>];
+        <span class="k">for</span> (<span class="t">Employee</span> employee : staff) {
+            <span class="k">if</span> (employee.monthlyPay().compareTo(best.monthlyPay()) &gt; <span class="n">0</span>) {
+                best = employee;
+            }
+        }
+        <span class="k">return</span> best;
+    }
+
+    <span class="k">public</span> <span class="k">void</span> printReport(<span class="t">String</span> title) {
+        <span class="t">System</span>.out.println(<span class="n">&quot;=== &quot;</span> + title + <span class="n">&quot; ===&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="t">String</span>.format(<span class="n">&quot;%-6s %-13s %-10s %11s&quot;</span>, <span class="n">&quot;ID&quot;</span>, <span class="n">&quot;Name&quot;</span>, <span class="n">&quot;Role&quot;</span>, <span class="n">&quot;Monthly pay&quot;</span>));
+        <span class="k">for</span> (<span class="t">Employee</span> employee : staff) {
+            <span class="t">System</span>.out.println(employee);
+        }
+        <span class="t">System</span>.out.println(<span class="n">&quot;Total payroll: &quot;</span> + total().toPlainString());
+        <span class="t">System</span>.out.println(<span class="n">&quot;Highest paid : &quot;</span> + highestPaid().getName());
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+=== Payroll before the raise ===
+ID     Name          Role       Monthly pay
+E101   Asha Menon    Developer     74000.00
+E102   Dev Patel     Developer     65000.00
+E201   Rahul Verma   Manager       99000.00
+E301   Kiran Rao     Intern        15000.00
+Total payroll: 253000.00
+Highest paid : Rahul Verma
+
+Applying a 10 percent raise to everyone...
+
+=== Payroll after the raise ===
+ID     Name          Role       Monthly pay
+E101   Asha Menon    Developer     81000.00
+E102   Dev Patel     Developer     71500.00
+E201   Rahul Verma   Manager      108000.00
+E301   Kiran Rao     Intern        15000.00
+Total payroll: 275500.00
+Highest paid : Rahul Verma
+
+Rahul Verma manages a team of 6
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add another Developer.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add annualPay() to Employee.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Change the on-call allowance.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add a SalesExecutive with commission.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add countByRole() to Payroll.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Add a Contractor without touching Payroll.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a missing <span class="mono">super</span> call, an <span class="mono">@Override</span> typo, and a subclass method called through a parent variable. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">03-object-oriented-programming/10-employee-management-system</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-11.html"><span class="k2">Next</span><span class="v">11 Vehicle Rental System</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · [YOUR WEBSITE URL]</span>
+    <span class="mono">[YOUR GITHUB URL]</span>
+  </div>
+</footer>
+
+</body>
+</html>

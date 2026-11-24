@@ -1,0 +1,14 @@
+--- Fleet ---
+MH12AB1001 Car      Hyundai i20                  2500.00 per day
+MH12AB1002 Car      Toyota Innova                3000.00 per day
+MH12CD2001 Bike     Royal Enfield Classic 350     800.00 per day
+MH12EF3001 Truck    Tata 407                     4500.00 per day
+
+--- Quotes ---
+Car      Hyundai i20                 3 days  rent   7500.00  insurance   900.00  total    8400.00
+Car      Toyota Innova               7 days  rent  18900.00  insurance  2100.00  total   21000.00
+Bike     Royal Enfield Classic 350   2 days  rent   1600.00  insurance        -  total    1600.00
+Bike     Royal Enfield Classic 350  10 days  rent   7200.00  insurance        -  total    7200.00
+Truck    Tata 407                    2 days  rent   9000.00  insurance  1400.00  total   10400.00
+
+Rejected: A rental must be at least 1 day

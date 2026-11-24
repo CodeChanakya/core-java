@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E-commerce Order Management | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 03 · Object-Oriented Programming · Program 13 of 43</p>
+    <h1>E-commerce Order Management</h1>
+    <div class="tags">
+      <span class="tag">Intermediate to advanced</span>
+      <span class="chip" style="background:#fff">Relationships</span>
+      <span class="chip" style="background:#fff">Services</span>
+      <span class="chip" style="background:#fff">Phase project</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>An online shop sells physical goods and downloads. An order must check stock, work out discount, shipping and GST, and move through payment and dispatch in order.</p>
+        <p>This is the Phase 3 project. It combines encapsulation, an abstract Product with two subclasses, composition and a service class that makes ordering all or nothing.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Product.java and two subclasses</b><span class="d">Abstract parent, different shipping.</span></span></li>
+          <li><span class="badge">2</span><span><b>Order.java, OrderItem.java</b><span class="d">The order owns its items.</span></span></li>
+          <li><span class="badge">3</span><span><b>OrderService.java</b><span class="d">The two-pass, all-or-nothing rule.</span></span></li>
+          <li><span class="badge">4</span><span><b>Main.java</b><span class="d">A full scenario with a refused order.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/shop/Product.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.shop;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.math.<span class="t">RoundingMode</span>;
+
+<span class="c">/**
+ * Something the shop sells. Abstract, because every real product is either
+ * physical or digital, and the two ship very differently.
+ */</span>
+<span class="k">public</span> <span class="k">abstract</span> <span class="k">class</span> <span class="t">Product</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> sku;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> name;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">BigDecimal</span> price;
+    <span class="k">private</span> <span class="k">int</span> stock;
+
+    <span class="k">protected</span> <span class="t">Product</span>(<span class="t">String</span> sku, <span class="t">String</span> name, <span class="t">BigDecimal</span> price, <span class="k">int</span> stock) {
+        <span class="k">this</span>.sku = sku;
+        <span class="k">this</span>.name = name;
+        <span class="k">this</span>.price = price.setScale(<span class="n">2</span>, <span class="t">RoundingMode</span>.HALF_UP);
+        <span class="k">this</span>.stock = stock;
+    }
+
+    <span class="c">/** Shipping charged for each unit of this product. */</span>
+    <span class="k">public</span> <span class="k">abstract</span> <span class="t">BigDecimal</span> shippingPerUnit();
+
+    <span class="k">public</span> <span class="k">abstract</span> <span class="t">String</span> kind();
+
+    <span class="k">public</span> <span class="k">boolean</span> hasStock(<span class="k">int</span> quantity) {
+        <span class="k">return</span> quantity &gt; <span class="n">0</span> &amp;&amp; quantity &lt;= stock;
+    }
+
+    <span class="c">/** Takes units off the shelf. The caller must have checked hasStock first. */</span>
+    <span class="k">public</span> <span class="k">void</span> removeStock(<span class="k">int</span> quantity) {
+        <span class="k">if</span> (!hasStock(quantity)) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="n">&quot;Not enough stock of &quot;</span> + name);
+        }
+        stock -= quantity;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getSku() {
+        <span class="k">return</span> sku;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getName() {
+        <span class="k">return</span> name;
+    }
+
+    <span class="k">public</span> <span class="t">BigDecimal</span> getPrice() {
+        <span class="k">return</span> price;
+    }
+
+    <span class="k">public</span> <span class="k">int</span> getStock() {
+        <span class="k">return</span> stock;
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/shop/Order.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.shop;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.math.<span class="t">RoundingMode</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+
+<span class="c">/**
+ * A customer&#x27;s order: who bought, what they bought, and where it stands.
+ *
+ * Relationships used here:
+ *   Order -&gt; Customer    association  (the customer outlives the order)
+ *   Order -&gt; OrderItem   composition  (the items belong to this order alone)
+ *   OrderItem -&gt; Product association  (products live on in the catalog)
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Order</span> {
+
+    <span class="c">// Plain text statuses for now. Program 14 replaces them with an enum, which</span>
+    <span class="c">// is safer because a typo such as &quot;PAYED&quot; would then fail to compile.</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">final</span> <span class="t">String</span> NEW = <span class="n">&quot;NEW&quot;</span>;
+    <span class="k">public</span> <span class="k">static</span> <span class="k">final</span> <span class="t">String</span> PAID = <span class="n">&quot;PAID&quot;</span>;
+    <span class="k">public</span> <span class="k">static</span> <span class="k">final</span> <span class="t">String</span> SHIPPED = <span class="n">&quot;SHIPPED&quot;</span>;
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> GST_RATE = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;0.18&quot;</span>);
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> id;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Customer</span> customer;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayList</span>&lt;<span class="t">OrderItem</span>&gt; items = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+    <span class="k">private</span> <span class="t">String</span> status = NEW;
+
+    <span class="k">public</span> <span class="t">Order</span>(<span class="t">String</span> id, <span class="t">Customer</span> customer) {
+        <span class="k">this</span>.id = id;
+        <span class="k">this</span>.customer = customer;
+    }
+
+    <span class="k">public</span> <span class="k">void</span> addItem(<span class="t">Product</span> product, <span class="k">int</span> quantity) {
+        items.add(<span class="k">new</span> <span class="t">OrderItem</span>(product, quantity));
+    }
+
+    <span class="k">public</span> <span class="t">BigDecimal</span> subtotal() {
+        <span class="t">BigDecimal</span> sum = <span class="t">BigDecimal</span>.ZERO.setScale(<span class="n">2</span>);
+        <span class="k">for</span> (<span class="t">OrderItem</span> item : items) {
+            sum = sum.add(item.lineTotal());
+        }
+        <span class="k">return</span> sum;
+    }
+
+    <span class="k">public</span> <span class="t">BigDecimal</span> discount() {
+        <span class="k">return</span> subtotal().multiply(customer.discountRate()).setScale(<span class="n">2</span>, <span class="t">RoundingMode</span>.HALF_UP);
+    }
+
+    <span class="k">public</span> <span class="t">BigDecimal</span> shipping() {
+        <span class="t">BigDecimal</span> sum = <span class="t">BigDecimal</span>.ZERO.setScale(<span class="n">2</span>);
+        <span class="k">for</span> (<span class="t">OrderItem</span> item : items) {
+            sum = sum.add(item.shipping());
+        }
+        <span class="k">return</span> sum;
+    }
+
+    <span class="c">/** GST is charged on the goods after the discount, not on shipping. */</span>
+    <span class="k">public</span> <span class="t">BigDecimal</span> gst() {
+        <span class="k">return</span> subtotal().subtract(discount()).multiply(GST_RATE).setScale(<span class="n">2</span>, <span class="t">RoundingMode</span>.HALF_UP);
+    }
+
+    <span class="k">public</span> <span class="t">BigDecimal</span> total() {
+        <span class="k">return</span> subtotal().subtract(discount()).add(shipping()).add(gst());
+    }
+
+    <span class="c">/** NEW to PAID. Returns false if the order is not waiting for payment. */</span>
+    <span class="k">public</span> <span class="k">boolean</span> markPaid() {
+        <span class="k">if</span> (!status.equals(NEW)) {
+            <span class="k">return</span> <span class="k">false</span>;
+        }
+        status = PAID;
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="c">/** PAID to SHIPPED. An unpaid order must not leave the warehouse. */</span>
+    <span class="k">public</span> <span class="k">boolean</span> markShipped() {
+        <span class="k">if</span> (!status.equals(PAID)) {
+            <span class="k">return</span> <span class="k">false</span>;
+        }
+        status = SHIPPED;
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> invoice() {
+        <span class="t">StringBuilder</span> text = <span class="k">new</span> <span class="t">StringBuilder</span>();
+        text.append(<span class="n">&quot;Order &quot;</span>).append(id).append(<span class="n">&quot; for &quot;</span>).append(customer.getName());
+        text.append(customer.isLoyaltyMember() ? <span class="n">&quot; (loyalty member)&quot;</span> : <span class="n">&quot;&quot;</span>).append(&#x27;\n&#x27;);
+        <span class="k">for</span> (<span class="t">OrderItem</span> item : items) {
+            text.append(<span class="t">String</span>.format(<span class="n">&quot;  %-22s %-8s %2d x %9s = %10s%n&quot;</span>,
+                    item.getProduct().getName(), item.getProduct().kind(), item.getQuantity(),
+                    item.getProduct().getPrice().toPlainString(), item.lineTotal().toPlainString()));
+        }
+        text.append(<span class="t">String</span>.format(<span class="n">&quot;  %-45s %10s%n&quot;</span>, <span class="n">&quot;Subtotal&quot;</span>, subtotal().toPlainString()));
+        text.append(<span class="t">String</span>.format(<span class="n">&quot;  %-45s %10s%n&quot;</span>, <span class="n">&quot;Loyalty discount&quot;</span>, discountText()));
+        text.append(<span class="t">String</span>.format(<span class="n">&quot;  %-45s %10s%n&quot;</span>, <span class="n">&quot;Shipping&quot;</span>, shipping().toPlainString()));
+        text.append(<span class="t">String</span>.format(<span class="n">&quot;  %-45s %10s%n&quot;</span>, <span class="n">&quot;GST 18%&quot;</span>, gst().toPlainString()));
+        text.append(<span class="t">String</span>.format(<span class="n">&quot;  %-45s %10s%n&quot;</span>, <span class="n">&quot;TOTAL&quot;</span>, total().toPlainString()));
+        text.append(<span class="n">&quot;  Status: &quot;</span>).append(status);
+        <span class="k">return</span> text.toString();
+    }
+
+    <span class="c">/** A zero discount prints as 0.00, not -0.00. */</span>
+    <span class="k">private</span> <span class="t">String</span> discountText() {
+        <span class="k">return</span> discount().signum() == <span class="n">0</span> ? <span class="n">&quot;0.00&quot;</span> : <span class="n">&quot;-&quot;</span> + discount().toPlainString();
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getId() {
+        <span class="k">return</span> id;
+    }
+
+    <span class="k">public</span> <span class="t">Customer</span> getCustomer() {
+        <span class="k">return</span> customer;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getStatus() {
+        <span class="k">return</span> status;
+    }
+
+    <span class="k">public</span> <span class="k">int</span> itemCount() {
+        <span class="k">return</span> items.size();
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/shop/OrderService.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.shop;
+
+<span class="c">/**
+ * The rules for placing an order. Order and Catalog hold data; this class
+ * coordinates them, so a rule like &quot;all or nothing&quot; has one clear home.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">OrderService</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Catalog</span> catalog;
+    <span class="k">private</span> <span class="k">int</span> nextOrderNumber = <span class="n">5001</span>;
+
+    <span class="k">public</span> <span class="t">OrderService</span>(<span class="t">Catalog</span> catalog) {
+        <span class="k">this</span>.catalog = catalog;
+    }
+
+    <span class="c">/**
+     * Builds an order from parallel arrays of SKUs and quantities.
+     *
+     * It works in two passes. The first only checks, and throws before anything
+     * is touched. The second takes stock and builds the order. That way a
+     * failure on the third line cannot leave the first two lines already
+     * removed from the shelf.
+     */</span>
+    <span class="k">public</span> <span class="t">Order</span> placeOrder(<span class="t">Customer</span> customer, <span class="t">String</span>[] skus, <span class="k">int</span>[] quantities) {
+        <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; skus.length; i++) {
+            <span class="t">Product</span> product = catalog.find(skus[i]);
+            <span class="k">if</span> (product == <span class="k">null</span>) {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="n">&quot;Unknown product &quot;</span> + skus[i]);
+            }
+            <span class="k">if</span> (!product.hasStock(quantities[i])) {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(
+                        <span class="n">&quot;Only &quot;</span> + product.getStock() + <span class="n">&quot; left of &quot;</span> + product.getName()
+                        + <span class="n">&quot; (you asked for &quot;</span> + quantities[i] + <span class="n">&quot;)&quot;</span>);
+            }
+        }
+
+        <span class="t">Order</span> order = <span class="k">new</span> <span class="t">Order</span>(<span class="n">&quot;ORD-&quot;</span> + nextOrderNumber, customer);
+        nextOrderNumber++;
+        <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; skus.length; i++) {
+            <span class="t">Product</span> product = catalog.find(skus[i]);
+            product.removeStock(quantities[i]);
+            order.addItem(product, quantities[i]);
+        }
+        <span class="k">return</span> order;
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- Stock ---
+STAND-01 Laptop Stand           Physical    10 left
+KEYB-01  Mechanical Keyboard    Physical     3 left
+BOOK-01  Java Ebook             Digital    999 left
+
+Order ORD-5001 for Asha Menon (loyalty member)
+  Laptop Stand           Physical  1 x   1299.00 =    1299.00
+  Java Ebook             Digital   2 x    499.00 =     998.00
+  Subtotal                                         2297.00
+  Loyalty discount                                 -114.85
+  Shipping                                           50.00
+  GST 18%                                           392.79
+  TOTAL                                            2624.94
+  Status: NEW
+
+Order refused: Only 3 left of Mechanical Keyboard (you asked for 5)
+
+Order ORD-5002 for Rahul Verma
+  Mechanical Keyboard    Physical  2 x   3499.00 =    6998.00
+  Java Ebook             Digital   1 x    499.00 =     499.00
+  Subtotal                                         7497.00
+  Loyalty discount                                    0.00
+  Shipping                                           80.00
+  GST 18%                                          1349.46
+  TOTAL                                            8926.46
+  Status: NEW
+
+Ship ORD-5001 before paying: refused
+Pay  ORD-5001: done
+Pay  ORD-5001 again: refused
+Ship ORD-5001: done
+ORD-5001 is now SHIPPED
+
+--- Stock ---
+STAND-01 Laptop Stand           Physical     9 left
+KEYB-01  Mechanical Keyboard    Physical     1 left
+BOOK-01  Java Ebook             Digital    996 left
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a product.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Show the customer email on the invoice.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Raise the loyalty discount to 10 percent.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add printLowStock().</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add order cancellation that returns stock.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Give each customer an order history.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a status typo that silently never matches, two orders sharing one list, and stock removed without a check. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">03-object-oriented-programming/13-ecommerce-order-management</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="index.html#phase-4"><span class="k2">Next</span><span class="v">Phase 4: Advanced Language Features</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · [YOUR WEBSITE URL]</span>
+    <span class="mono">[YOUR GITHUB URL]</span>
+  </div>
+</footer>
+
+</body>
+</html>
