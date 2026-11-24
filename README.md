@@ -220,6 +220,6 @@ This compiles and runs every ready program and compares each with its `expected-
 
 ## About
 
-Built by **CodeChanakya** · [YOUR WEBSITE URL]
+Built by **CodeChanakya** ·
 
 Released under the [MIT License](LICENSE).
