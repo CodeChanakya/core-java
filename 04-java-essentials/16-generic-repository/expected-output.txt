@@ -1,0 +1,29 @@
+Customers (3)
+  C-101 Asha Menon (Pune)
+  C-102 Rahul Verma (Mumbai)
+  C-103 Meera Iyer (Chennai)
+
+Products (3)
+  1 Laptop Stand 1299.00
+  2 Mechanical Keyboard 3499.00
+  3 Wireless Mouse 899.00
+
+--- Finding and deleting ---
+Customer C-102: C-102 Rahul Verma (Mumbai)
+Customer C-999: null
+Product 3: 3 Wireless Mouse 899.00
+Delete product 2: true
+Delete product 2 again: false
+Products left: 2
+
+--- Saving with an existing id replaces ---
+C-101 is now: C-101 Asha Menon (Bengaluru)
+Customers still: 3
+
+--- Bounded generic methods ---
+Most expensive product: 1 Laptop Stand 1299.00
+Last name alphabetically: Rahul
+After swap: third, second, first
+Sum of counts: 27.0
+Sum of weights: 3.75
+A pair: (Laptop Stand, 12), name length 12, doubled count 24
