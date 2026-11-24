@@ -1,0 +1,8 @@
+# Classes the loader should look at, one per line. Blank lines and # comments are ignored.
+com.codechanakya.plugins.builtin.ReportPlugin
+com.codechanakya.plugins.builtin.CleanupPlugin
+com.codechanakya.plugins.builtin.WelcomePlugin
+com.codechanakya.plugins.builtin.ExperimentalPlugin
+com.codechanakya.plugins.builtin.AuditPlugin
+com.codechanakya.plugins.builtin.NotAPlugin
+com.codechanakya.plugins.builtin.DoesNotExist

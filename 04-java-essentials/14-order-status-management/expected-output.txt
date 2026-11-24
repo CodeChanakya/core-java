@@ -1,0 +1,30 @@
+Ship a NEW order straight away: refused
+Pay it first instead: done
+Pay a RETURNED order: refused
+
+--- Journeys ---
+ORD-7001  Asha Menon  New > Paid > Packed > Shipped > Delivered
+ORD-7002  Rahul Verma New > Paid > Cancelled
+ORD-7003  Meera Iyer  New > Paid
+ORD-7004  Kiran Rao   New > Paid > Packed > Shipped > Delivered > Returned
+ORD-7005  Dev Patel   New
+Orders created: 5
+
+--- Orders by status ---
+New        1
+Paid       1
+Packed     0
+Shipped    0
+Delivered  1
+Cancelled  1
+Returned   1
+
+--- What can SHIPPED become? ---
+[DELIVERED]
+Finished states:
+  CANCELLED (position 5)
+  RETURNED (position 6)
+
+Parsing text from outside the program:
+  "SHIPPED" -> SHIPPED
+  "PAYED" is not a status: No enum constant com.codechanakya.orders.OrderStatus.PAYED

@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generic Repository | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 04 · Java Essentials · Program 16 of 43</p>
+    <h1>Generic Repository</h1>
+    <div class="tags">
+      <span class="tag">Intermediate to advanced</span>
+      <span class="chip" style="background:#fff">Generics</span>
+      <span class="chip" style="background:#fff">Bounded types</span>
+      <span class="chip" style="background:#fff">Wildcards</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>Customers, products and orders all need save, find and list. Copying a store per type means keeping several classes in step.</p>
+        <p>A generic repository is written once for any type, and the compiler rejects a product in the customer store.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Repository.java</b><span class="d">Two type parameters and a bound.</span></span></li>
+          <li><span class="badge">2</span><span><b>InMemoryRepository.java</b><span class="d">The one implementation.</span></span></li>
+          <li><span class="badge">3</span><span><b>Util.java</b><span class="d">Generic methods and wildcards.</span></span></li>
+          <li><span class="badge">4</span><span><b>Pair.java</b><span class="d">Two independent parameters.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/repository/Repository.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.repository;
+
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="c">/**
+ * A place to store and find things of one type.
+ *
+ * Two type parameters: T is what is stored, ID is how it is looked up.
+ * &quot;T extends Identifiable&amp;lt;ID&amp;gt;&quot; is a bound. It restricts T to types that have
+ * a getId() of the matching kind, which is what lets the repository use
+ * item.getId() without knowing anything else about T.
+ *
+ * Write this once and you have a repository for customers, products, orders
+ * and everything you add later.
+ */</span>
+<span class="k">public</span> <span class="k">interface</span> <span class="t">Repository</span>&lt;T <span class="k">extends</span> <span class="t">Identifiable</span>&lt;ID&gt;, ID&gt; {
+
+    <span class="c">/** Stores the item. An item with the same id replaces the old one. */</span>
+    <span class="k">void</span> save(T item);
+
+    <span class="c">/** Returns the item with this id, or null when there is none. */</span>
+    T findById(ID id);
+
+    <span class="t">List</span>&lt;T&gt; findAll();
+
+    <span class="c">/** Removes the item. Returns false when nothing had that id. */</span>
+    <span class="k">boolean</span> delete(ID id);
+
+    <span class="k">int</span> count();
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/repository/InMemoryRepository.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.repository;
+
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">LinkedHashMap</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+
+<span class="c">/**
+ * A repository that keeps everything in memory.
+ *
+ * A Map stores values under keys. LinkedHashMap remembers the order things
+ * were added, so listings come out in a predictable order. Phase 5 covers maps.
+ * A database-backed repository in Phase 9 will implement the same interface,
+ * and code that uses Repository will not need to change.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">InMemoryRepository</span>&lt;T <span class="k">extends</span> <span class="t">Identifiable</span>&lt;ID&gt;, ID&gt; <span class="k">implements</span> <span class="t">Repository</span>&lt;T, ID&gt; {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Map</span>&lt;ID, T&gt; items = <span class="k">new</span> <span class="t">LinkedHashMap</span>&lt;&gt;();
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="k">void</span> save(T item) {
+        items.put(item.getId(), item);
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> T findById(ID id) {
+        <span class="k">return</span> items.get(id);
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;T&gt; findAll() {
+        <span class="c">// A copy, so callers cannot change our storage by editing the list they get.</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(items.values());
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="k">boolean</span> delete(ID id) {
+        <span class="k">return</span> items.remove(id) != <span class="k">null</span>;
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="k">int</span> count() {
+        <span class="k">return</span> items.size();
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/repository/Util.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.repository;
+
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="c">/** Small generic helpers, one for each flavour of generic method. */</span>
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> <span class="t">Util</span> {
+
+    <span class="k">private</span> <span class="t">Util</span>() {
+    }
+
+    <span class="c">/**
+     * The largest item in a non-empty list.
+     *
+     * &quot;T extends Comparable&amp;lt;T&amp;gt;&quot; is the bound: only types that can be compared
+     * with themselves are allowed, because the method calls compareTo.
+     * Strings, Integers and our Product qualify. A type with no ordering, such
+     * as Customer, is rejected by the compiler.
+     */</span>
+    <span class="k">public</span> <span class="k">static</span> &lt;T <span class="k">extends</span> <span class="t">Comparable</span>&lt;T&gt;&gt; T maxOf(<span class="t">List</span>&lt;T&gt; items) {
+        T best = items.get(<span class="n">0</span>);
+        <span class="k">for</span> (T item : items) {
+            <span class="k">if</span> (item.compareTo(best) &gt; <span class="n">0</span>) {
+                best = item;
+            }
+        }
+        <span class="k">return</span> best;
+    }
+
+    <span class="c">/** Swaps two positions in an array of any reference type. The compiler works out T from the argument. */</span>
+    <span class="k">public</span> <span class="k">static</span> &lt;T&gt; <span class="k">void</span> swap(T[] array, <span class="k">int</span> i, <span class="k">int</span> j) {
+        T temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+
+    <span class="c">/**
+     * Adds up any list of numbers as doubles. Fine for counts and measurements,
+     * never for money; use BigDecimal for that.
+     *
+     * &quot;? extends Number&quot; is a wildcard: a list of some unknown type that is
+     * a Number. We can read Numbers out of it, but could not safely add to it.
+     */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">double</span> sum(<span class="t">List</span>&lt;? <span class="k">extends</span> <span class="t">Number</span>&gt; numbers) {
+        <span class="k">double</span> total = <span class="n">0</span>;
+        <span class="k">for</span> (<span class="t">Number</span> number : numbers) {
+            total += number.doubleValue();
+        }
+        <span class="k">return</span> total;
+    }
+
+    <span class="c">/** Prints a list of anything. &quot;?&quot; means &quot;I do not care what the elements are&quot;. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> printAll(<span class="t">String</span> title, <span class="t">List</span>&lt;?&gt; items) {
+        <span class="t">System</span>.out.println(title + <span class="n">&quot; (&quot;</span> + items.size() + <span class="n">&quot;)&quot;</span>);
+        <span class="k">for</span> (<span class="t">Object</span> item : items) {
+            <span class="t">System</span>.out.println(<span class="n">&quot;  &quot;</span> + item);
+        }
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+Customers (3)
+  C-101 Asha Menon (Pune)
+  C-102 Rahul Verma (Mumbai)
+  C-103 Meera Iyer (Chennai)
+
+Products (3)
+  1 Laptop Stand 1299.00
+  2 Mechanical Keyboard 3499.00
+  3 Wireless Mouse 899.00
+
+--- Finding and deleting ---
+Customer C-102: C-102 Rahul Verma (Mumbai)
+Customer C-999: null
+Product 3: 3 Wireless Mouse 899.00
+Delete product 2: true
+Delete product 2 again: false
+Products left: 2
+
+--- Saving with an existing id replaces ---
+C-101 is now: C-101 Asha Menon (Bengaluru)
+Customers still: 3
+
+--- Bounded generic methods ---
+Most expensive product: 1 Laptop Stand 1299.00
+Last name alphabetically: Rahul
+After swap: third, second, first
+Sum of counts: 27.0
+Sum of weights: 3.75
+A pair: (Laptop Stand, 12), name length 12, doubled count 24
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Save a fourth customer.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add a default exists() method.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print the customer count.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add minOf().</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add sorted().</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Write a Cache with a fixed capacity.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a primitive type argument, the wrong type in a list, and a raw type that crashes later. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">04-java-essentials/16-generic-repository</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-17.html"><span class="k2">Next</span><span class="v">17 Plugin Discovery Demonstration</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plugin Discovery Demonstration | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 04 · Java Essentials · Program 17 of 43</p>
+    <h1>Plugin Discovery Demonstration</h1>
+    <div class="tags">
+      <span class="tag">Advanced</span>
+      <span class="chip" style="background:#fff">Annotations</span>
+      <span class="chip" style="background:#fff">Reflection</span>
+      <span class="chip" style="background:#fff">Phase project</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>An application should gain behaviour by adding one class, with no edit to the main code.</p>
+        <p>This Phase 4 project reads class names from a file, inspects them with reflection, checks the @PluginInfo annotation and runs the plugins in phase and order.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>PluginInfo.java</b><span class="d">A custom annotation with defaults.</span></span></li>
+          <li><span class="badge">2</span><span><b>PluginLoader.java</b><span class="d">The questions asked of each class.</span></span></li>
+          <li><span class="badge">3</span><span><b>LoadedPlugin.java</b><span class="d">Comparable, giving the run order.</span></span></li>
+          <li><span class="badge">4</span><span><b>Main.java</b><span class="d">Load, run and reflect.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/plugins/PluginInfo.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.plugins;
+
+<span class="k">import</span> java.lang.annotation.<span class="t">ElementType</span>;
+<span class="k">import</span> java.lang.annotation.<span class="t">Retention</span>;
+<span class="k">import</span> java.lang.annotation.<span class="t">RetentionPolicy</span>;
+<span class="k">import</span> java.lang.annotation.<span class="t">Target</span>;
+
+<span class="c">/**
+ * Labels a class as a plugin and describes it.
+ *
+ * An annotation is metadata: information ABOUT a class that does not change
+ * what the class does by itself. Someone has to read it. Here the PluginLoader
+ * reads it at run time using reflection.
+ *
+ * The two lines above the declaration are annotations on the annotation:
+ *   Retention RUNTIME  keep this information in the compiled class so the
+ *                      running program can read it (the default would drop it)
+ *   Target TYPE        it may only be placed on a class, interface or enum
+ */</span>
+<span class="k">@Retention</span>(<span class="t">RetentionPolicy</span>.RUNTIME)
+<span class="k">@Target</span>(<span class="t">ElementType</span>.TYPE)
+<span class="k">public</span> <span class="k">@interface</span> <span class="t">PluginInfo</span> {
+
+    <span class="c">/** The name shown in reports. Required: it has no default. */</span>
+    <span class="t">String</span> name();
+
+    <span class="c">/** Smaller numbers run first within a phase. */</span>
+    <span class="k">int</span> order() <span class="k">default</span> <span class="n">100</span>;
+
+    <span class="t">PluginPhase</span> phase() <span class="k">default</span> <span class="t">PluginPhase</span>.MAIN;
+
+    <span class="c">/** A disabled plugin is found but never started. */</span>
+    <span class="k">boolean</span> enabled() <span class="k">default</span> <span class="k">true</span>;
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/plugins/PluginLoader.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.plugins;
+
+<span class="k">import</span> java.io.<span class="t">BufferedReader</span>;
+<span class="k">import</span> java.io.<span class="t">IOException</span>;
+<span class="k">import</span> java.io.<span class="t">InputStream</span>;
+<span class="k">import</span> java.io.<span class="t">InputStreamReader</span>;
+<span class="k">import</span> java.nio.charset.<span class="t">StandardCharsets</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Collections</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="c">/**
+ * Finds plugins by reading class names from a text file and inspecting them.
+ *
+ * This is reflection: the program looks at classes it did not know about when
+ * it was compiled. Nothing here mentions WelcomePlugin or ReportPlugin by
+ * name. Add a class and a line in plugins.txt, and it is picked up.
+ *
+ * Every class goes through the same four questions, and the answer to each is
+ * recorded in &quot;skipped&quot; so a reader can see why something did not run.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">PluginLoader</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; skipped = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+
+    <span class="c">/** Reads the file and returns the plugins that passed, in running order. */</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">LoadedPlugin</span>&gt; load(<span class="t">String</span> resourceName) <span class="k">throws</span> <span class="t">IOException</span>, <span class="t">PluginLoadException</span> {
+        <span class="t">List</span>&lt;<span class="t">LoadedPlugin</span>&gt; found = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+
+        <span class="k">for</span> (<span class="t">String</span> className : readClassNames(resourceName)) {
+            <span class="t">Class</span>&lt;?&gt; type;
+            <span class="k">try</span> {
+                type = <span class="t">Class</span>.forName(className);                        <span class="c">// 1. does the class exist?</span>
+            } <span class="k">catch</span> (<span class="t">ClassNotFoundException</span> e) {
+                skipped.add(shortName(className) + <span class="n">&quot;: class not found&quot;</span>);
+                <span class="k">continue</span>;
+            }
+
+            <span class="t">PluginInfo</span> info = type.getAnnotation(<span class="t">PluginInfo</span>.<span class="k">class</span>);     <span class="c">// 2. is it marked @PluginInfo?</span>
+            <span class="k">if</span> (info == <span class="k">null</span>) {
+                skipped.add(type.getSimpleName() + <span class="n">&quot;: no @PluginInfo annotation&quot;</span>);
+                <span class="k">continue</span>;
+            }
+            <span class="k">if</span> (!<span class="t">Plugin</span>.<span class="k">class</span>.isAssignableFrom(type)) {                 <span class="c">// 3. can it run?</span>
+                skipped.add(type.getSimpleName() + <span class="n">&quot;: does not implement Plugin&quot;</span>);
+                <span class="k">continue</span>;
+            }
+            <span class="k">if</span> (!info.enabled()) {                                      <span class="c">// 4. is it switched on?</span>
+                skipped.add(type.getSimpleName() + <span class="n">&quot;: disabled&quot;</span>);
+                <span class="k">continue</span>;
+            }
+
+            <span class="k">try</span> {
+                <span class="t">Plugin</span> instance = (<span class="t">Plugin</span>) type.getDeclaredConstructor().newInstance();
+                found.add(<span class="k">new</span> <span class="t">LoadedPlugin</span>(instance, info));
+            } <span class="k">catch</span> (<span class="t">ReflectiveOperationException</span> e) {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">PluginLoadException</span>(<span class="n">&quot;Could not create &quot;</span> + type.getName(), e);
+            }
+        }
+
+        <span class="t">Collections</span>.sort(found);
+        <span class="k">return</span> found;
+    }
+
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; getSkipped() {
+        <span class="k">return</span> skipped;
+    }
+
+    <span class="k">private</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; readClassNames(<span class="t">String</span> resourceName) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; names = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">try</span> (<span class="t">InputStream</span> in = <span class="t">PluginLoader</span>.<span class="k">class</span>.getResourceAsStream(resourceName)) {
+            <span class="k">if</span> (in == <span class="k">null</span>) {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">IOException</span>(<span class="n">&quot;Resource not found: &quot;</span> + resourceName);
+            }
+            <span class="t">BufferedReader</span> reader = <span class="k">new</span> <span class="t">BufferedReader</span>(<span class="k">new</span> <span class="t">InputStreamReader</span>(in, <span class="t">StandardCharsets</span>.UTF_8));
+            <span class="t">String</span> line;
+            <span class="k">while</span> ((line = reader.readLine()) != <span class="k">null</span>) {
+                <span class="t">String</span> trimmed = line.trim();
+                <span class="k">if</span> (!trimmed.isEmpty() &amp;&amp; !trimmed.startsWith(<span class="n">&quot;#&quot;</span>)) {
+                    names.add(trimmed);
+                }
+            }
+        }
+        <span class="k">return</span> names;
+    }
+
+    <span class="k">private</span> <span class="t">String</span> shortName(<span class="t">String</span> fullName) {
+        <span class="k">return</span> fullName.substring(fullName.lastIndexOf(&#x27;.&#x27;) + <span class="n">1</span>);
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- Skipped ---
+  ExperimentalPlugin: disabled
+  NotAPlugin: no @PluginInfo annotation
+  DoesNotExist: class not found
+
+--- Running order ---
+  STARTUP   10  Welcome
+  MAIN      50  Audit
+  MAIN     100  Report
+  CLEANUP   10  Cleanup
+
+--- Running ---
+Welcome to the plugin demo
+Audit: nothing suspicious found
+Report: runs last among the MAIN plugins, just before Cleanup
+Cleanup: temporary files removed
+
+--- Reflection on WelcomePlugin ---
+Full name : com.codechanakya.plugins.builtin.WelcomePlugin
+Package   : com.codechanakya.plugins.builtin
+Implements: [Plugin]
+Annotation: name=Welcome, order=10, phase=STARTUP, enabled=true
+Methods   : [run]
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a GreetingPlugin.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Enable ExperimentalPlugin.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Predict the order after changing numbers.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add a description element.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Skip classes with no no-argument constructor.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Add a method annotation and call annotated methods.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: an annotation lost at run time, a missing required element, and a class name typo. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">04-java-essentials/17-plugin-discovery-demonstration</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="index.html#phase-5"><span class="k2">Next</span><span class="v">Phase 5: Collections</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

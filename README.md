@@ -7,7 +7,7 @@
 
 <p align="center">
   <img alt="Java 21 or newer" src="https://img.shields.io/badge/Java-21%2B-B83A0E">
-  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-13%20of%2043-0F766E">
+  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-17%20of%2043-0F766E">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-0E1726">
   <a href="https://github.com/codechanakya/core-java/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/codechanakya/core-java/actions/workflows/ci.yml/badge.svg"></a>
 </p>
@@ -23,7 +23,7 @@
 
 It follows a fixed path: smallest building block first, then the next concept that depends on it, until you can design and test a small system yourself.
 
-> **Status:** Phases 1, 2 and 3 are ready (13 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
+> **Status:** Phases 1, 2, 3 and 4 are ready (17 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
 
 ## Start here
 
@@ -101,10 +101,10 @@ Each phase ends with a project that uses everything taught before it. Frameworks
 
 | No. | Program | Concepts | Status |
 |---|---|---|---|
-| 14 | Order Status Management | enums, `static`, `final` | Planned |
-| 15 | Banking Exception Management | custom exceptions, `try` / `catch` | Planned |
-| 16 | Generic Repository | generics, bounded types | Planned |
-| 17 | Plugin Discovery Demonstration | annotations, reflection | Planned |
+| 14 | [Order Status Management](04-java-essentials/14-order-status-management) | enums, `static`, `final` | Ready |
+| 15 | [Banking Exception Management](04-java-essentials/15-banking-exception-management) | custom exceptions, `try` / `catch` | Ready |
+| 16 | [Generic Repository](04-java-essentials/16-generic-repository) | generics, bounded types | Ready |
+| 17 | [Plugin Discovery Demonstration](04-java-essentials/17-plugin-discovery-demonstration) | annotations, reflection | Ready |
 
 </details>
 
@@ -220,6 +220,6 @@ This compiles and runs every ready program and compares each with its `expected-
 
 ## About
 
-Built by **CodeChanakya** ·
+Built by **CodeChanakya** · [codechanakya.github.io](https://codechanakya.github.io/)
 
 Released under the [MIT License](LICENSE).

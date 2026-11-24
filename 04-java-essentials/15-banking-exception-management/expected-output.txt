@@ -1,0 +1,25 @@
+1. Catching a checked exception
+   Withdrew 250, balance 750.00
+   Refused: Cannot withdraw 5000.00, balance is 750.00
+   Short by 4250.00
+
+2. An unchecked exception from bad input
+   Refused: Amount must be greater than zero, but was -5
+
+3. Looking up an account that does not exist
+   No account with number ACC-9999
+
+4. A chained exception: the wrapper and its cause
+   Transfer of 100 done
+   Transfer of 9000 failed
+   Cause: Cannot withdraw 9000.00, balance is 300.00
+   Transfer of 10 failed
+   Cause: No account with number ACC-7777
+
+5. try-with-resources and finally
+[audit] end-of-day opened
+[audit] Asha balance 650.00
+[audit] Rahul balance 300.00
+[audit] end-of-day closed with 2 entries
+   Stopped part-way: Cannot withdraw 1000.00, balance is 300.00
+   finally runs every time, with or without an error

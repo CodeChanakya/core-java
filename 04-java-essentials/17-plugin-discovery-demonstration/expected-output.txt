@@ -1,0 +1,23 @@
+--- Skipped ---
+  ExperimentalPlugin: disabled
+  NotAPlugin: no @PluginInfo annotation
+  DoesNotExist: class not found
+
+--- Running order ---
+  STARTUP   10  Welcome
+  MAIN      50  Audit
+  MAIN     100  Report
+  CLEANUP   10  Cleanup
+
+--- Running ---
+Welcome to the plugin demo
+Audit: nothing suspicious found
+Report: runs last among the MAIN plugins, just before Cleanup
+Cleanup: temporary files removed
+
+--- Reflection on WelcomePlugin ---
+Full name : com.codechanakya.plugins.builtin.WelcomePlugin
+Package   : com.codechanakya.plugins.builtin
+Implements: [Plugin]
+Annotation: name=Welcome, order=10, phase=STARTUP, enabled=true
+Methods   : [run]

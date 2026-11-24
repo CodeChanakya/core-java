@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order Status Management | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 04 · Java Essentials · Program 14 of 43</p>
+    <h1>Order Status Management</h1>
+    <div class="tags">
+      <span class="tag">Intermediate</span>
+      <span class="chip" style="background:#fff">Enums</span>
+      <span class="chip" style="background:#fff">static</span>
+      <span class="chip" style="background:#fff">final</span>
+      <span class="chip" style="background:#fff">Switch expressions</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>Program 13 stored an order status as a String, and one wrong letter silently never matched anything.</p>
+        <p>An enum lists every legal status, carries its own label and rules, and a misspelling stops the program from compiling.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>OrderStatus.java</b><span class="d">The constants and the allowed moves.</span></span></li>
+          <li><span class="badge">2</span><span><b>Order.java</b><span class="d">static counters and final fields.</span></span></li>
+          <li><span class="badge">3</span><span><b>OrderBoard.java</b><span class="d">A final class with an EnumMap.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/orders/OrderStatus.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.orders;
+
+<span class="k">import</span> java.util.<span class="t">EnumSet</span>;
+<span class="k">import</span> java.util.<span class="t">Set</span>;
+
+<span class="c">/**
+ * Every state an order can be in, and the moves allowed between them.
+ *
+ * Program 13 kept the status as a String, so a typo like &quot;PAYED&quot; compiled and
+ * silently never matched. An enum is a fixed list of named values: the
+ * compiler knows them all, so a misspelling is an error on the line where you
+ * wrote it, and a switch over an enum can be checked for missing cases.
+ *
+ * An enum is also a class. These constants carry a label and a flag, and the
+ * type has methods like any other.
+ */</span>
+<span class="k">public</span> enum <span class="t">OrderStatus</span> {
+
+    NEW(<span class="n">&quot;New&quot;</span>, <span class="k">false</span>),
+    PAID(<span class="n">&quot;Paid&quot;</span>, <span class="k">false</span>),
+    PACKED(<span class="n">&quot;Packed&quot;</span>, <span class="k">false</span>),
+    SHIPPED(<span class="n">&quot;Shipped&quot;</span>, <span class="k">false</span>),
+    DELIVERED(<span class="n">&quot;Delivered&quot;</span>, <span class="k">false</span>),
+    CANCELLED(<span class="n">&quot;Cancelled&quot;</span>, <span class="k">true</span>),
+    RETURNED(<span class="n">&quot;Returned&quot;</span>, <span class="k">true</span>);
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> label;
+    <span class="k">private</span> <span class="k">final</span> <span class="k">boolean</span> finished;
+
+    <span class="c">// Constructors of an enum are always private; you never call them yourself.</span>
+    <span class="c">// Java runs this once for each constant above, when the enum is first used.</span>
+    <span class="t">OrderStatus</span>(<span class="t">String</span> label, <span class="k">boolean</span> finished) {
+        <span class="k">this</span>.label = label;
+        <span class="k">this</span>.finished = finished;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getLabel() {
+        <span class="k">return</span> label;
+    }
+
+    <span class="c">/** True for states an order can never leave. */</span>
+    <span class="k">public</span> <span class="k">boolean</span> isFinished() {
+        <span class="k">return</span> finished;
+    }
+
+    <span class="c">/**
+     * The states this one may move to. The rules live here, next to the
+     * values, so they cannot drift apart from them.
+     *
+     * The switch has no default branch on purpose: if someone adds a new
+     * constant and forgets to handle it here, this stops compiling.
+     * EnumSet is a set built for enum values (Phase 5 covers sets).
+     */</span>
+    <span class="k">public</span> <span class="t">Set</span>&lt;<span class="t">OrderStatus</span>&gt; nextStates() {
+        <span class="k">return</span> <span class="k">switch</span> (<span class="k">this</span>) {
+            <span class="k">case</span> NEW -&gt; <span class="t">EnumSet</span>.of(PAID, CANCELLED);
+            <span class="k">case</span> PAID -&gt; <span class="t">EnumSet</span>.of(PACKED, CANCELLED);
+            <span class="k">case</span> PACKED -&gt; <span class="t">EnumSet</span>.of(SHIPPED);
+            <span class="k">case</span> SHIPPED -&gt; <span class="t">EnumSet</span>.of(DELIVERED);
+            <span class="k">case</span> DELIVERED -&gt; <span class="t">EnumSet</span>.of(RETURNED);
+            <span class="k">case</span> CANCELLED, RETURNED -&gt; <span class="t">EnumSet</span>.noneOf(<span class="t">OrderStatus</span>.<span class="k">class</span>);
+        };
+    }
+
+    <span class="k">public</span> <span class="k">boolean</span> canMoveTo(<span class="t">OrderStatus</span> next) {
+        <span class="k">return</span> nextStates().contains(next);
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/orders/Order.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.orders;
+
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+
+<span class="c">/**
+ * One customer order and the path it has taken through its statuses.
+ *
+ * Three keywords from this phase appear here:
+ *   final   a value that is set once and never changes
+ *   static  belongs to the class itself, not to any one order
+ *   enum    the status is an OrderStatus, never free text
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Order</span> {
+
+    <span class="c">// A constant: static (one copy for the whole class) and final (never reassigned).</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">final</span> <span class="t">String</span> ID_PREFIX = <span class="n">&quot;ORD-&quot;</span>;
+
+    <span class="c">// static state is shared by every Order. Each new order takes the next number.</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">int</span> nextNumber = <span class="n">7001</span>;
+    <span class="k">private</span> <span class="k">static</span> <span class="k">int</span> createdCount = <span class="n">0</span>;
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> id;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> customer;
+    <span class="k">private</span> <span class="t">OrderStatus</span> status = <span class="t">OrderStatus</span>.NEW;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayList</span>&lt;<span class="t">OrderStatus</span>&gt; path = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+
+    <span class="k">public</span> <span class="t">Order</span>(<span class="t">String</span> customer) {
+        <span class="k">this</span>.id = ID_PREFIX + nextNumber;
+        <span class="k">this</span>.customer = customer;
+        nextNumber++;
+        createdCount++;
+        path.add(status);
+    }
+
+    <span class="c">/** How many orders have been created since the program started. Called as Order.totalCreated(). */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">int</span> totalCreated() {
+        <span class="k">return</span> createdCount;
+    }
+
+    <span class="c">/**
+     * Moves the order to a new status if the rules allow it.
+     * Returns false, and changes nothing, when the move is not allowed.
+     */</span>
+    <span class="k">public</span> <span class="k">boolean</span> moveTo(<span class="t">OrderStatus</span> next) {
+        <span class="k">if</span> (!status.canMoveTo(next)) {
+            <span class="k">return</span> <span class="k">false</span>;
+        }
+        status = next;
+        path.add(next);
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="c">/** The journey so far, for example &quot;New &gt; Paid &gt; Packed&quot;. */</span>
+    <span class="k">public</span> <span class="t">String</span> pathText() {
+        <span class="t">StringBuilder</span> text = <span class="k">new</span> <span class="t">StringBuilder</span>();
+        <span class="k">for</span> (<span class="t">OrderStatus</span> step : path) {
+            <span class="k">if</span> (text.length() &gt; <span class="n">0</span>) {
+                text.append(<span class="n">&quot; &gt; &quot;</span>);
+            }
+            text.append(step.getLabel());
+        }
+        <span class="k">return</span> text.toString();
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getId() {
+        <span class="k">return</span> id;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getCustomer() {
+        <span class="k">return</span> customer;
+    }
+
+    <span class="k">public</span> <span class="t">OrderStatus</span> getStatus() {
+        <span class="k">return</span> status;
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+Ship a NEW order straight away: refused
+Pay it first instead: done
+Pay a RETURNED order: refused
+
+--- Journeys ---
+ORD-7001  Asha Menon  New &gt; Paid &gt; Packed &gt; Shipped &gt; Delivered
+ORD-7002  Rahul Verma New &gt; Paid &gt; Cancelled
+ORD-7003  Meera Iyer  New &gt; Paid
+ORD-7004  Kiran Rao   New &gt; Paid &gt; Packed &gt; Shipped &gt; Delivered &gt; Returned
+ORD-7005  Dev Patel   New
+Orders created: 5
+
+--- Orders by status ---
+New        1
+Paid       1
+Packed     0
+Shipped    0
+Delivered  1
+Cancelled  1
+Returned   1
+
+--- What can SHIPPED become? ---
+[DELIVERED]
+Finished states:
+  CANCELLED (position 5)
+  RETURNED (position 6)
+
+Parsing text from outside the program:
+  &quot;SHIPPED&quot; -&gt; SHIPPED
+  &quot;PAYED&quot; is not a status: No enum constant com.codechanakya.orders.OrderStatus.PAYED
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a REFUNDED status.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add isFinished() to Order.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print every status with its position.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add countFinished() to OrderBoard.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add OrderStatus.fromText().</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Add a ShippingSpeed enum with a body per constant.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a misspelt constant, a switch that misses a case, and a static method reading an instance field. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">04-java-essentials/14-order-status-management</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-15.html"><span class="k2">Next</span><span class="v">15 Banking Exception Management</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
