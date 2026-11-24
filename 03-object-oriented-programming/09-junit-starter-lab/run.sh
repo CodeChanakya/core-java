@@ -11,12 +11,35 @@ cd "$(dirname "$0")"
 
 JUNIT_VERSION="1.11.4"
 JAR="lib/junit-platform-console-standalone-${JUNIT_VERSION}.jar"
-URL="https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/${JUNIT_VERSION}/junit-platform-console-standalone-${JUNIT_VERSION}.jar"
+PATH_IN_REPO="org/junit/platform/junit-platform-console-standalone/${JUNIT_VERSION}/junit-platform-console-standalone-${JUNIT_VERSION}.jar"
+
+# Maven Central sometimes answers "429 too many requests" when many people share
+# one address, as happens on CI servers. So we try a mirror as well, and retry
+# a few times with a pause before giving up.
+URLS=(
+    "https://repo1.maven.org/maven2/${PATH_IN_REPO}"
+    "https://maven-central.storage-download.googleapis.com/maven2/${PATH_IN_REPO}"
+)
+
+download_junit() {
+    mkdir -p lib
+    for attempt in 1 2 3; do
+        for url in "${URLS[@]}"; do
+            if curl -fsSL -o "$JAR.part" "$url"; then
+                mv "$JAR.part" "$JAR"
+                return 0
+            fi
+        done
+        echo "Download failed (attempt $attempt of 3). Waiting before retrying..."
+        sleep $((attempt * 10))
+    done
+    rm -f "$JAR.part"
+    return 1
+}
 
 if [ ! -f "$JAR" ]; then
     echo "Downloading JUnit ${JUNIT_VERSION} (one time only)..."
-    mkdir -p lib
-    curl -fsSL -o "$JAR" "$URL" || { rm -f "$JAR"; echo "Download failed. Check your internet connection."; exit 1; }
+    download_junit || { echo "Could not download JUnit. Check your internet connection and try again in a minute."; exit 1; }
 fi
 
 rm -rf out && mkdir -p out
