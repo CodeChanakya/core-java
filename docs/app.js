@@ -25,12 +25,12 @@
 
   var programs = [
     P(1, 1, 'Personal Profile Generator', ['javac and java', 'System.out'], true, true, 'program-01.html'),
-    P(2, 2, 'Employee Salary Calculator', ['Variables', 'Operators', 'Casting']),
-    P(3, 2, 'Money Handling Mini-Lab', ['BigDecimal', 'Rounding']),
-    P(4, 2, 'Electricity Bill Generator', ['if / else', 'Constants', 'Methods']),
-    P(5, 2, 'ATM Menu Simulation', ['switch', 'Loops', 'Scanner']),
-    P(6, 2, 'Student Marks Analyzer', ['Arrays', 'Method overloading']),
-    P(7, 2, 'Shopping Cart Calculator', ['Strings', 'StringBuilder'], true),
+    P(2, 2, 'Employee Salary Calculator', ['Variables', 'Operators', 'Casting'], false, true, 'program-02.html'),
+    P(3, 2, 'Money Handling Mini-Lab', ['BigDecimal', 'Rounding'], false, true, 'program-03.html'),
+    P(4, 2, 'Electricity Bill Generator', ['if / else', 'Constants', 'Methods'], false, true, 'program-04.html'),
+    P(5, 2, 'ATM Menu Simulation', ['switch', 'Loops', 'Scanner'], false, true, 'program-05.html'),
+    P(6, 2, 'Student Marks Analyzer', ['Arrays', 'Method overloading'], false, true, 'program-06.html'),
+    P(7, 2, 'Shopping Cart Calculator', ['Strings', 'StringBuilder'], true, true, 'program-07.html'),
     P(8, 3, 'Banking Application', ['Classes', 'Encapsulation']),
     P(9, 3, 'JUnit Starter Lab', ['JUnit 5', 'Assertions']),
     P(10, 3, 'Employee Management System', ['Inheritance', 'Polymorphism']),

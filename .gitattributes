@@ -1,0 +1,5 @@
+# Keep line endings stable so run.sh and expected-output.txt behave the same on every machine.
+* text=auto
+*.sh text eol=lf
+expected-output.txt text eol=lf
+sample-input.txt text eol=lf

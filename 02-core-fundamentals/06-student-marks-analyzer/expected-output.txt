@@ -1,0 +1,15 @@
+Name        Maths  Science  English  History  Total  Average  Grade
+Asha           92       88       95       90    365    91.25      A
+Rahul          67       54       71       60    252    63.00      C
+Meera          81       79       85       77    322    80.50      B
+Kiran          45       38       52       41    176    44.00      D
+
+Class average : 69.69
+Highest mark  : 95
+Topper        : Asha (average 91.25)
+
+Average per subject
+  Maths    71.25
+  Science  64.75
+  English  75.75
+  History  67.00

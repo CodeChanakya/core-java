@@ -1,0 +1,23 @@
+PART 1: double
+0.1 + 0.2        = 0.30000000000000004
+0.1 + 0.2 == 0.3 : false
+1.10 x 3         = 3.3000000000000003
+
+PART 2: BigDecimal
+0.1 + 0.2        = 0.3
+From a String    : 0.1
+From a double    : 0.1000000000000000055511151231257827021181583404541015625
+
+PART 3: invoice
+Subtotal         : 1499.97
+GST before round : 269.9946
+GST (18%)        : 269.99
+Total            : 1769.96
+
+PART 4: comparing
+2.0 equals 2.00    : false
+2.0 compareTo 2.00 : 0
+
+PART 5: dividing
+1000 / 3         = 333.33
+Three shares     = 999.99

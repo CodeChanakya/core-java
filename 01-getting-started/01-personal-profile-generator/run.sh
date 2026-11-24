@@ -9,7 +9,7 @@ mkdir -p out
 javac --release 21 -d out src/main/java/PersonalProfile.java
 
 if [ "${1:-}" = "--check" ]; then
-    java -cp out PersonalProfile | diff - expected-output.txt \
+    java -cp out PersonalProfile | tr -d "\r" | diff - expected-output.txt \
         && echo "OK: output matches expected-output.txt"
 else
     java -cp out PersonalProfile

@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Employee Salary Calculator | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 02 · Core Fundamentals · Program 02 of 43</p>
+    <h1>Employee Salary Calculator</h1>
+    <div class="tags">
+      <span class="tag">Beginner</span>
+      <span class="chip" style="background:#fff">Variables</span>
+      <span class="chip" style="background:#fff">int and double</span>
+      <span class="chip" style="background:#fff">Operators</span>
+      <span class="chip" style="background:#fff">Casting</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A company wants to work out an employee's monthly pay: basic salary, an allowance, a deduction, and the amount that reaches the bank.</p>
+        <p>The program shows how Java stores whole numbers and decimals, and where casting quietly loses information.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>SalaryCalculator.java</b><span class="d">Variables first, then the casting demonstration.</span></span></li>
+          <li><span class="badge">2</span><span><b>expected-output.txt</b><span class="d">Check the 59626.67 line by hand.</span></span></li>
+          <li><span class="badge">3</span><span><b>broken/</b><span class="d">Three classic type mistakes.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/SalaryCalculator.java</b></div>
+<pre class="code"><span class="k">import</span> java.util.<span class="t">Locale</span>;
+
+<span class="c">/**
+ * Works out one employee&#x27;s monthly salary slip from their basic salary.
+ *
+ * Everything happens inside main so you can follow the numbers from top to
+ * bottom. Methods arrive later in this phase.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">SalaryCalculator</span> {
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> main(<span class="k">String</span>[] args) {
+        <span class="c">// Money is kept in double here to keep the arithmetic easy to read.</span>
+        <span class="c">// Program 3 shows why real payroll code should not do this.</span>
+        <span class="k">int</span> basicSalary = <span class="n">50000</span>;
+        <span class="k">int</span> specialAllowance = <span class="n">5000</span>;
+        <span class="k">double</span> hra = basicSalary * <span class="n">0.40</span>;            <span class="c">// house rent allowance, 40% of basic</span>
+        <span class="k">double</span> grossSalary = basicSalary + hra + specialAllowance;
+
+        <span class="k">double</span> providentFund = basicSalary * <span class="n">0.12</span>;  <span class="c">// 12% of basic</span>
+        <span class="k">int</span> professionalTax = <span class="n">200</span>;
+        <span class="k">double</span> totalDeductions = providentFund + professionalTax;
+
+        <span class="k">double</span> netSalary = grossSalary - totalDeductions;
+
+        <span class="c">// This employee worked 26 of the 30 working days.</span>
+        <span class="k">int</span> daysWorked = <span class="n">26</span>;
+        <span class="k">int</span> workingDays = <span class="n">30</span>;
+
+        <span class="c">// Both lines look reasonable. Only one of them is right.</span>
+        <span class="k">int</span> wrongPercent = daysWorked / workingDays * <span class="n">100</span>;
+        <span class="k">int</span> rightPercent = daysWorked * <span class="n">100</span> / workingDays;
+
+        <span class="k">double</span> payable = netSalary * daysWorked / workingDays;
+        <span class="k">int</span> payableCutOff = (<span class="k">int</span>) payable;           <span class="c">// the cast chops off the decimals</span>
+        <span class="k">long</span> payableRounded = <span class="t">Math</span>.round(payable);   <span class="c">// rounds to the nearest whole number</span>
+
+        <span class="t">System</span>.out.println(<span class="n">&quot;===== SALARY SLIP =====&quot;</span>);
+        <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;Basic salary      : %d%n&quot;</span>, basicSalary);
+        <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;HRA (40%%)         : %.2f%n&quot;</span>, hra);
+        <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;Special allowance : %d%n&quot;</span>, specialAllowance);
+        <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;Gross salary      : %.2f%n&quot;</span>, grossSalary);
+        <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;Provident fund    : %.2f%n&quot;</span>, providentFund);
+        <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;Professional tax  : %d%n&quot;</span>, professionalTax);
+        <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;Net salary        : %.2f%n&quot;</span>, netSalary);
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;===== ATTENDANCE =====&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;Days worked       : &quot;</span> + daysWorked + <span class="n">&quot; of &quot;</span> + workingDays);
+        <span class="t">System</span>.out.println(<span class="n">&quot;Wrong percentage  : &quot;</span> + wrongPercent);
+        <span class="t">System</span>.out.println(<span class="n">&quot;Right percentage  : &quot;</span> + rightPercent);
+        <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;Payable amount    : %.2f%n&quot;</span>, payable);
+        <span class="t">System</span>.out.println(<span class="n">&quot;Cut off to whole  : &quot;</span> + payableCutOff);
+        <span class="t">System</span>.out.println(<span class="n">&quot;Rounded to whole  : &quot;</span> + payableRounded);
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.printf(<span class="t">Locale</span>.US, <span class="n">&quot;Net salary, 12 months: %.2f%n&quot;</span>, netSalary * <span class="n">12</span>);
+    }
+}</pre>
+</div>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+===== SALARY SLIP =====
+Basic salary      : 50000
+HRA (40%)         : 20000.00
+Special allowance : 5000
+Gross salary      : 75000.00
+Provident fund    : 6000.00
+Professional tax  : 200
+Net salary        : 68800.00
+
+===== ATTENDANCE =====
+Days worked       : 26 of 30
+Wrong percentage  : 0
+Right percentage  : 86
+Payable amount    : 59626.67
+Cut off to whole  : 59626
+Rounded to whole  : 59627
+
+Net salary, 12 months: 825600.00
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Change the salary figures and predict the output before running.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add a bonus variable and include it in the total.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print the yearly salary.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add a second deduction for insurance.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Print the take-home as a percentage of gross.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Show the same figure cut off, rounded and exact, and explain the three results.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a lossy conversion, an uninitialised variable and integer division. Each shows the real compiler or run output. The README in the broken folder shows the real compiler messages.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">02-core-fundamentals/02-employee-salary-calculator</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-03.html"><span class="k2">Next</span><span class="v">03 Money Handling Mini-Lab</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · [YOUR WEBSITE URL]</span>
+    <span class="mono">[YOUR GITHUB URL]</span>
+  </div>
+</footer>
+
+</body>
+</html>
