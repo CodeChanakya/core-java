@@ -9,12 +9,12 @@
   <img alt="Java 21 or newer" src="https://img.shields.io/badge/Java-21%2B-B83A0E">
   <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-13%20of%2043-0F766E">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-0E1726">
-  <a href="https://github.com/OWNER/Core-Java/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/OWNER/Core-Java/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/codechanakya/core-java/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/codechanakya/core-java/actions/workflows/ci.yml/badge.svg"></a>
 </p>
 
 <p align="center">
-  <a href="https://OWNER.github.io/Core-Java/"><b>Browse the site</b></a> &nbsp;·&nbsp;
-  <a href="https://codespaces.new/OWNER/Core-Java"><b>Open in Codespaces</b></a>
+  <a href="https://codechanakya.github.io/core-java/"><b>Browse the site</b></a> &nbsp;·&nbsp;
+  <a href="https://codespaces.new/codechanakya/core-java"><b>Open in Codespaces</b></a>
 </p>
 
 ---
