@@ -1,0 +1,23 @@
+Opened 3 accounts
+--- Chanakya Savings Bank ---
+ACC-1001  Asha Menon          5000.00
+ACC-1002  Rahul Verma         1200.50
+ACC-1003  Meera Iyer             0.00
+Total holdings: 6200.50
+
+Deposit 750.25 to Asha: done
+Deposit -20 to Rahul: refused
+Withdraw 300 from Rahul: done
+Withdraw 5000 from Meera: refused
+
+Transfer 1000 Asha to Meera: done
+Transfer 9999 Rahul to Asha: refused
+Transfer to unknown ACC-9999: refused
+
+--- Chanakya Savings Bank ---
+ACC-1001  Asha Menon          4750.25
+ACC-1002  Rahul Verma          900.50
+ACC-1003  Meera Iyer          1000.00
+Total holdings: 6650.75
+
+Rejected: Account holder name is required

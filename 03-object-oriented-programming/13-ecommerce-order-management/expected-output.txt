@@ -1,0 +1,37 @@
+--- Stock ---
+STAND-01 Laptop Stand           Physical    10 left
+KEYB-01  Mechanical Keyboard    Physical     3 left
+BOOK-01  Java Ebook             Digital    999 left
+
+Order ORD-5001 for Asha Menon (loyalty member)
+  Laptop Stand           Physical  1 x   1299.00 =    1299.00
+  Java Ebook             Digital   2 x    499.00 =     998.00
+  Subtotal                                         2297.00
+  Loyalty discount                                 -114.85
+  Shipping                                           50.00
+  GST 18%                                           392.79
+  TOTAL                                            2624.94
+  Status: NEW
+
+Order refused: Only 3 left of Mechanical Keyboard (you asked for 5)
+
+Order ORD-5002 for Rahul Verma
+  Mechanical Keyboard    Physical  2 x   3499.00 =    6998.00
+  Java Ebook             Digital   1 x    499.00 =     499.00
+  Subtotal                                         7497.00
+  Loyalty discount                                    0.00
+  Shipping                                           80.00
+  GST 18%                                          1349.46
+  TOTAL                                            8926.46
+  Status: NEW
+
+Ship ORD-5001 before paying: refused
+Pay  ORD-5001: done
+Pay  ORD-5001 again: refused
+Ship ORD-5001: done
+ORD-5001 is now SHIPPED
+
+--- Stock ---
+STAND-01 Laptop Stand           Physical     9 left
+KEYB-01  Mechanical Keyboard    Physical     1 left
+BOOK-01  Java Ebook             Digital    996 left

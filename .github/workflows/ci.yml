@@ -16,5 +16,10 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
+      # Keeps the JUnit jar between runs so Maven Central is not hit every time.
+      - uses: actions/cache@v4
+        with:
+          path: 03-object-oriented-programming/09-junit-starter-lab/lib
+          key: junit-console-1.11.4
       - name: Compile and check every program
-        run: ./scripts/check-all.sh
+        run: bash scripts/check-all.sh

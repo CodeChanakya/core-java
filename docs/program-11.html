@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vehicle Rental System | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 03 · Object-Oriented Programming · Program 11 of 43</p>
+    <h1>Vehicle Rental System</h1>
+    <div class="tags">
+      <span class="tag">Intermediate</span>
+      <span class="chip" style="background:#fff">Abstract classes</span>
+      <span class="chip" style="background:#fff">Interfaces</span>
+      <span class="chip" style="background:#fff">Default methods</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>An agency rents cars, bikes and trucks, each priced differently, with insurance on some of them.</p>
+        <p>An abstract class shares the pricing rules and leaves the rate to each subclass. An interface describes the ability to be insured, which a car and a truck have and a bike does not.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Vehicle.java</b><span class="d">Abstract, with the shared rental rule.</span></span></li>
+          <li><span class="badge">2</span><span><b>Insurable.java</b><span class="d">An interface with a default method.</span></span></li>
+          <li><span class="badge">3</span><span><b>Car.java, Motorbike.java, Truck.java</b><span class="d">Concrete vehicles.</span></span></li>
+          <li><span class="badge">4</span><span><b>RentalAgency.java</b><span class="d">Quotes for any vehicle.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/rental/Vehicle.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.rental;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.math.<span class="t">RoundingMode</span>;
+
+<span class="c">/**
+ * Anything the agency can rent out.
+ *
+ * The class is abstract because &quot;a vehicle&quot; on its own does not exist: you
+ * rent a car, a bike or a truck. It still holds everything the types share
+ * (registration, model, the long-rental discount) and leaves the parts that
+ * differ, the daily rate and the kind, for each subclass to fill in.
+ */</span>
+<span class="k">public</span> <span class="k">abstract</span> <span class="k">class</span> <span class="t">Vehicle</span> {
+
+    <span class="c">/** Rentals of this many days or more get the long-rental discount. */</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="k">int</span> LONG_RENTAL_DAYS = <span class="n">7</span>;
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> LONG_RENTAL_FACTOR = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;0.90&quot;</span>);
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> registration;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> model;
+
+    <span class="k">protected</span> <span class="t">Vehicle</span>(<span class="t">String</span> registration, <span class="t">String</span> model) {
+        <span class="k">this</span>.registration = registration;
+        <span class="k">this</span>.model = model;
+    }
+
+    <span class="c">/** What this vehicle costs per day before any discount. Every subclass must supply it. */</span>
+    <span class="k">public</span> <span class="k">abstract</span> <span class="t">BigDecimal</span> dailyRate();
+
+    <span class="c">/** A one-word description such as &quot;Car&quot; or &quot;Truck&quot;. */</span>
+    <span class="k">public</span> <span class="k">abstract</span> <span class="t">String</span> kind();
+
+    <span class="c">/**
+     * The rent for a number of days. Written once here, so a long-rental
+     * discount applies to every kind of vehicle in exactly the same way.
+     */</span>
+    <span class="k">public</span> <span class="t">BigDecimal</span> rentalCost(<span class="k">int</span> days) {
+        <span class="k">if</span> (days &lt; <span class="n">1</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="n">&quot;A rental must be at least 1 day&quot;</span>);
+        }
+        <span class="t">BigDecimal</span> rent = dailyRate().multiply(<span class="t">BigDecimal</span>.valueOf(days));
+        <span class="k">if</span> (days &gt;= LONG_RENTAL_DAYS) {
+            rent = rent.multiply(LONG_RENTAL_FACTOR);
+        }
+        <span class="k">return</span> rent.setScale(<span class="n">2</span>, <span class="t">RoundingMode</span>.HALF_UP);
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getRegistration() {
+        <span class="k">return</span> registration;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getModel() {
+        <span class="k">return</span> model;
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">String</span> toString() {
+        <span class="k">return</span> <span class="t">String</span>.format(<span class="n">&quot;%-10s %-8s %-26s %9s per day&quot;</span>, registration, kind(), model, dailyRate().toPlainString());
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/rental/Insurable.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.rental;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+
+<span class="c">/**
+ * A promise that a vehicle can be insured.
+ *
+ * An interface describes what something can do without saying how, and a class
+ * may promise several of them. Cars and trucks are insurable; the motorbike is
+ * not, and nothing forces it to pretend. That is why this is an interface and
+ * not another parent class: Java lets a class extend only one parent.
+ */</span>
+<span class="k">public</span> <span class="k">interface</span> <span class="t">Insurable</span> {
+
+    <span class="t">BigDecimal</span> insurancePerDay();
+
+    <span class="c">/** A default method: shared behaviour that implementing classes get for free. */</span>
+    <span class="k">default</span> <span class="t">BigDecimal</span> insuranceFor(<span class="k">int</span> days) {
+        <span class="k">return</span> insurancePerDay().multiply(<span class="t">BigDecimal</span>.valueOf(days));
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/rental/Truck.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.rental;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+
+<span class="c">/** A truck. The daily rate grows with the load it can carry. */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Truck</span> <span class="k">extends</span> <span class="t">Vehicle</span> <span class="k">implements</span> <span class="t">Insurable</span> {
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> BASE_RATE = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;3000.00&quot;</span>);
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> PER_TONNE = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;500.00&quot;</span>);
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> INSURANCE = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;700.00&quot;</span>);
+
+    <span class="k">private</span> <span class="k">final</span> <span class="k">int</span> loadTonnes;
+
+    <span class="k">public</span> <span class="t">Truck</span>(<span class="t">String</span> registration, <span class="t">String</span> model, <span class="k">int</span> loadTonnes) {
+        <span class="k">super</span>(registration, model);
+        <span class="k">this</span>.loadTonnes = loadTonnes;
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">BigDecimal</span> dailyRate() {
+        <span class="k">return</span> BASE_RATE.add(PER_TONNE.multiply(<span class="t">BigDecimal</span>.valueOf(loadTonnes)));
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">String</span> kind() {
+        <span class="k">return</span> <span class="n">&quot;Truck&quot;</span>;
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">BigDecimal</span> insurancePerDay() {
+        <span class="k">return</span> INSURANCE;
+    }
+
+    <span class="k">public</span> <span class="k">int</span> getLoadTonnes() {
+        <span class="k">return</span> loadTonnes;
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- Fleet ---
+MH12AB1001 Car      Hyundai i20                  2500.00 per day
+MH12AB1002 Car      Toyota Innova                3000.00 per day
+MH12CD2001 Bike     Royal Enfield Classic 350     800.00 per day
+MH12EF3001 Truck    Tata 407                     4500.00 per day
+
+--- Quotes ---
+Car      Hyundai i20                 3 days  rent   7500.00  insurance   900.00  total    8400.00
+Car      Toyota Innova               7 days  rent  18900.00  insurance  2100.00  total   21000.00
+Bike     Royal Enfield Classic 350   2 days  rent   1600.00  insurance        -  total    1600.00
+Bike     Royal Enfield Classic 350  10 days  rent   7200.00  insurance        -  total    7200.00
+Truck    Tata 407                    2 days  rent   9000.00  insurance  1400.00  total   10400.00
+
+Rejected: A rental must be at least 1 day
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add another Car.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print the Innova&#x27;s seats.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Start the long-rental discount at 5 days.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add a Bicycle.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add cheapestFor(days).</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Make Truck refuse rentals over 30 days.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: instantiating an abstract class, an unfinished subclass, and an interface method without <span class="mono">public</span>. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">03-object-oriented-programming/11-vehicle-rental-system</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-12.html"><span class="k2">Next</span><span class="v">12 Payment Processing System</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · [YOUR WEBSITE URL]</span>
+    <span class="mono">[YOUR GITHUB URL]</span>
+  </div>
+</footer>
+
+</body>
+</html>

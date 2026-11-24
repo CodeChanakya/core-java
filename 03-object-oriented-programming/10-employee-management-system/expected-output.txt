@@ -1,0 +1,21 @@
+=== Payroll before the raise ===
+ID     Name          Role       Monthly pay
+E101   Asha Menon    Developer     74000.00
+E102   Dev Patel     Developer     65000.00
+E201   Rahul Verma   Manager       99000.00
+E301   Kiran Rao     Intern        15000.00
+Total payroll: 253000.00
+Highest paid : Rahul Verma
+
+Applying a 10 percent raise to everyone...
+
+=== Payroll after the raise ===
+ID     Name          Role       Monthly pay
+E101   Asha Menon    Developer     81000.00
+E102   Dev Patel     Developer     71500.00
+E201   Rahul Verma   Manager      108000.00
+E301   Kiran Rao     Intern        15000.00
+Total payroll: 275500.00
+Highest paid : Rahul Verma
+
+Rahul Verma manages a team of 6

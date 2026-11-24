@@ -1,0 +1,19 @@
+Card, 12000 -> approved CARD-0001 | Approved
+Card, 45000 -> declined - | Over the card limit (37760.00 left)
+Card, -50 -> declined - | Amount must be positive
+UPI, 2500 -> approved UPI-0001 | Approved
+UPI, 150000 -> declined - | Above the per-payment limit of 100000.00
+Wallet, 250 -> approved WAL-0001 | Approved
+Wallet, 100 -> declined - | Wallet balance is only 45.00
+
+--- Ledger ---
+APPROVED CARD-0001 charged 12240.00 (amount 12000.00 + 2% fee) via Card ****4242
+DECLINED  Card ****4242: Over the card limit (37760.00 left)
+DECLINED  Card ****4242: Amount must be positive
+APPROVED UPI-0001 charged 2500.00 (amount 2500.00 + flat 0.00) via UPI asha@examplebank
+DECLINED  UPI asha@examplebank: Above the per-payment limit of 100000.00
+APPROVED WAL-0001 charged 255.00 (amount 250.00 + flat 5.00) via Wallet of Rahul
+DECLINED  Wallet of Rahul: Wallet balance is only 45.00
+
+Card limit left : 37760.00
+Wallet balance  : 45.00
