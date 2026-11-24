@@ -1,0 +1,9 @@
+==============================
+  PERSONAL PROFILE
+==============================
+Name     : Priya Nair
+Age      : 29
+City     : Pune
+Role     : QA engineer
+Learning : Java
+==============================

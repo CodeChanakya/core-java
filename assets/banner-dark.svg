@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-label="Core Java by CodeChanakya">
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#1A263C" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="320" fill="#0E1726"/>
+  <rect width="1280" height="320" fill="url(#grid)"/>
+
+  <text x="80" y="150" font-family="'Helvetica Neue', Arial, sans-serif" font-size="96" font-weight="800" letter-spacing="-2">
+    <tspan fill="#FFB38A">{ </tspan><tspan fill="#F2F4F0">Core Java</tspan><tspan fill="#FFB38A"> }</tspan>
+  </text>
+  <text x="84" y="206" font-family="'Helvetica Neue', Arial, sans-serif" font-size="28" fill="#C9D2E0">43 Java programs, in the order that makes them make sense.</text>
+  <rect x="84" y="244" width="6" height="28" fill="#FFB38A"/>
+  <text x="104" y="266" font-family="Menlo, Consolas, monospace" font-size="20" font-weight="700" fill="#F2F4F0">by CodeChanakya</text>
+
+  <g transform="translate(900 60)">
+    <rect width="300" height="200" rx="14" fill="#1B2840" stroke="#2C3E5E"/>
+    <circle cx="26" cy="26" r="5" fill="#2C3E5E"/>
+    <circle cx="44" cy="26" r="5" fill="#2C3E5E"/>
+    <circle cx="62" cy="26" r="5" fill="#2C3E5E"/>
+    <rect x="26" y="60" width="140" height="10" rx="5" fill="#F4A07A"/>
+    <rect x="48" y="86" width="190" height="10" rx="5" fill="#E6EAF2" opacity="0.7"/>
+    <rect x="48" y="112" width="120" height="10" rx="5" fill="#9CC2FF"/>
+    <rect x="48" y="138" width="210" height="10" rx="5" fill="#7DD3C0"/>
+    <rect x="26" y="164" width="40" height="10" rx="5" fill="#F4A07A"/>
+  </g>
+</svg>

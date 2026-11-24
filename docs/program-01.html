@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personal Profile Generator | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 01 · Getting Started · Program 01 of 43</p>
+    <h1>Personal Profile Generator</h1>
+    <div class="tags">
+      <span class="tag">Beginner</span>
+      <span class="chip" style="background:#fff">javac and java</span>
+      <span class="chip" style="background:#fff">System.out</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+
+      <section>
+        <h2>The problem</h2>
+        <p>You want a program that introduces a person: it knows a few facts about them and prints those facts as a neat card in the terminal.</p>
+        <p>It is the smallest useful program in Java. Before you can build a bank or an online shop, you need to see one program go from a text file to something running.</p>
+      </section>
+
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>PersonalProfile.java</b><span class="d">The whole program. Only about 15 lines do real work.</span></span></li>
+          <li><span class="badge">2</span><span><b>expected-output.txt</b><span class="d">What a correct run prints.</span></span></li>
+          <li><span class="badge">3</span><span><b>run.sh</b><span class="d">The two commands that compile and run it.</span></span></li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>The code</h2>
+        <div class="code-panel flat">
+          <div class="code-head"><b>src/main/java/PersonalProfile.java</b></div>
+<pre class="code"><span class="c">/**
+ * Prints a short personal profile to the console.
+ *
+ * This is the first program in the course, so it stays small on purpose:
+ * store a few facts, then print them as a labelled card.
+ */</span>
+<span class="k">public class</span> <span class="t">PersonalProfile</span> {
+
+    <span class="k">public static void</span> main(<span class="t">String</span>[] args) {
+        <span class="c">// Variables get a full lesson in Phase 2. For now, read each line as
+        // "give this value a name". The word in front says what kind of value
+        // it is: String is text, int is a whole number.</span>
+        <span class="t">String</span> name = <span class="n">"Priya Nair"</span>;
+        <span class="k">int</span> age = <span class="n">29</span>;
+        <span class="t">String</span> city = <span class="n">"Pune"</span>;
+        <span class="t">String</span> role = <span class="n">"QA engineer"</span>;
+        <span class="t">String</span> learning = <span class="n">"Java"</span>;
+
+        System.out.println(<span class="n">"=============================="</span>);
+        System.out.println(<span class="n">"  PERSONAL PROFILE"</span>);
+        System.out.println(<span class="n">"=============================="</span>);
+        System.out.println(<span class="n">"Name     : "</span> + name);
+        System.out.println(<span class="n">"Age      : "</span> + age);
+        System.out.println(<span class="n">"City     : "</span> + city);
+        System.out.println(<span class="n">"Role     : "</span> + role);
+        System.out.println(<span class="n">"Learning : "</span> + learning);
+        System.out.println(<span class="n">"=============================="</span>);
+    }
+}</pre>
+        </div>
+      </section>
+
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+==============================
+  PERSONAL PROFILE
+==============================
+Name     : Priya Nair
+Age      : 29
+City     : Pune
+Role     : QA engineer
+Learning : Java
+==============================
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Change every value to your own details.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add a hobby variable and a line that prints it.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print an empty line between the header and the first fact.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add a country and print the city line as Pune, India.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Print the age in months.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Add a long label and make every colon line up in the same column.</span></li>
+        </ol>
+        <p class="small">Hints unlock one at a time in the exercises folder. Solutions stay closed until you have tried.</p>
+      </section>
+
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>The broken folder has five files with one mistake each: a missing semicolon, a class name that does not match its file, a missing quote, a lowercase <span class="mono">system</span>, and a misspelled <span class="mono">main</span>. The README there shows the real compiler messages.</p>
+      </section>
+    </div>
+
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">01-getting-started/01-personal-profile-generator</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="index.html#phase-2"><span class="k2">Next</span><span class="v">02 Employee Salary Calculator</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · [YOUR WEBSITE URL]</span>
+    <span class="mono">[YOUR GITHUB URL]</span>
+  </div>
+</footer>
+
+</body>
+</html>
