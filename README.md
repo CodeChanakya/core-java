@@ -7,7 +7,7 @@
 
 <p align="center">
   <img alt="Java 21 or newer" src="https://img.shields.io/badge/Java-21%2B-B83A0E">
-  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-26%20of%2043-0F766E">
+  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-30%20of%2043-0F766E">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-0E1726">
   <a href="https://github.com/codechanakya/core-java/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/codechanakya/core-java/actions/workflows/ci.yml/badge.svg"></a>
 </p>
@@ -23,7 +23,7 @@
 
 It follows a fixed path: smallest building block first, then the next concept that depends on it, until you can design and test a small system yourself.
 
-> **Status:** Phases 1 to 6 are ready (26 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
+> **Status:** Phases 1 to 7 are ready (30 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
 
 ## Start here
 
@@ -138,10 +138,10 @@ Each phase ends with a project that uses everything taught before it. Frameworks
 
 | No. | Program | Concepts | Status |
 |---|---|---|---|
-| 27 | Customer Data Processing | lambdas, `filter` / `map` | Planned |
-| 28 | Transaction Reporting | records, `Optional` | Planned |
-| 29 | Sales Analytics | `groupingBy`, collectors | Planned |
-| 30 | Product Recommendation Filtering | sealed classes, pattern matching | Planned |
+| 27 | [Customer Data Processing](07-modern-java/27-customer-data-processing) | lambdas, `filter` / `map` | Ready |
+| 28 | [Transaction Reporting](07-modern-java/28-transaction-reporting) | records, `Optional` | Ready |
+| 29 | [Sales Analytics](07-modern-java/29-sales-analytics) | `groupingBy`, collectors | Ready |
+| 30 | [Product Recommendation Filtering](07-modern-java/30-product-recommendation-filtering) | sealed classes, pattern matching | Ready |
 
 </details>
 
