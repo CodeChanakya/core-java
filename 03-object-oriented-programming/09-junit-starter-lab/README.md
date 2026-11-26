@@ -12,6 +12,29 @@ In Program 8 you checked the bank by running `Main` and reading the output. That
 
 A **unit test** is a small program that calls one method with known input and checks the result. You run all of them in one go, and they tell you in seconds whether anything that used to work has stopped working.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-09.svg"><img alt="Flow of Program 09, JUnit Starter Lab, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-09.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A quality inspector who checks the bank every time you change it, in seconds. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Tests are independent and repeatable. BigDecimal assertions need compareTo or an agreed scale. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **The class under test** (input): Account, copied unchanged from Program 8. (`Account.java`)
+2. **Arrange** (work): Each test builds the objects it needs. (`AccountTest.java`)
+3. **Act** (work): Call one method with known input. (`@Test`)
+4. **Assert** (check): assertEquals, assertThrows and friends compare with what you expect. (`assertions`)
+5. **A pass or fail report** (result): The launcher lists every test and its result. (`run.sh`)
+
+</details>
+<!--/flow-->
+
 ## What you will build
 
 Nine tests for the `Account` class from Program 8 (the file is copied here so this folder runs on its own). They cover the happy path, the refusals, rounding, and the constructor's exceptions.

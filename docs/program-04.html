@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>A utility charges by slab: 3.50 a unit up to 100 units, 5.25 up to 200, 7.80 beyond. Work out the bill for any number of units.</p>
         <p>It is the first program with two classes and the first where a method returns a value.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-04.svg"><img src="flows/program-04.svg" alt="Flow of Program 04, Electricity Bill Generator, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A tiered price list: the first units are cheap, the later ones cost more, and each band is billed on its own.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Constants name the rules. Splitting billFor and slabFor keeps each method to one job and one test.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Units used this month</b> (input): A few readings are tried, including 100 and 101.</li><li><b>Which slab is each unit in?</b> (check): if / else if picks the band: first 100, up to 200, above 200.</li><li><b>Bill each slab at its own rate</b> (work): Three named constants hold the rates.</li><li><b>Add the slabs together</b> (work): The result is a BigDecimal total.</li><li><b>A table of bills</b> (result): The boundary rows prove the cut-offs are right.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

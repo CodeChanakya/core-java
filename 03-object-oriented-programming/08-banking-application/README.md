@@ -12,6 +12,29 @@ A small bank needs to keep accounts: who owns each one, how much is in it, and t
 
 In Phase 2 every value lived in its own variable or array. That breaks down when a thing has several facts that belong together (a number, an owner, a balance) and rules about how they may change. A **class** bundles the facts and the rules into one unit; an **object** is one real account made from it.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-08.svg"><img alt="Flow of Program 08, Banking Application, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-08.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A bank account is a locked box with a slot: money goes in and out only through the rules. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Encapsulation: private fields, public behaviour. The invariant (balance never negative) lives in one place. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Open an account** (input): The constructor checks the owner and the opening amount. (`Account.java`)
+2. **Deposit** (check): Positive amounts only; true or false comes back. (`deposit`)
+3. **Withdraw** (check): Refused when the balance would go negative. (`withdraw`)
+4. **Transfer between accounts** (work): Bank owns the rule that spans two accounts. (`Bank.transfer`)
+5. **A scripted day at the bank** (result): Totals match a hand calculation. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>HR needs to find an employee by id instantly, group people by department and count them. Scanning a list each time does not scale.</p>
         <p>A Map finds a value from its key. For that to work the key needs a correct equals and hashCode, written together.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-21.svg"><img src="flows/program-21.svg" alt="Flow of Program 21, Employee Directory, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A phone book: look up by name in one step instead of reading every page.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>A HashMap finds a bucket with hashCode, then compares with equals. TreeMap and LinkedHashMap trade speed for order.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Employees with an id</b> (input): equals and hashCode are written from the same field.</li><li><b>HashMap by id</b> (store): Lookup by id is effectively one step.</li><li><b>Group by department</b> (work): A Map from department to a list of people.</li><li><b>Replace and count</b> (work): put replaces; merge counts per department.</li><li><b>Lookups and groups</b> (result): Why equals and hashCode must go together is shown.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

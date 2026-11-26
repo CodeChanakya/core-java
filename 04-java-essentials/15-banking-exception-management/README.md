@@ -12,6 +12,29 @@ Program 8 handled trouble by returning `false`. That says "no" but not why, and 
 
 Exceptions fix both problems. An exception **carries the reason**, and unless someone deals with it, the program **stops** instead of carrying on with bad data.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-15.svg"><img alt="Flow of Program 15, Banking Exception Management, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-15.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | Instead of saying only no, the bank says why, and nobody can ignore the answer. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Checked exceptions force a decision at the boundary; unchecked ones mark programmer errors. try-with-resources guarantees cleanup. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **A request** (input): Deposit, withdraw or transfer. (`Bank.java`)
+2. **Is the amount valid?** (check): InvalidAmountException (unchecked) for nonsense input. (`Account.java`)
+3. **Is there enough money?** (check): InsufficientFundsException (checked) carries the numbers. (`Account.java`)
+4. **Handle or wrap** (work): Multi-catch handles it; a wrapped cause keeps the story. (`Bank.java`)
+5. **Audit log, always closed** (result): AuditLog is AutoCloseable, so try-with-resources closes it. (`AuditLog.java`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

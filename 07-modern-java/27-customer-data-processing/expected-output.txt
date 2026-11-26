@@ -1,0 +1,51 @@
+--- The same question, a loop and a stream ---
+Names of active customers in Pune:
+  loop  : [Rahul Verma, Zoya Khan]
+  stream: [Rahul Verma, Zoya Khan]
+
+--- Predicate: a yes/no question, as a value ---
+  Active big spenders : [Asha Menon, Meera Iyer, Zoya Khan]
+  Inactive or in Kochi: [Asha Menon, Kiran Rao, Imran Sheikh, Neha Joshi, Leela Nair]
+  Test one customer   : true
+
+--- Function: turn one thing into another ---
+  Asha Menon <asha@example.com>
+  RAHUL VERMA <RAHUL@MAIL.ORG>
+
+--- Consumer and Supplier ---
+  Hello, Dev!
+  [empty list made on demand]
+
+--- Sorting with a Comparator ---
+  Top 3 spenders:
+    Meera Iyer (Chennai, 41, 30500.00)
+    Zoya Khan (Pune, 36, 19800.00)
+    Asha Menon (Kochi, 34, 12500.00)
+  Youngest first, then by name: [Dev Patel, Rahul Verma, Farah Siddiqui, Neha Joshi]
+
+--- Pipelines: filter, map, distinct, sorted ---
+  Cities, sorted, no repeats: [Chennai, Kochi, Mumbai, Pune]
+  Email domains            : [corp.example.net, example.com, mail.org]
+  How many are active      : 7
+
+--- Questions with a yes or no answer ---
+  Anyone over 55?           true
+  Everyone spent something? false
+  Nobody under 18?          true
+
+--- Adding things up ---
+  Total spent: 95051.25
+  Average per customer: 9505.13
+  Ages: min 23, max 60, average 37.9, count 10
+
+--- Your own functional interface ---
+  Basket 400.00: 10 percent -> 360.00, voucher -> 350.00, both -> 310.00
+
+--- Changing a list in place ---
+  [VIP, PUNE]
+
+--- Streams are lazy, and used once ---
+  Nothing has been checked yet. Asking for the first match:
+    checking Asha Menon
+  First over 30: Asha Menon
+  Using the same stream again: IllegalStateException

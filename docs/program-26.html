@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>A team in New York, London and Kolkata books meetings. Nobody may be double-booked, everyone wants the agenda on their own clock, and the bookings must survive the program closing.</p>
         <p>This Phase 6 project combines time zones, daylight saving, a checked exception, Comparable and saving to a file with careful error reports.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-26.svg"><img src="flows/program-26.svg" alt="Flow of Program 26, Appointment Scheduler (Phase 6 project), in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A shared diary across time zones: everyone sees the same moment on their own clock.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Compare instants, never local times from different zones. Daylight saving makes plusDays and a 24-hour Duration differ.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Book with a zone</b> (input): ZonedDateTime for New York, London or Kolkata.</li><li><b>Does it clash?</b> (check): overlaps compares instants; a checked exception carries the clash.</li><li><b>Keep the list sorted</b> (store): Comparable orders appointments by instant.</li><li><b>Show on another clock</b> (work): withZoneSameInstant converts without changing the moment.</li><li><b>Save and load</b> (result): One line per appointment; a damaged line is reported.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">
@@ -287,7 +303,7 @@ OK: output matches expected-output.txt</pre>
         <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
         <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
       </div>
-      <a class="navcard" href="index.html#phase-7"><span class="k2">Next</span><span class="v">Phase 7: Modern Java</span></a>
+      <a class="navcard" href="program-27.html"><span class="k2">Next</span><span class="v">27 Customer Data Processing</span></a>
     </aside>
   </div>
 </section>

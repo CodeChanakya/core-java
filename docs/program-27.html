@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Data Processing | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 07 · Modern Java · Program 27 of 43</p>
+    <h1>Customer Data Processing</h1>
+    <div class="tags">
+      <span class="tag">Intermediate</span>
+      <span class="chip" style="background:#fff">Lambdas</span>
+      <span class="chip" style="background:#fff">Predicate</span>
+      <span class="chip" style="background:#fff">Method references</span>
+      <span class="chip" style="background:#fff">Streams</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A marketing team keeps a list of customers and asks a new question every day: who is active in Pune, who spends most, which email domains do we have. Each question used to mean another loop.</p>
+        <p>Lambdas pass small pieces of behaviour around as values, and a stream pipeline says what you want instead of how to loop. Streams are lazy and can be used only once.</p>
+      </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-27.svg"><img src="flows/program-27.svg" alt="Flow of Program 27, Customer Data Processing, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>Asking a list questions in one sentence: keep the active ones in Pune, give me their names.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Lazy, single-use pipelines. A lambda is a functional interface value; captured variables must be effectively final.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Ten customers</b> (input): A plain list of Customer objects.</li><li><b>stream() starts a pipeline</b> (work): Nothing runs yet; the pipeline is only described.</li><li><b>filter with a Predicate</b> (check): Small yes/no lambdas combine with and, or, negate.</li><li><b>map, sorted, distinct</b> (work): Method references such as Customer::getName shorten the steps.</li><li><b>A terminal step runs it</b> (result): toList, count, sum or findFirst finishes the stream.</li></ol></details>
+      </section>
+<!--/flow-->
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Customer.java, Discount.java</b><span class="d">An ordinary class, and your own functional interface.</span></span></li>
+          <li><span class="badge">2</span><span><b>CustomerData.java</b><span class="d">Ten sample customers.</span></span></li>
+          <li><span class="badge">3</span><span><b>Main.java</b><span class="d">Eleven short sections, from loop versus stream to laziness.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/customerdata/Discount.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.customerdata;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+
+<span class="c">/**
+ * A rule that turns an amount into a discounted amount.
+ *
+ * An interface with exactly one abstract method is a &quot;functional interface&quot;, and a lambda can
+ * stand in for it. The annotation is optional, but it makes the compiler refuse a second
+ * abstract method, so nobody breaks every lambda that uses it by accident.
+ */</span>
+<span class="k">@FunctionalInterface</span>
+<span class="k">public</span> <span class="k">interface</span> <span class="t">Discount</span> {
+
+    <span class="t">BigDecimal</span> apply(<span class="t">BigDecimal</span> amount);
+
+    <span class="c">/** A default method is fine: it does not count as the one abstract method. */</span>
+    <span class="k">default</span> <span class="t">Discount</span> then(<span class="t">Discount</span> next) {
+        <span class="k">return</span> amount -&gt; next.apply(apply(amount));
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/customerdata/Main.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.customerdata;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.math.<span class="t">RoundingMode</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Comparator</span>;
+<span class="k">import</span> java.util.<span class="t">IntSummaryStatistics</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.function.<span class="t">Consumer</span>;
+<span class="k">import</span> java.util.function.<span class="t">Function</span>;
+<span class="k">import</span> java.util.function.<span class="t">Predicate</span>;
+<span class="k">import</span> java.util.function.<span class="t">Supplier</span>;
+<span class="k">import</span> java.util.stream.<span class="t">Stream</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> main(<span class="t">String</span>[] args) {
+        <span class="t">List</span>&lt;<span class="t">Customer</span>&gt; customers = <span class="t">CustomerData</span>.sample();
+
+        <span class="t">System</span>.out.println(<span class="n">&quot;--- The same question, a loop and a stream ---&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;Names of active customers in Pune:&quot;</span>);
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; byLoop = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">Customer</span> customer : customers) {
+            <span class="k">if</span> (customer.isActive() &amp;&amp; customer.getCity().equals(<span class="n">&quot;Pune&quot;</span>)) {
+                byLoop.add(customer.getName());
+            }
+        }
+        <span class="t">System</span>.out.println(<span class="n">&quot;  loop  : &quot;</span> + byLoop);
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; byStream = customers.stream()
+                .filter(<span class="t">Customer</span>::isActive)
+                .filter(customer -&gt; customer.getCity().equals(<span class="n">&quot;Pune&quot;</span>))
+                .map(<span class="t">Customer</span>::getName)
+                .toList();
+        <span class="t">System</span>.out.println(<span class="n">&quot;  stream: &quot;</span> + byStream);
+
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;--- Predicate: a yes/no question, as a value ---&quot;</span>);
+        <span class="t">Predicate</span>&lt;<span class="t">Customer</span>&gt; active = <span class="t">Customer</span>::isActive;
+        <span class="t">Predicate</span>&lt;<span class="t">Customer</span>&gt; bigSpender = customer -&gt; customer.getTotalSpent().compareTo(<span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;10000&quot;</span>)) &gt;= <span class="n">0</span>;
+        <span class="t">Predicate</span>&lt;<span class="t">Customer</span>&gt; inKochi = customer -&gt; customer.getCity().equals(<span class="n">&quot;Kochi&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Active big spenders : &quot;</span> + names(customers, active.and(bigSpender)));
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Inactive or in Kochi: &quot;</span> + names(customers, active.negate().or(inKochi)));
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Test one customer   : &quot;</span> + bigSpender.test(customers.get(<span class="n">2</span>)));
+
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;--- Function: turn one thing into another ---&quot;</span>);
+        <span class="t">Function</span>&lt;<span class="t">Customer</span>, <span class="t">String</span>&gt; label = customer -&gt; customer.getName() + <span class="n">&quot; &lt;&quot;</span> + customer.getEmail() + <span class="n">&quot;&gt;&quot;</span>;
+        <span class="t">Function</span>&lt;<span class="t">String</span>, <span class="t">String</span>&gt; shout = <span class="t">String</span>::toUpperCase;
+        <span class="t">System</span>.out.println(<span class="n">&quot;  &quot;</span> + label.apply(customers.get(<span class="n">0</span>)));
+        <span class="t">System</span>.out.println(<span class="n">&quot;  &quot;</span> + label.andThen(shout).apply(customers.get(<span class="n">1</span>)));
+
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;--- Consumer and Supplier ---&quot;</span>);
+        <span class="t">Consumer</span>&lt;<span class="t">Customer</span>&gt; greet = customer -&gt; <span class="t">System</span>.out.println(<span class="n">&quot;  Hello, &quot;</span> + customer.getName().split(<span class="n">&quot; &quot;</span>)[<span class="n">0</span>] + <span class="n">&quot;!&quot;</span>);
+        greet.accept(customers.get(<span class="n">4</span>));
+        <span class="t">Supplier</span>&lt;<span class="t">List</span>&lt;<span class="t">String</span>&gt;&gt; newList = <span class="t">ArrayList</span>::<span class="k">new</span>;       <span class="c">// a recipe for making an empty list</span>
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; fresh = newList.get();
+        fresh.add(<span class="n">&quot;empty list made on demand&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;  &quot;</span> + fresh);
+
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;--- Sorting with a Comparator ---&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Top 3 spenders:&quot;</span>);
+        customers.stream()
+                .sorted(<span class="t">Comparator</span>.comparing(<span class="t">Customer</span>::getTotalSpent).reversed())
+                .limit(<span class="n">3</span>)
+                .forEach(customer -&gt; <span class="t">System</span>.out.println(<span class="n">&quot;    &quot;</span> + customer));
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Youngest first, then by name: &quot;</span> + customers.stream()
+                .sorted(<span class="t">Comparator</span>.comparingInt(<span class="t">Customer</span>::getAge).thenComparing(<span class="t">Customer</span>::getName))
+                .limit(<span class="n">4</span>).map(<span class="t">Customer</span>::getName).toList());
+
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;--- Pipelines: filter, map, distinct, sorted ---&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Cities, sorted, no repeats: &quot;</span> + customers.stream()
+                .map(<span class="t">Customer</span>::getCity).distinct().sorted().toList());
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Email domains            : &quot;</span> + customers.stream()
+                .map(<span class="t">Customer</span>::getEmailDomain).distinct().sorted().toList());
+        <span class="t">System</span>.out.println(<span class="n">&quot;  How many are active      : &quot;</span> + customers.stream().filter(<span class="t">Customer</span>::isActive).count());
+
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;--- Questions with a yes or no answer ---&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Anyone over 55?           &quot;</span> + customers.stream().anyMatch(c -&gt; c.getAge() &gt; <span class="n">55</span>));
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Everyone spent something? &quot;</span> + customers.stream()
+                .allMatch(c -&gt; c.getTotalSpent().signum() &gt; <span class="n">0</span>));
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Nobody under 18?          &quot;</span> + customers.stream().noneMatch(c -&gt; c.getAge() &lt; <span class="n">18</span>));
+
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;--- Adding things up ---&quot;</span>);
+        <span class="t">BigDecimal</span> total = customers.stream()
+                .map(<span class="t">Customer</span>::getTotalSpent)
+                .reduce(<span class="t">BigDecimal</span>.ZERO, <span class="t">BigDecimal</span>::add);
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Total spent: &quot;</span> + total);
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Average per customer: &quot;</span> + total.divide(<span class="t">BigDecimal</span>.valueOf(customers.size()), <span class="n">2</span>, <span class="t">RoundingMode</span>.HALF_UP));
+        <span class="t">IntSummaryStatistics</span> ages = customers.stream().mapToInt(<span class="t">Customer</span>::getAge).summaryStatistics();
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Ages: min &quot;</span> + ages.getMin() + <span class="n">&quot;, max &quot;</span> + ages.getMax()
+                + <span class="n">&quot;, average &quot;</span> + ages.getAverage() + <span class="n">&quot;, count &quot;</span> + ages.getCount());
+
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;--- Your own functional interface ---&quot;</span>);
+        <span class="t">Discount</span> tenPercent = amount -&gt; amount.multiply(<span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;0.90&quot;</span>)).setScale(<span class="n">2</span>, <span class="t">RoundingMode</span>.HALF_UP);
+        <span class="t">BigDecimal</span> fiftyOff = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;50.00&quot;</span>);
+        <span class="t">Discount</span> voucher = amount -&gt; amount.subtract(fiftyOff).max(<span class="t">BigDecimal</span>.ZERO);
+        <span class="t">BigDecimal</span> basket = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;400.00&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Basket &quot;</span> + basket + <span class="n">&quot;: 10 percent -&gt; &quot;</span> + tenPercent.apply(basket)
+                + <span class="n">&quot;, voucher -&gt; &quot;</span> + voucher.apply(basket)
+                + <span class="n">&quot;, both -&gt; &quot;</span> + tenPercent.then(voucher).apply(basket));
+
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;--- Changing a list in place ---&quot;</span>);
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; tags = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(<span class="t">List</span>.of(<span class="n">&quot;vip&quot;</span>, <span class="n">&quot;new&quot;</span>, <span class="n">&quot;pune&quot;</span>, <span class="n">&quot;new&quot;</span>));
+        tags.replaceAll(<span class="t">String</span>::toUpperCase);
+        tags.removeIf(tag -&gt; tag.equals(<span class="n">&quot;NEW&quot;</span>));
+        <span class="t">System</span>.out.println(<span class="n">&quot;  &quot;</span> + tags);
+
+        <span class="t">System</span>.out.println();
+        <span class="t">System</span>.out.println(<span class="n">&quot;--- Streams are lazy, and used once ---&quot;</span>);
+        <span class="t">Stream</span>&lt;<span class="t">String</span>&gt; lazy = customers.stream()
+                .filter(c -&gt; {
+                    <span class="t">System</span>.out.println(<span class="n">&quot;    checking &quot;</span> + c.getName());
+                    <span class="k">return</span> c.getAge() &gt; <span class="n">30</span>;
+                })
+                .map(<span class="t">Customer</span>::getName);
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Nothing has been checked yet. Asking for the first match:&quot;</span>);
+        <span class="t">System</span>.out.println(<span class="n">&quot;  First over 30: &quot;</span> + lazy.findFirst().orElse(<span class="n">&quot;nobody&quot;</span>));
+        <span class="k">try</span> {
+            lazy.count();
+        } <span class="k">catch</span> (<span class="t">IllegalStateException</span> e) {
+            <span class="t">System</span>.out.println(<span class="n">&quot;  Using the same stream again: &quot;</span> + e.getClass().getSimpleName());
+        }
+    }
+
+    <span class="c">/** Names of the customers that pass a test. The test arrives as a parameter, which is what lambdas are for. */</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; names(<span class="t">List</span>&lt;<span class="t">Customer</span>&gt; customers, <span class="t">Predicate</span>&lt;<span class="t">Customer</span>&gt; test) {
+        <span class="k">return</span> customers.stream().filter(test).map(<span class="t">Customer</span>::getName).toList();
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- The same question, a loop and a stream ---
+Names of active customers in Pune:
+  loop  : [Rahul Verma, Zoya Khan]
+  stream: [Rahul Verma, Zoya Khan]
+
+--- Predicate: a yes/no question, as a value ---
+  Active big spenders : [Asha Menon, Meera Iyer, Zoya Khan]
+  Inactive or in Kochi: [Asha Menon, Kiran Rao, Imran Sheikh, Neha Joshi, Leela Nair]
+  Test one customer   : true
+
+--- Function: turn one thing into another ---
+  Asha Menon &lt;asha@example.com&gt;
+  RAHUL VERMA &lt;RAHUL@MAIL.ORG&gt;
+
+--- Consumer and Supplier ---
+  Hello, Dev!
+  [empty list made on demand]
+
+--- Sorting with a Comparator ---
+  Top 3 spenders:
+    Meera Iyer (Chennai, 41, 30500.00)
+    Zoya Khan (Pune, 36, 19800.00)
+    Asha Menon (Kochi, 34, 12500.00)
+  Youngest first, then by name: [Dev Patel, Rahul Verma, Farah Siddiqui, Neha Joshi]
+
+--- Pipelines: filter, map, distinct, sorted ---
+  Cities, sorted, no repeats: [Chennai, Kochi, Mumbai, Pune]
+  Email domains            : [corp.example.net, example.com, mail.org]
+  How many are active      : 7
+
+--- Questions with a yes or no answer ---
+  Anyone over 55?           true
+  Everyone spent something? false
+  Nobody under 18?          true
+
+--- Adding things up ---
+  Total spent: 95051.25
+  Average per customer: 9505.13
+  Ages: min 23, max 60, average 37.9, count 10
+
+--- Your own functional interface ---
+  Basket 400.00: 10 percent -&gt; 360.00, voucher -&gt; 350.00, both -&gt; 310.00
+
+--- Changing a list in place ---
+  [VIP, PUNE]
+
+--- Streams are lazy, and used once ---
+  Nothing has been checked yet. Asking for the first match:
+    checking Asha Menon
+  First over 30: Asha Menon
+  Using the same stream again: IllegalStateException
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Names of customers over 40.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Emails of inactive customers.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Count customers in Pune.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Write inCity() returning a Predicate.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">A Discount that caps the amount.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">A generic select(List, Predicate).</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: changing a captured variable, reusing a stream, and a pipeline with no terminal step. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">07-modern-java/27-customer-data-processing</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-28.html"><span class="k2">Next</span><span class="v">28 Transaction Reporting</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

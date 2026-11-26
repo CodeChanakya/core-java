@@ -12,6 +12,29 @@ A shopper adds products, adds the same one again, removes one, and wants to see 
 
 A `List` is the collection for "several things, in order, repeats allowed, and the size changes".
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-18.svg"><img alt="Flow of Program 18, Online Shopping Cart, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-18.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A shopping basket you can add to, remove from and sort every way you like. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | A List keeps order and allows duplicates. Comparators separate how to sort from what is sorted. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Add products** (input): ArrayList grows as items are added, including duplicates. (`ShoppingCart.java`)
+2. **Sort by name, price or line cost** (work): Three Comparators give three orders without changing the items. (`Comparator`)
+3. **Remove safely** (work): An Iterator removes while walking the list. (`iterator.remove`)
+4. **Guard the wrong turns** (check): Four common failures are shown on purpose. (`Main.java`)
+5. **Cart views** (result): The same list, shown in different orders. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

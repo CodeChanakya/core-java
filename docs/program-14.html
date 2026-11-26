@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>Program 13 stored an order status as a String, and one wrong letter silently never matched anything.</p>
         <p>An enum lists every legal status, carries its own label and rules, and a misspelling stops the program from compiling.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-14.svg"><img src="flows/program-14.svg" alt="Flow of Program 14, Order Status Management, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A parcel&#x27;s journey: it can only move to the next legal stop, and the compiler knows every stop.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Enums replace stringly-typed state. static belongs to the class and final fixes a value; EnumMap is compact and ordered.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Order status as an enum</b> (input): NEW, PAID, SHIPPED and so on, each with a label.</li><li><b>Is the move allowed?</b> (check): nextStates() lists what may follow each status.</li><li><b>moveTo changes the order</b> (work): Illegal moves are refused.</li><li><b>Count by status</b> (store): An EnumMap keeps the board in enum order.</li><li><b>Five journeys</b> (result): Each order takes a different route.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

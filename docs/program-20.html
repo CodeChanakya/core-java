@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -41,6 +41,22 @@
         <p>Orders arrive all day and are handled one at a time. Who goes next, and can the last step be taken back?</p>
         <p>A queue serves first come first served. A PriorityQueue lets express orders jump the line fairly. A Deque used as a stack gives undo.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-20.svg"><img src="flows/program-20.svg" alt="Flow of Program 20, Order Processing Queue, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A warehouse line: the urgent orders jump ahead, and the last step can be taken back.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Queue and Deque are interfaces; pick the implementation for the policy. PriorityQueue orders on removal, not on iteration.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Orders arrive</b> (input): Each gets an arrival number so ties stay fair.</li><li><b>FIFO line</b> (work): ArrayDeque serves first come, first served.</li><li><b>Priority line</b> (work): PriorityQueue serves URGENT before NORMAL.</li><li><b>Undo with a stack</b> (work): A Deque used as a stack remembers the last step.</li><li><b>The order they are served</b> (result): Each structure shown in turn.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

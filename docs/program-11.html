@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -41,6 +41,22 @@
         <p>An agency rents cars, bikes and trucks, each priced differently, with insurance on some of them.</p>
         <p>An abstract class shares the pricing rules and leaves the rate to each subclass. An interface describes the ability to be insured, which a car and a truck have and a bike does not.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-11.svg"><img src="flows/program-11.svg" alt="Flow of Program 11, Vehicle Rental System, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A rental counter: you rent a car or a truck, never just a vehicle, and insurance is an add-on only some have.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Abstract class shares code and state; interface adds a capability across the family tree. A class can have one parent but many interfaces.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Build the fleet</b> (input): Car, Motorbike and Truck extend the abstract Vehicle.</li><li><b>Price by days</b> (work): rentalCost is written once and uses each vehicle&#x27;s daily rate.</li><li><b>Is it insurable?</b> (check): instanceof Insurable adds the insurance line.</li><li><b>Discount for long rentals</b> (work): The rule sits in one place.</li><li><b>Quotes and a refused rental</b> (result): The fleet list, three quotes and one refusal.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

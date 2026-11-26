@@ -15,6 +15,29 @@ Two ideas from Program 10 are not enough here:
 - There is no such thing as "just a vehicle". You rent a *car* or a *truck*. The parent class should exist to share code, not to be created.
 - Insurance is not a property of every vehicle, and it is not tied to one family of vehicles. A car and a truck both have it; a bike does not. A class can have only one parent, so this needs something else.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-11.svg"><img alt="Flow of Program 11, Vehicle Rental System, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-11.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A rental counter: you rent a car or a truck, never just a vehicle, and insurance is an add-on only some have. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Abstract class shares code and state; interface adds a capability across the family tree. A class can have one parent but many interfaces. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Build the fleet** (input): Car, Motorbike and Truck extend the abstract Vehicle. (`Vehicle.java`)
+2. **Price by days** (work): rentalCost is written once and uses each vehicle's daily rate. (`rentalCost`)
+3. **Is it insurable?** (check): instanceof Insurable adds the insurance line. (`RentalAgency.java`)
+4. **Discount for long rentals** (work): The rule sits in one place. (`quote`)
+5. **Quotes and a refused rental** (result): The fleet list, three quotes and one refusal. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

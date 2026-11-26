@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>Returning false says no but not why, and a caller can forget to look. An exception carries the reason and stops the program unless someone deals with it.</p>
         <p>This program adds checked and unchecked custom exceptions, chaining, a multi-catch and an audit log that always closes.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-15.svg"><img src="flows/program-15.svg" alt="Flow of Program 15, Banking Exception Management, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>Instead of saying only no, the bank says why, and nobody can ignore the answer.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Checked exceptions force a decision at the boundary; unchecked ones mark programmer errors. try-with-resources guarantees cleanup.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>A request</b> (input): Deposit, withdraw or transfer.</li><li><b>Is the amount valid?</b> (check): InvalidAmountException (unchecked) for nonsense input.</li><li><b>Is there enough money?</b> (check): InsufficientFundsException (checked) carries the numbers.</li><li><b>Handle or wrap</b> (work): Multi-catch handles it; a wrapped cause keeps the story.</li><li><b>Audit log, always closed</b> (result): AuditLog is AutoCloseable, so try-with-resources closes it.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

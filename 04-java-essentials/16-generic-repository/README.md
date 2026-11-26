@@ -14,6 +14,29 @@ Before generics, the alternative was one store holding `Object`, and a cast on e
 
 Generics give you one repository written once, for **any** type, with the compiler checking you never mix them up.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-16.svg"><img alt="Flow of Program 16, Generic Repository, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-16.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | One shelf design for any item: the same save, find, list and delete rules, for customers or products. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Bounded types (T extends Identifiable<ID>) let the compiler prove what you can call. Wildcards express producer and consumer roles. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **An Identifiable item** (input): Anything with an id of any type, such as Customer or Product. (`Identifiable.java`)
+2. **One repository contract** (work): Repository<T, ID> declares save, find, list, delete. (`Repository.java`)
+3. **One implementation** (store): InMemoryRepository stores items by id. (`InMemoryRepository.java`)
+4. **Generic helpers** (work): Methods and wildcards work on any type that fits. (`Util.java`)
+5. **Two repositories, one class** (result): The same code serves both customers and products. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

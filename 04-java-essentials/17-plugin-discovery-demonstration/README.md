@@ -12,6 +12,29 @@ An application wants to be extended without being edited. A new report, a new ch
 
 That needs the program to look at classes it never saw at compile time. Reflection does the looking. Annotations do the labelling: a class says "I am a plugin, my name is Audit, run me in the MAIN phase" in a way a program can read.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-17.svg"><img alt="Flow of Program 17, Plugin Discovery Demonstration (Phase 4 project), in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-17.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A building with sockets: new devices plug in without rewiring the building. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Reflection trades compile-time safety for flexibility. Retention RUNTIME makes the annotation readable. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **A list of class names** (input): plugins.txt names the plug-ins to load. (`plugins.txt`)
+2. **Load each class by name** (work): Class.forName finds it at run time. (`PluginLoader.java`)
+3. **Four questions to every class** (check): Does it exist, carry @PluginInfo, implement Plugin, and is it enabled? (`PluginLoader.java`)
+4. **Sort by phase and order** (work): LoadedPlugin is Comparable, giving the run order. (`LoadedPlugin.java`)
+5. **Run, then reflect** (result): Each plug-in runs; its annotation is read back. (`Main.java`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

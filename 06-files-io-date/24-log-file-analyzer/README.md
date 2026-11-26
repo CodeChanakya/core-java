@@ -12,6 +12,29 @@ A service writes a log file per day. Someone has to answer, every morning: how m
 
 This is the same file work as Program 23, with the modern toolkit: `Path` for locations and `Files` for actions.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-24.svg"><img alt="Flow of Program 24, Log File Analyzer, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-24.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A detective reading yesterday's diary: scan every .log file and tell me where it hurt. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Path and Files throw precise exceptions. Sorting directory results removes the dependence on file-system order. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Find the .log files** (input): DirectoryStream with a glob, sorted. (`LogFolder.java`)
+2. **Read each file** (work): Files.readAllLines gives the lines. (`Files`)
+3. **Is the line an event?** (check): split with a limit; valueOf for a safe level. (`LogParser.java`)
+4. **Count by level and component** (work): EnumMap and TreeMap with merge. (`LogReport.java`)
+5. **Errors, noisy component, first error** (result): Printed with / in file names, the same everywhere. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

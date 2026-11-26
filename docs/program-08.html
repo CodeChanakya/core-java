@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>A small bank keeps accounts: an owner, a balance, and rules for deposits, withdrawals and transfers.</p>
         <p>A class bundles the facts and the rules into one unit, and private fields stop anyone changing a balance without going through those rules.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-08.svg"><img src="flows/program-08.svg" alt="Flow of Program 08, Banking Application, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A bank account is a locked box with a slot: money goes in and out only through the rules.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Encapsulation: private fields, public behaviour. The invariant (balance never negative) lives in one place.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Open an account</b> (input): The constructor checks the owner and the opening amount.</li><li><b>Deposit</b> (check): Positive amounts only; true or false comes back.</li><li><b>Withdraw</b> (check): Refused when the balance would go negative.</li><li><b>Transfer between accounts</b> (work): Bank owns the rule that spans two accounts.</li><li><b>A scripted day at the bank</b> (result): Totals match a hand calculation.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

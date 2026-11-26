@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product Recommendation Filtering | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 07 · Modern Java · Program 30 of 43</p>
+    <h1>Product Recommendation Filtering</h1>
+    <div class="tags">
+      <span class="tag">Advanced</span>
+      <span class="chip" style="background:#fff">Sealed types</span>
+      <span class="chip" style="background:#fff">Pattern matching</span>
+      <span class="chip" style="background:#fff">Record patterns</span>
+      <span class="chip" style="background:#fff">Phase project</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>An online shop sells books, gadgets and groceries. Each shopper has a budget, a minimum rating, wanted kinds and maybe a dietary rule. The shop wants ordered recommendations with a reason for each, and when a new kind of product is added the compiler should point out every place to update.</p>
+        <p>This Phase 7 project combines records, sealed interfaces, exhaustive pattern-matching switches without a default, rules held as data, streams and Optional.</p>
+      </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-30.svg"><img src="flows/program-30.svg" alt="Flow of Program 30, Product Recommendation Filtering, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A shop assistant with a rulebook: shoppers state wishes, the rulebook picks and ranks the right products.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Sealed types make a closed set the compiler can check. Rules as data can be evaluated, printed and compared; lambdas cannot be printed.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Products as a sealed set</b> (input): Book, Gadget or Grocery, nothing else.</li><li><b>Wishes become one Rule</b> (work): A tree of records: MinRating, MaxPrice, OfKind, Not, AllOf, AnyOf.</li><li><b>Match with an exhaustive switch</b> (check): Record patterns, no default: the compiler checks every case.</li><li><b>Score and sort</b> (work): Streams filter, score and order the matches.</li><li><b>Ranked picks and a best pick</b> (result): Each has a reason; Optional says none when nothing matches.</li></ol></details>
+      </section>
+<!--/flow-->
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Product.java and the three records</b><span class="d">sealed interface with permits.</span></span></li>
+          <li><span class="badge">2</span><span><b>Rule.java, RuleEngine.java</b><span class="d">Rules as a tree of records, matched and described by switches.</span></span></li>
+          <li><span class="badge">3</span><span><b>Shopper.java, Recommender.java</b><span class="d">Wishes become one rule; score, sort, highlight.</span></span></li>
+          <li><span class="badge">4</span><span><b>Main.java</b><span class="d">Five sections, ending with a pattern switch on Object.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/recommend/Product.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.recommend;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+
+<span class="c">/**
+ * Everything the shop sells is exactly one of three kinds.
+ *
+ * &quot;sealed&quot; with a &quot;permits&quot; list closes the family: no other class can implement Product.
+ * That promise is what lets the compiler check, later, that a switch has covered every kind.
+ */</span>
+<span class="k">public</span> sealed <span class="k">interface</span> <span class="t">Product</span> permits <span class="t">Book</span>, <span class="t">Gadget</span>, <span class="t">Grocery</span> {
+
+    <span class="t">String</span> name();
+
+    <span class="t">BigDecimal</span> price();
+
+    <span class="k">double</span> rating();
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/recommend/RuleEngine.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.recommend;
+
+<span class="k">import</span> java.util.<span class="t">Locale</span>;
+<span class="k">import</span> java.util.stream.<span class="t">Collectors</span>;
+
+<span class="c">/** Reads a Rule and answers questions about it. All the work is pattern-matching switches. */</span>
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> <span class="t">RuleEngine</span> {
+
+    <span class="k">private</span> <span class="t">RuleEngine</span>() {
+    }
+
+    <span class="c">/**
+     * Does this product satisfy the rule?
+     *
+     * There is no &quot;default&quot; branch. Rule is sealed, so the compiler knows the seven cases below are
+     * all of them, and adding an eighth rule type will stop this method compiling until it is handled.
+     */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">boolean</span> matches(<span class="t">Rule</span> rule, <span class="t">Product</span> product) {
+        <span class="k">return</span> <span class="k">switch</span> (rule) {
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">MinRating</span> r -&gt; product.rating() &gt;= r.value();
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">MaxPrice</span> r -&gt; product.price().compareTo(r.value()) &lt;= <span class="n">0</span>;
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">OfKind</span> r -&gt; r.kind().isInstance(product);
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">VegetarianOnly</span> r -&gt; !(product <span class="k">instanceof</span> <span class="t">Grocery</span> g) || g.vegetarian();
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">Not</span>(<span class="t">Rule</span> inner) -&gt; !matches(inner, product);                       <span class="c">// a record pattern</span>
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">AllOf</span>(<span class="k">var</span> rules) -&gt; rules.stream().allMatch(r -&gt; matches(r, product));
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">AnyOf</span>(<span class="k">var</span> rules) -&gt; rules.stream().anyMatch(r -&gt; matches(r, product));
+        };
+    }
+
+    <span class="c">/** A sentence describing the rule, built the same way. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">String</span> describe(<span class="t">Rule</span> rule) {
+        <span class="k">return</span> <span class="k">switch</span> (rule) {
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">MinRating</span> r -&gt; <span class="n">&quot;rated at least &quot;</span> + <span class="t">String</span>.format(<span class="t">Locale</span>.ROOT, <span class="n">&quot;%.1f&quot;</span>, r.value());
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">MaxPrice</span> r -&gt; <span class="n">&quot;costs no more than &quot;</span> + r.value();
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">OfKind</span> r -&gt; <span class="n">&quot;is a &quot;</span> + r.kind().getSimpleName().toLowerCase();
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">VegetarianOnly</span> r -&gt; <span class="n">&quot;is vegetarian when it is food&quot;</span>;
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">Not</span>(<span class="t">Rule</span> inner) -&gt; <span class="n">&quot;is not (&quot;</span> + describe(inner) + <span class="n">&quot;)&quot;</span>;
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">AllOf</span>(<span class="k">var</span> rules) -&gt; rules.stream().map(<span class="t">RuleEngine</span>::describe).collect(<span class="t">Collectors</span>.joining(<span class="n">&quot; and &quot;</span>, <span class="n">&quot;(&quot;</span>, <span class="n">&quot;)&quot;</span>));
+            <span class="k">case</span> <span class="t">Rule</span>.<span class="t">AnyOf</span>(<span class="k">var</span> rules) -&gt; rules.stream().map(<span class="t">RuleEngine</span>::describe).collect(<span class="t">Collectors</span>.joining(<span class="n">&quot; or &quot;</span>, <span class="n">&quot;(&quot;</span>, <span class="n">&quot;)&quot;</span>));
+        };
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/recommend/Recommender.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.recommend;
+
+<span class="k">import</span> java.util.<span class="t">Comparator</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Optional</span>;
+
+<span class="c">/** Filters a catalogue by rules, scores what is left, and explains each choice. */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Recommender</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">List</span>&lt;<span class="t">Product</span>&gt; catalogue;
+
+    <span class="k">public</span> <span class="t">Recommender</span>(<span class="t">List</span>&lt;<span class="t">Product</span>&gt; catalogue) {
+        <span class="k">this</span>.catalogue = catalogue;
+    }
+
+    <span class="c">/** The shopper&#x27;s best matches, highest score first, ties broken by name. */</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">Recommendation</span>&gt; recommend(<span class="t">Shopper</span> shopper, <span class="k">int</span> limit) {
+        <span class="t">Rule</span> rule = shopper.toRule();
+        <span class="k">return</span> catalogue.stream()
+                .filter(product -&gt; <span class="t">RuleEngine</span>.matches(rule, product))
+                .map(product -&gt; <span class="k">new</span> <span class="t">Recommendation</span>(product, score(product), highlight(product)))
+                .sorted(<span class="t">Comparator</span>.comparingDouble(<span class="t">Recommendation</span>::score).reversed()
+                        .thenComparing(r -&gt; r.product().name()))
+                .limit(limit)
+                .toList();
+    }
+
+    <span class="c">/** The single best match, if anything matched at all. */</span>
+    <span class="k">public</span> <span class="t">Optional</span>&lt;<span class="t">Recommendation</span>&gt; bestPick(<span class="t">Shopper</span> shopper) {
+        <span class="k">return</span> recommend(shopper, <span class="n">1</span>).stream().findFirst();
+    }
+
+    <span class="c">/** Products that match a rule, in catalogue order. */</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">Product</span>&gt; filter(<span class="t">Rule</span> rule) {
+        <span class="k">return</span> catalogue.stream().filter(product -&gt; <span class="t">RuleEngine</span>.matches(rule, product)).toList();
+    }
+
+    <span class="c">/** Rating counts most; each kind of product adds its own small bonus or penalty. */</span>
+    <span class="k">static</span> <span class="k">double</span> score(<span class="t">Product</span> product) {
+        <span class="k">double</span> base = product.rating() * <span class="n">10</span>;
+        <span class="k">return</span> <span class="k">switch</span> (product) {
+            <span class="k">case</span> <span class="t">Book</span> b -&gt; base + (b.pages() &gt; <span class="n">300</span> ? <span class="n">2</span> : <span class="n">0</span>);
+            <span class="k">case</span> <span class="t">Gadget</span> g -&gt; base + g.warrantyMonths() / <span class="n">12.0</span>;
+            <span class="k">case</span> <span class="t">Grocery</span> g -&gt; base - (g.shelfLifeDays() &lt;= <span class="n">3</span> ? <span class="n">5</span> : <span class="n">0</span>);
+        };
+    }
+
+    <span class="c">/** One sentence about a product. &quot;when&quot; adds a condition to a case, and the first match wins. */</span>
+    <span class="k">static</span> <span class="t">String</span> highlight(<span class="t">Product</span> product) {
+        <span class="k">return</span> <span class="k">switch</span> (product) {
+            <span class="k">case</span> <span class="t">Book</span> b when b.pages() &gt; <span class="n">500</span> -&gt; <span class="n">&quot;a long read by &quot;</span> + b.author();
+            <span class="k">case</span> <span class="t">Book</span> b -&gt; <span class="n">&quot;a quick read by &quot;</span> + b.author();
+            <span class="k">case</span> <span class="t">Gadget</span> g when g.wireless() -&gt; <span class="n">&quot;wireless, with &quot;</span> + g.warrantyMonths() + <span class="n">&quot; months of warranty&quot;</span>;
+            <span class="k">case</span> <span class="t">Gadget</span> g -&gt; <span class="n">&quot;wired, with &quot;</span> + g.warrantyMonths() + <span class="n">&quot; months of warranty&quot;</span>;
+            <span class="k">case</span> <span class="t">Grocery</span>(<span class="t">String</span> name, <span class="k">var</span> price, <span class="k">var</span> rating, <span class="k">boolean</span> veg, <span class="k">int</span> days) when days &lt;= <span class="n">7</span> -&gt;
+                    (veg ? <span class="n">&quot;vegetarian&quot;</span> : <span class="n">&quot;contains meat&quot;</span>) + <span class="n">&quot;, fresh: use within &quot;</span> + days + <span class="n">&quot; days&quot;</span>;
+            <span class="k">case</span> <span class="t">Grocery</span> g -&gt; (g.vegetarian() ? <span class="n">&quot;vegetarian&quot;</span> : <span class="n">&quot;contains meat&quot;</span>) + <span class="n">&quot;, keeps for &quot;</span> + g.shelfLifeDays() + <span class="n">&quot; days&quot;</span>;
+        };
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- Rules are values ---
+  Rule : (costs no more than 500 and rated at least 4.0)
+  Match: USB-C Cable, Fresh Paneer 200g, Chicken Sausages
+  Rule : is not (is a grocery)
+  Match: The Pragmatic Programmer, Clean Code, Java Concurrency in Practice, A Pocket Guide to SQL, Noise-Cancelling Headphones, USB-C Cable, Mechanical Keyboard
+  Raw record: AllOf[rules=[MaxPrice[value=500], MinRating[value=4.0]]]
+
+--- One switch, many shapes ---
+  The Pragmatic Programmer: a quick read by Hunt and Thomas
+  Clean Code: a quick read by Robert Martin
+  Java Concurrency in Practice: a long read by Brian Goetz
+  Noise-Cancelling Headphones: wireless, with 24 months of warranty
+  Fresh Paneer 200g: vegetarian, fresh: use within 3 days
+  Chicken Sausages: contains meat, fresh: use within 5 days
+
+--- Recommendations ---
+  Developer on a budget:
+    wants: (rated at least 4.3 and costs no more than 2000 and (is a book or is a gadget))
+    50.0  The Pragmatic Programmer - a quick read by Hunt and Thomas
+    49.0  Java Concurrency in Practice - a long read by Brian Goetz
+    47.0  Noise-Cancelling Headphones - wireless, with 24 months of warranty
+    best pick: The Pragmatic Programmer
+  Vegetarian shopper:
+    wants: (rated at least 4.0 and costs no more than 700 and (is a grocery or is a book) and is vegetarian when it is food)
+    43.0  Basmati Rice 5kg - vegetarian, keeps for 365 days
+    36.0  Fresh Paneer 200g - vegetarian, fresh: use within 3 days
+    best pick: Basmati Rice 5kg
+  Very picky:
+    wants: (rated at least 4.9 and costs no more than 100 and (is a book))
+    nothing matches
+    best pick: none
+
+--- Pattern matching on a single value ---
+  a book called The Pragmatic Programmer by Hunt and Thomas
+  a long string (8 characters)
+  the integer 42
+  a rule: rated at least 3.5
+  something else: [1, 2]
+
+--- Counting the catalogue by kind ---
+  {Book=4, Gadget=3, Grocery=3}
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a fourth grocery item.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print every highlight.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">A vegetarian shopper with a bigger budget.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add a MinWarranty rule and follow the compiler.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add a Toy product kind.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">simplify(): remove double negatives.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a switch that misses a case, a class not in the <code>permits</code> list, and a general case placed before a specific one. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">07-modern-java/30-product-recommendation-filtering</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="index.html#phase-8"><span class="k2">Next</span><span class="v">Phase 8: Concurrency</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

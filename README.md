@@ -7,13 +7,14 @@
 
 <p align="center">
   <img alt="Java 21 or newer" src="https://img.shields.io/badge/Java-21%2B-B83A0E">
-  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-26%20of%2043-0F766E">
+  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-30%20of%2043-0F766E">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-0E1726">
   <a href="https://github.com/codechanakya/core-java/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/codechanakya/core-java/actions/workflows/ci.yml/badge.svg"></a>
 </p>
 
 <p align="center">
   <a href="https://codechanakya.github.io/core-java/"><b>Browse the site</b></a> &nbsp;·&nbsp;
+  <a href="https://codechanakya.github.io/core-java/flows.html"><b>Flow gallery</b></a> &nbsp;·&nbsp;
   <a href="https://codespaces.new/codechanakya/core-java"><b>Open in Codespaces</b></a>
 </p>
 
@@ -23,7 +24,7 @@
 
 It follows a fixed path: smallest building block first, then the next concept that depends on it, until you can design and test a small system yourself.
 
-> **Status:** Phases 1 to 6 are ready (26 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
+> **Status:** Phases 1 to 7 are ready (30 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
 
 ## Start here
 
@@ -56,6 +57,67 @@ flowchart LR
 ```
 
 Each phase ends with a project that uses everything taught before it. Frameworks such as Spring Boot come only after the Core Java foundation is solid.
+
+<!--gallery-->
+## See every program as a picture
+
+Each ready program has a flow diagram in three layers: a story in everyday words, the numbered steps with the file where each one happens, and a note for experienced developers. The same picture sits at the top of every program README and on the [flow gallery](https://codechanakya.github.io/core-java/flows.html).
+
+<table>
+  <tr>
+    <td align="center" valign="top"><a href="01-getting-started/01-personal-profile-generator"><img alt="Flow of Program 01, Personal Profile Generator, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-01.svg" width="290"></a><br><b>01 · Personal Profile Generator</b></td>
+    <td align="center" valign="top"><a href="02-core-fundamentals/02-employee-salary-calculator"><img alt="Flow of Program 02, Employee Salary Calculator, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-02.svg" width="290"></a><br><b>02 · Employee Salary Calculator</b></td>
+    <td align="center" valign="top"><a href="02-core-fundamentals/03-money-handling-mini-lab"><img alt="Flow of Program 03, Money Handling Mini-Lab, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-03.svg" width="290"></a><br><b>03 · Money Handling Mini-Lab</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="02-core-fundamentals/04-electricity-bill-generator"><img alt="Flow of Program 04, Electricity Bill Generator, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-04.svg" width="290"></a><br><b>04 · Electricity Bill Generator</b></td>
+    <td align="center" valign="top"><a href="02-core-fundamentals/05-atm-menu-simulation"><img alt="Flow of Program 05, ATM Menu Simulation, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-05.svg" width="290"></a><br><b>05 · ATM Menu Simulation</b></td>
+    <td align="center" valign="top"><a href="02-core-fundamentals/06-student-marks-analyzer"><img alt="Flow of Program 06, Student Marks Analyzer, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-06.svg" width="290"></a><br><b>06 · Student Marks Analyzer</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="02-core-fundamentals/07-shopping-cart-calculator"><img alt="Flow of Program 07, Shopping Cart Calculator (Phase 2 project), in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-07.svg" width="290"></a><br><b>07 · Shopping Cart Calculator (Phase 2 project)</b></td>
+    <td align="center" valign="top"><a href="03-object-oriented-programming/08-banking-application"><img alt="Flow of Program 08, Banking Application, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-08.svg" width="290"></a><br><b>08 · Banking Application</b></td>
+    <td align="center" valign="top"><a href="03-object-oriented-programming/09-junit-starter-lab"><img alt="Flow of Program 09, JUnit Starter Lab, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-09.svg" width="290"></a><br><b>09 · JUnit Starter Lab</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="03-object-oriented-programming/10-employee-management-system"><img alt="Flow of Program 10, Employee Management System, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-10.svg" width="290"></a><br><b>10 · Employee Management System</b></td>
+    <td align="center" valign="top"><a href="03-object-oriented-programming/11-vehicle-rental-system"><img alt="Flow of Program 11, Vehicle Rental System, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-11.svg" width="290"></a><br><b>11 · Vehicle Rental System</b></td>
+    <td align="center" valign="top"><a href="03-object-oriented-programming/12-payment-processing-system"><img alt="Flow of Program 12, Payment Processing System, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-12.svg" width="290"></a><br><b>12 · Payment Processing System</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="03-object-oriented-programming/13-ecommerce-order-management"><img alt="Flow of Program 13, E-commerce Order Management (Phase 3 project), in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-13.svg" width="290"></a><br><b>13 · E-commerce Order Management (Phase 3 project)</b></td>
+    <td align="center" valign="top"><a href="04-java-essentials/14-order-status-management"><img alt="Flow of Program 14, Order Status Management, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-14.svg" width="290"></a><br><b>14 · Order Status Management</b></td>
+    <td align="center" valign="top"><a href="04-java-essentials/15-banking-exception-management"><img alt="Flow of Program 15, Banking Exception Management, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-15.svg" width="290"></a><br><b>15 · Banking Exception Management</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="04-java-essentials/16-generic-repository"><img alt="Flow of Program 16, Generic Repository, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-16.svg" width="290"></a><br><b>16 · Generic Repository</b></td>
+    <td align="center" valign="top"><a href="04-java-essentials/17-plugin-discovery-demonstration"><img alt="Flow of Program 17, Plugin Discovery Demonstration (Phase 4 project), in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-17.svg" width="290"></a><br><b>17 · Plugin Discovery Demonstration (Phase 4 project)</b></td>
+    <td align="center" valign="top"><a href="05-collections/18-online-shopping-cart"><img alt="Flow of Program 18, Online Shopping Cart, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-18.svg" width="290"></a><br><b>18 · Online Shopping Cart</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="05-collections/19-customer-search"><img alt="Flow of Program 19, Customer Search, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-19.svg" width="290"></a><br><b>19 · Customer Search</b></td>
+    <td align="center" valign="top"><a href="05-collections/20-order-processing-queue"><img alt="Flow of Program 20, Order Processing Queue, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-20.svg" width="290"></a><br><b>20 · Order Processing Queue</b></td>
+    <td align="center" valign="top"><a href="05-collections/21-employee-directory"><img alt="Flow of Program 21, Employee Directory, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-21.svg" width="290"></a><br><b>21 · Employee Directory</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="05-collections/22-product-inventory"><img alt="Flow of Program 22, Product Inventory (Phase 5 project), in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-22.svg" width="290"></a><br><b>22 · Product Inventory (Phase 5 project)</b></td>
+    <td align="center" valign="top"><a href="06-files-io-date/23-employee-file-management"><img alt="Flow of Program 23, Employee File Management, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-23.svg" width="290"></a><br><b>23 · Employee File Management</b></td>
+    <td align="center" valign="top"><a href="06-files-io-date/24-log-file-analyzer"><img alt="Flow of Program 24, Log File Analyzer, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-24.svg" width="290"></a><br><b>24 · Log File Analyzer</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="06-files-io-date/25-daily-transaction-report"><img alt="Flow of Program 25, Daily Transaction Report, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-25.svg" width="290"></a><br><b>25 · Daily Transaction Report</b></td>
+    <td align="center" valign="top"><a href="06-files-io-date/26-appointment-scheduler"><img alt="Flow of Program 26, Appointment Scheduler (Phase 6 project), in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-26.svg" width="290"></a><br><b>26 · Appointment Scheduler (Phase 6 project)</b></td>
+    <td align="center" valign="top"><a href="07-modern-java/27-customer-data-processing"><img alt="Flow of Program 27, Customer Data Processing, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-27.svg" width="290"></a><br><b>27 · Customer Data Processing</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="07-modern-java/28-transaction-reporting"><img alt="Flow of Program 28, Transaction Reporting, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-28.svg" width="290"></a><br><b>28 · Transaction Reporting</b></td>
+    <td align="center" valign="top"><a href="07-modern-java/29-sales-analytics"><img alt="Flow of Program 29, Sales Analytics, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-29.svg" width="290"></a><br><b>29 · Sales Analytics</b></td>
+    <td align="center" valign="top"><a href="07-modern-java/30-product-recommendation-filtering"><img alt="Flow of Program 30, Product Recommendation Filtering, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-30.svg" width="290"></a><br><b>30 · Product Recommendation Filtering</b></td>
+  </tr>
+</table>
+
+Colour code: slate is input, teal is work, amber is a check, violet is stored data, orange is the result you see.
+<!--/gallery-->
 
 ## All programs
 
@@ -138,10 +200,10 @@ Each phase ends with a project that uses everything taught before it. Frameworks
 
 | No. | Program | Concepts | Status |
 |---|---|---|---|
-| 27 | Customer Data Processing | lambdas, `filter` / `map` | Planned |
-| 28 | Transaction Reporting | records, `Optional` | Planned |
-| 29 | Sales Analytics | `groupingBy`, collectors | Planned |
-| 30 | Product Recommendation Filtering | sealed classes, pattern matching | Planned |
+| 27 | [Customer Data Processing](07-modern-java/27-customer-data-processing) | lambdas, `filter` / `map` | Ready |
+| 28 | [Transaction Reporting](07-modern-java/28-transaction-reporting) | records, `Optional` | Ready |
+| 29 | [Sales Analytics](07-modern-java/29-sales-analytics) | `groupingBy`, collectors | Ready |
+| 30 | [Product Recommendation Filtering](07-modern-java/30-product-recommendation-filtering) | sealed classes, pattern matching | Ready |
 
 </details>
 

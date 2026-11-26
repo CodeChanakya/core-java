@@ -12,6 +12,29 @@ The sign-up form lets people submit twice. The marketing team wants a list of un
 
 Each of those questions has the same shape: a collection where **nothing appears twice** and where position does not matter. That is a `Set`.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-19.svg"><img alt="Flow of Program 19, Customer Search, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-19.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A guest list: no one is on it twice, and you can ask who is on one list but not the other. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Choose the Set by the guarantee you need: speed, sorted, or insertion order. compareTo must agree with equals. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Customers, with duplicates** (input): The same person can submit twice. (`Customer.java`)
+2. **HashSet removes duplicates** (work): equals decides who counts as the same. (`HashSet`)
+3. **TreeSet sorts** (work): compareTo defines the order. (`TreeSet`)
+4. **LinkedHashSet keeps arrival order** (work): Same uniqueness, predictable order. (`LinkedHashSet`)
+5. **Set maths** (result): Newsletter but no purchase: removeAll, retainAll, addAll. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

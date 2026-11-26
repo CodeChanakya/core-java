@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>A shopper adds, removes and re-adds products, and wants the cart sorted by name, price or line total. An array cannot grow, shrink or sort by several rules.</p>
         <p>A List holds items in order with repeats allowed. A Comparator describes each sort rule, and an Iterator removes items safely while looping.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-18.svg"><img src="flows/program-18.svg" alt="Flow of Program 18, Online Shopping Cart, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A shopping basket you can add to, remove from and sort every way you like.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>A List keeps order and allows duplicates. Comparators separate how to sort from what is sorted.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Add products</b> (input): ArrayList grows as items are added, including duplicates.</li><li><b>Sort by name, price or line cost</b> (work): Three Comparators give three orders without changing the items.</li><li><b>Remove safely</b> (work): An Iterator removes while walking the list.</li><li><b>Guard the wrong turns</b> (check): Four common failures are shown on purpose.</li><li><b>Cart views</b> (result): The same list, shown in different orders.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">
