@@ -1,0 +1,31 @@
+--- One payment, step by step ---
+  process() has returned. It did not wait for the payment to finish.
+  P-1001 COMPLETED: authorised AUTH-P-1001, notice sent
+  Trail: PENDING -> VALIDATED -> CHECKED -> AUTHORISED -> COMPLETED
+
+--- Seven payments started together ---
+  P-1001  COMPLETED  authorised AUTH-P-1001, notice sent
+          PENDING -> VALIDATED -> CHECKED -> AUTHORISED -> COMPLETED
+  P-2001  DECLINED   Declined: insufficient funds
+          PENDING -> VALIDATED -> DECLINED
+  P-2002  DECLINED   Declined: fraud score 90 is too high
+          PENDING -> VALIDATED -> DECLINED
+  P-2003  FAILED     Invalid payment: amount must be positive
+          PENDING -> FAILED
+  P-GATE  FAILED     Gateway unavailable, try again later
+          PENDING -> VALIDATED -> CHECKED -> FAILED
+  P-SLOW  TIMED_OUT  No answer from the gateway within 400 ms
+          PENDING -> VALIDATED -> CHECKED -> TIMED_OUT
+  P-MAIL  COMPLETED  authorised AUTH-P-MAIL, notice NOT SENT
+          PENDING -> VALIDATED -> CHECKED -> AUTHORISED -> COMPLETED
+
+--- A batch of nine, waiting with allOf ---
+  By status: {COMPLETED=4, DECLINED=2, FAILED=2, TIMED_OUT=1}
+  Callbacks that fired: 9
+
+--- Two gateways, the faster one wins ---
+  Answered by: backup gateway
+
+--- Trying again when the gateway fails ---
+  Succeeded after 3 attempts: AUTH-RETRIED
+  Gave up after 3 attempts: still down

@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Asynchronous Payment Status Simulator | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 08 · Concurrency · Program 34 of 43</p>
+    <h1>Asynchronous Payment Status Simulator</h1>
+    <div class="tags">
+      <span class="tag">Advanced</span>
+      <span class="chip" style="background:#fff">CompletableFuture</span>
+      <span class="chip" style="background:#fff">thenCompose</span>
+      <span class="chip" style="background:#fff">Timeouts</span>
+      <span class="chip" style="background:#fff">Phase project</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A payment service validates, checks fraud and funds, calls an outside gateway and notifies the customer. Several steps wait on other services, and a thread per waiting payment would need thousands of threads.</p>
+        <p>This Phase 8 project describes each payment as a chain of steps that run when the previous one finishes. Fraud and balance checks run in parallel, the gateway has a deadline, a slow mail server cannot fail a good payment, and one handle() at the end turns every outcome into a status.</p>
+      </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-34.svg"><img src="flows/program-34.svg" alt="Flow of Program 34, Asynchronous Payment Status Simulator, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A parcel tracking page: each stage hands over to the next, and nobody stands waiting at the counter.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>thenCompose flattens async steps; one handle at the end centralises failure. Block only at the edge, with join().</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>A payment request</b> (input): Many are started together; process() returns at once.</li><li><b>Validate, then two checks at once</b> (check): Fraud score and balance run in parallel, then thenCombine.</li><li><b>Authorise with a deadline</b> (work): orTimeout fails the step if the gateway is too slow.</li><li><b>Notify, with a fallback</b> (work): completeOnTimeout keeps a good payment from failing on slow mail.</li><li><b>handle() gives the final status</b> (result): COMPLETED, DECLINED, FAILED or TIMED_OUT, with the trail.</li></ol></details>
+      </section>
+<!--/flow-->
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Status.java, PaymentRequest.java, PaymentResult.java</b><span class="d">An enum and two records.</span></span></li>
+          <li><span class="badge">2</span><span><b>The four service classes</b><span class="d">Each returns a CompletableFuture.</span></span></li>
+          <li><span class="badge">3</span><span><b>PaymentPipeline.java</b><span class="d">The chain. The file to study.</span></span></li>
+          <li><span class="badge">4</span><span><b>Retry.java, PaymentSystem.java</b><span class="d">A recursive retry and the shared daemon pool.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/asyncpay/PaymentPipeline.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.asyncpay;
+
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CompletableFuture</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CompletionException</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CopyOnWriteArrayList</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executor</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ExecutionException</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeoutException</span>;
+
+<span class="c">/**
+ * One payment&#x27;s journey, written as a chain of steps that run when the previous one finishes.
+ *
+ * &lt;pre&gt;
+ * validate -&gt; ( fraud score  +  balance check ) -&gt; authorise -&gt; notify -&gt; result
+ *                  in parallel, then combined
+ * &lt;/pre&gt;
+ *
+ * &lt;p&gt;The method returns at once with a {@link CompletableFuture}. Nothing blocks. Each arrow above
+ * is {@code thenApply}, {@code thenCompose} or {@code thenCombine}, and the error handling sits at
+ * the very end in one {@code handle} call, so no stage needs its own try and catch.
+ */</span>
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> <span class="t">PaymentPipeline</span> {
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="k">long</span> GATEWAY_DEADLINE_MS = <span class="n">400</span>;
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="k">long</span> NOTICE_DEADLINE_MS = <span class="n">200</span>;
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Executor</span> executor;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">FraudService</span> fraud;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">BalanceService</span> balances;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">GatewayService</span> gateway;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">NotificationService</span> notifier;
+
+    <span class="k">public</span> <span class="t">PaymentPipeline</span>(<span class="t">Executor</span> executor, <span class="t">FraudService</span> fraud, <span class="t">BalanceService</span> balances,
+                           <span class="t">GatewayService</span> gateway, <span class="t">NotificationService</span> notifier) {
+        <span class="k">this</span>.executor = executor;
+        <span class="k">this</span>.fraud = fraud;
+        <span class="k">this</span>.balances = balances;
+        <span class="k">this</span>.gateway = gateway;
+        <span class="k">this</span>.notifier = notifier;
+    }
+
+    <span class="c">/** What the two parallel checks found. */</span>
+    <span class="k">private</span> record <span class="t">Checks</span>(<span class="k">int</span> fraudScore, <span class="k">boolean</span> hasFunds) {
+    }
+
+    <span class="c">/** Starts the payment and returns straight away. The future always completes normally, with a {@link PaymentResult}. */</span>
+    <span class="k">public</span> <span class="t">CompletableFuture</span>&lt;<span class="t">PaymentResult</span>&gt; process(<span class="t">PaymentRequest</span> request) {
+        <span class="c">// Several stages run on different threads, one after another. A copy-on-write list is</span>
+        <span class="c">// safe to add to from whichever thread runs the next stage.</span>
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; trail = <span class="k">new</span> <span class="t">CopyOnWriteArrayList</span>&lt;&gt;();
+        trail.add(<span class="n">&quot;PENDING&quot;</span>);
+
+        <span class="k">return</span> <span class="t">CompletableFuture</span>
+                .supplyAsync(() -&gt; validate(request, trail), executor)
+                .thenCompose(valid -&gt; checkInParallel(valid, trail))
+                .thenCompose(valid -&gt; authorise(valid, trail))
+                .thenCompose(code -&gt; tellTheCustomer(request, code, trail))
+                .handle((detail, error) -&gt; error == <span class="k">null</span>
+                        ? <span class="k">new</span> <span class="t">PaymentResult</span>(request.id(), <span class="t">Status</span>.COMPLETED, detail, trail)
+                        : failure(request, error, trail));
+    }
+
+    <span class="k">private</span> <span class="t">PaymentRequest</span> validate(<span class="t">PaymentRequest</span> request, <span class="t">List</span>&lt;<span class="t">String</span>&gt; trail) {
+        <span class="k">if</span> (request.amount().signum() &lt;= <span class="n">0</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">InvalidPaymentException</span>(<span class="n">&quot;amount must be positive&quot;</span>);
+        }
+        <span class="k">if</span> (!<span class="t">List</span>.of(<span class="n">&quot;card&quot;</span>, <span class="n">&quot;upi&quot;</span>, <span class="n">&quot;wallet&quot;</span>).contains(request.method())) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">InvalidPaymentException</span>(<span class="n">&quot;unknown method &quot;</span> + request.method());
+        }
+        trail.add(<span class="n">&quot;VALIDATED&quot;</span>);
+        <span class="k">return</span> request;
+    }
+
+    <span class="c">/**
+     * Starts the fraud check and the balance check together, waits for both, and applies the rules.
+     * {@code thenCombine} is the &quot;both of these, then that&quot; operation.
+     */</span>
+    <span class="k">private</span> <span class="t">CompletableFuture</span>&lt;<span class="t">PaymentRequest</span>&gt; checkInParallel(<span class="t">PaymentRequest</span> request, <span class="t">List</span>&lt;<span class="t">String</span>&gt; trail) {
+        <span class="k">return</span> fraud.score(request)
+                .thenCombine(balances.hasFunds(request), <span class="t">Checks</span>::<span class="k">new</span>)
+                .thenApply(checks -&gt; {
+                    <span class="k">if</span> (!checks.hasFunds()) {
+                        <span class="k">throw</span> <span class="k">new</span> <span class="t">DeclinedException</span>(<span class="n">&quot;insufficient funds&quot;</span>);
+                    }
+                    <span class="k">if</span> (checks.fraudScore() &gt;= <span class="n">80</span>) {
+                        <span class="k">throw</span> <span class="k">new</span> <span class="t">DeclinedException</span>(<span class="n">&quot;fraud score &quot;</span> + checks.fraudScore() + <span class="n">&quot; is too high&quot;</span>);
+                    }
+                    trail.add(<span class="n">&quot;CHECKED&quot;</span>);
+                    <span class="k">return</span> request;
+                });
+    }
+
+    <span class="c">/**
+     * The gateway call is the one we cannot trust to answer, so it gets a deadline.
+     * {@code orTimeout} makes the future fail with a {@link TimeoutException} if it is still empty after the time.
+     */</span>
+    <span class="k">private</span> <span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt; authorise(<span class="t">PaymentRequest</span> request, <span class="t">List</span>&lt;<span class="t">String</span>&gt; trail) {
+        <span class="k">return</span> gateway.authorize(request)
+                .orTimeout(GATEWAY_DEADLINE_MS, <span class="t">TimeUnit</span>.MILLISECONDS)
+                .thenApply(code -&gt; {
+                    trail.add(<span class="n">&quot;AUTHORISED&quot;</span>);
+                    <span class="k">return</span> code;
+                });
+    }
+
+    <span class="c">/**
+     * The money has moved, so a slow mail server must not turn a good payment into a bad one.
+     * {@code completeOnTimeout} supplies a default instead of an error.
+     */</span>
+    <span class="k">private</span> <span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt; tellTheCustomer(<span class="t">PaymentRequest</span> request, <span class="t">String</span> code, <span class="t">List</span>&lt;<span class="t">String</span>&gt; trail) {
+        <span class="k">return</span> notifier.send(request)
+                .completeOnTimeout(<span class="n">&quot;NOT SENT&quot;</span>, NOTICE_DEADLINE_MS, <span class="t">TimeUnit</span>.MILLISECONDS)
+                .thenApply(notice -&gt; {
+                    trail.add(<span class="n">&quot;COMPLETED&quot;</span>);
+                    <span class="k">return</span> <span class="n">&quot;authorised &quot;</span> + code + <span class="n">&quot;, notice &quot;</span> + notice;
+                });
+    }
+
+    <span class="c">/** Turns whatever went wrong into a result. Exceptions in a chain arrive wrapped, so we unwrap first. */</span>
+    <span class="k">private</span> <span class="t">PaymentResult</span> failure(<span class="t">PaymentRequest</span> request, <span class="t">Throwable</span> error, <span class="t">List</span>&lt;<span class="t">String</span>&gt; trail) {
+        <span class="t">Throwable</span> cause = error;
+        <span class="k">while</span> ((cause <span class="k">instanceof</span> <span class="t">CompletionException</span> || cause <span class="k">instanceof</span> <span class="t">ExecutionException</span>) &amp;&amp; cause.getCause() != <span class="k">null</span>) {
+            cause = cause.getCause();
+        }
+
+        <span class="t">Status</span> status;
+        <span class="t">String</span> detail;
+        <span class="k">if</span> (cause <span class="k">instanceof</span> <span class="t">DeclinedException</span>) {
+            status = <span class="t">Status</span>.DECLINED;
+            detail = <span class="n">&quot;Declined: &quot;</span> + cause.getMessage();
+        } <span class="k">else</span> <span class="k">if</span> (cause <span class="k">instanceof</span> <span class="t">InvalidPaymentException</span>) {
+            status = <span class="t">Status</span>.FAILED;
+            detail = <span class="n">&quot;Invalid payment: &quot;</span> + cause.getMessage();
+        } <span class="k">else</span> <span class="k">if</span> (cause <span class="k">instanceof</span> <span class="t">GatewayUnavailableException</span>) {
+            status = <span class="t">Status</span>.FAILED;
+            detail = <span class="n">&quot;Gateway unavailable, try again later&quot;</span>;
+        } <span class="k">else</span> <span class="k">if</span> (cause <span class="k">instanceof</span> <span class="t">TimeoutException</span>) {
+            status = <span class="t">Status</span>.TIMED_OUT;
+            detail = <span class="n">&quot;No answer from the gateway within &quot;</span> + GATEWAY_DEADLINE_MS + <span class="n">&quot; ms&quot;</span>;
+        } <span class="k">else</span> {
+            status = <span class="t">Status</span>.FAILED;
+            detail = <span class="n">&quot;Unexpected &quot;</span> + cause.getClass().getSimpleName();
+        }
+        trail.add(status.name());
+        <span class="k">return</span> <span class="k">new</span> <span class="t">PaymentResult</span>(request.id(), status, detail, trail);
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/asyncpay/Retry.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.asyncpay;
+
+<span class="k">import</span> java.util.concurrent.<span class="t">CompletableFuture</span>;
+<span class="k">import</span> java.util.function.<span class="t">Supplier</span>;
+
+<span class="c">/** Tries an asynchronous action again when it fails. */</span>
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> <span class="t">Retry</span> {
+
+    <span class="k">private</span> <span class="t">Retry</span>() {
+    }
+
+    <span class="c">/**
+     * Runs {@code action}. If its future fails and attempts remain, runs it again, without blocking
+     * any thread while waiting.
+     *
+     * &lt;p&gt;{@code handle} sees both the value and the error. We return a &lt;em&gt;future of a future&lt;/em&gt;
+     * from it, either the good result or the next attempt, and {@code thenCompose} flattens it.
+     *
+     * @param attempts the total number of tries, including the first
+     */</span>
+    <span class="k">public</span> <span class="k">static</span> &lt;T&gt; <span class="t">CompletableFuture</span>&lt;T&gt; withAttempts(<span class="k">int</span> attempts, <span class="t">Supplier</span>&lt;<span class="t">CompletableFuture</span>&lt;T&gt;&gt; action) {
+        <span class="k">return</span> action.get()
+                .handle((value, error) -&gt; {
+                    <span class="k">if</span> (error == <span class="k">null</span>) {
+                        <span class="k">return</span> <span class="t">CompletableFuture</span>.completedFuture(value);
+                    }
+                    <span class="k">if</span> (attempts &gt; <span class="n">1</span>) {
+                        <span class="k">return</span> withAttempts(attempts - <span class="n">1</span>, action);
+                    }
+                    <span class="k">return</span> <span class="t">CompletableFuture</span>.&lt;T&gt;failedFuture(error);
+                })
+                .thenCompose(next -&gt; next);
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- One payment, step by step ---
+  process() has returned. It did not wait for the payment to finish.
+  P-1001 COMPLETED: authorised AUTH-P-1001, notice sent
+  Trail: PENDING -&gt; VALIDATED -&gt; CHECKED -&gt; AUTHORISED -&gt; COMPLETED
+
+--- Seven payments started together ---
+  P-1001  COMPLETED  authorised AUTH-P-1001, notice sent
+          PENDING -&gt; VALIDATED -&gt; CHECKED -&gt; AUTHORISED -&gt; COMPLETED
+  P-2001  DECLINED   Declined: insufficient funds
+          PENDING -&gt; VALIDATED -&gt; DECLINED
+  P-2002  DECLINED   Declined: fraud score 90 is too high
+          PENDING -&gt; VALIDATED -&gt; DECLINED
+  P-2003  FAILED     Invalid payment: amount must be positive
+          PENDING -&gt; FAILED
+  P-GATE  FAILED     Gateway unavailable, try again later
+          PENDING -&gt; VALIDATED -&gt; CHECKED -&gt; FAILED
+  P-SLOW  TIMED_OUT  No answer from the gateway within 400 ms
+          PENDING -&gt; VALIDATED -&gt; CHECKED -&gt; TIMED_OUT
+  P-MAIL  COMPLETED  authorised AUTH-P-MAIL, notice NOT SENT
+          PENDING -&gt; VALIDATED -&gt; CHECKED -&gt; AUTHORISED -&gt; COMPLETED
+
+--- A batch of nine, waiting with allOf ---
+  By status: {COMPLETED=4, DECLINED=2, FAILED=2, TIMED_OUT=1}
+  Callbacks that fired: 9
+
+--- Two gateways, the faster one wins ---
+  Answered by: backup gateway
+
+--- Trying again when the gateway fails ---
+  Succeeded after 3 attempts: AUTH-RETRIED
+  Gave up after 3 attempts: still down
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Process one more payment.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print the reason of each non-completed payment.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Predict a 45,000 payment.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add a third parallel check.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Retry with a pause.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Limit payments in flight with a Semaphore.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: an exception wrapped in <span class="mono">CompletionException</span>, <span class="mono">main</span> ending before the async work, and <span class="mono">thenApply</span> where <span class="mono">thenCompose</span> belongs. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">08-concurrency/34-asynchronous-payment-status-simulator</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="index.html#phase-9"><span class="k2">Next</span><span class="v">Phase 9: Professional Java</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
