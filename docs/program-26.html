@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appointment Scheduler | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 06 · Files, I/O and Date · Program 26 of 43</p>
+    <h1>Appointment Scheduler</h1>
+    <div class="tags">
+      <span class="tag">Advanced</span>
+      <span class="chip" style="background:#fff">ZonedDateTime</span>
+      <span class="chip" style="background:#fff">Time zones</span>
+      <span class="chip" style="background:#fff">Daylight saving</span>
+      <span class="chip" style="background:#fff">Phase project</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A team in New York, London and Kolkata books meetings. Nobody may be double-booked, everyone wants the agenda on their own clock, and the bookings must survive the program closing.</p>
+        <p>This Phase 6 project combines time zones, daylight saving, a checked exception, Comparable and saving to a file with careful error reports.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Appointment.java</b><span class="d">ZonedDateTime, Duration and the file line format.</span></span></li>
+          <li><span class="badge">2</span><span><b>ScheduleConflictException.java</b><span class="d">A checked exception that carries the clash.</span></span></li>
+          <li><span class="badge">3</span><span><b>Scheduler.java</b><span class="d">A sorted list, zone conversion, save and load.</span></span></li>
+          <li><span class="badge">4</span><span><b>Main.java</b><span class="d">From zones to a damaged file.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/scheduler/Appointment.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.scheduler;
+
+<span class="k">import</span> java.time.<span class="t">Duration</span>;
+<span class="k">import</span> java.time.<span class="t">ZonedDateTime</span>;
+
+<span class="c">/**
+ * A booking: a title, when it starts (with its time zone) and how long it lasts.
+ *
+ * The start is a ZonedDateTime, so &quot;10:00 in New York&quot; is remembered together with the
+ * rules of New York. Everything that compares two appointments goes through toInstant(),
+ * the one absolute moment on the timeline, because 10:00 in New York and 14:00 in London
+ * can be the same moment and local clock times cannot be compared directly.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Appointment</span> <span class="k">implements</span> <span class="t">Comparable</span>&lt;<span class="t">Appointment</span>&gt; {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> title;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ZonedDateTime</span> start;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Duration</span> length;
+
+    <span class="k">public</span> <span class="t">Appointment</span>(<span class="t">String</span> title, <span class="t">ZonedDateTime</span> start, <span class="t">Duration</span> length) {
+        <span class="k">if</span> (length.isZero() || length.isNegative()) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="n">&quot;An appointment needs a positive length&quot;</span>);
+        }
+        <span class="k">this</span>.title = title;
+        <span class="k">this</span>.start = start;
+        <span class="k">this</span>.length = length;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getTitle() {
+        <span class="k">return</span> title;
+    }
+
+    <span class="k">public</span> <span class="t">ZonedDateTime</span> getStart() {
+        <span class="k">return</span> start;
+    }
+
+    <span class="k">public</span> <span class="t">Duration</span> getLength() {
+        <span class="k">return</span> length;
+    }
+
+    <span class="c">/** The end, found by adding exact elapsed time, so it stays right across a clock change. */</span>
+    <span class="k">public</span> <span class="t">ZonedDateTime</span> getEnd() {
+        <span class="k">return</span> start.plus(length);
+    }
+
+    <span class="c">/** True when the two appointments share any time. One ending exactly as another starts is fine. */</span>
+    <span class="k">public</span> <span class="k">boolean</span> overlaps(<span class="t">Appointment</span> other) {
+        <span class="k">return</span> start.toInstant().isBefore(other.getEnd().toInstant())
+                &amp;&amp; other.start.toInstant().isBefore(getEnd().toInstant());
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="k">int</span> compareTo(<span class="t">Appointment</span> other) {
+        <span class="k">return</span> start.toInstant().compareTo(other.start.toInstant());
+    }
+
+    <span class="c">/** One line for the data file: title|start|minutes. ZonedDateTime.toString() already includes the zone. */</span>
+    <span class="k">public</span> <span class="t">String</span> toLine() {
+        <span class="k">return</span> title + <span class="n">&quot;|&quot;</span> + start + <span class="n">&quot;|&quot;</span> + length.toMinutes();
+    }
+
+    <span class="c">/** The reverse of toLine(). Throws an unchecked exception when the line is not in that layout. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">Appointment</span> fromLine(<span class="t">String</span> line) {
+        <span class="t">String</span>[] parts = line.split(<span class="n">&quot;\\|&quot;</span>);
+        <span class="k">if</span> (parts.length != <span class="n">3</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="n">&quot;expected 3 parts but found &quot;</span> + parts.length);
+        }
+        <span class="k">return</span> <span class="k">new</span> <span class="t">Appointment</span>(parts[<span class="n">0</span>], <span class="t">ZonedDateTime</span>.parse(parts[<span class="n">1</span>]), <span class="t">Duration</span>.ofMinutes(<span class="t">Long</span>.parseLong(parts[<span class="n">2</span>])));
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/scheduler/Scheduler.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.scheduler;
+
+<span class="k">import</span> java.io.<span class="t">IOException</span>;
+<span class="k">import</span> java.nio.charset.<span class="t">StandardCharsets</span>;
+<span class="k">import</span> java.nio.file.<span class="t">Files</span>;
+<span class="k">import</span> java.nio.file.<span class="t">Path</span>;
+<span class="k">import</span> java.time.<span class="t">ZoneId</span>;
+<span class="k">import</span> java.time.<span class="t">ZonedDateTime</span>;
+<span class="k">import</span> java.time.format.<span class="t">DateTimeFormatter</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Collections</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Locale</span>;
+
+<span class="c">/** Keeps appointments in time order, refuses overlaps, and saves them to a text file. */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Scheduler</span> {
+
+    <span class="c">/** Weekday, date, 24-hour time, the offset from UTC and the zone name. */</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">DateTimeFormatter</span> SHOWN =
+            <span class="t">DateTimeFormatter</span>.ofPattern(<span class="n">&quot;EEE dd MMM HH:mm xxx &#x27;[&#x27;VV&#x27;]&#x27;&quot;</span>, <span class="t">Locale</span>.ENGLISH);
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">List</span>&lt;<span class="t">Appointment</span>&gt; appointments = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; loadProblems = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+
+    <span class="k">public</span> <span class="k">void</span> add(<span class="t">Appointment</span> wanted) <span class="k">throws</span> <span class="t">ScheduleConflictException</span> {
+        <span class="k">for</span> (<span class="t">Appointment</span> existing : appointments) {
+            <span class="k">if</span> (existing.overlaps(wanted)) {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">ScheduleConflictException</span>(wanted, existing);
+            }
+        }
+        appointments.add(wanted);
+        <span class="t">Collections</span>.sort(appointments);                 <span class="c">// Appointment is Comparable by moment in time</span>
+    }
+
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">Appointment</span>&gt; all() {
+        <span class="k">return</span> <span class="t">Collections</span>.unmodifiableList(appointments);
+    }
+
+    <span class="c">/**
+     * The agenda as text, with every start shown on the clocks of one zone.
+     * withZoneSameInstant keeps the moment and changes only how it is displayed.
+     */</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; agendaIn(<span class="t">ZoneId</span> zone) {
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; lines = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">Appointment</span> appointment : appointments) {
+            <span class="t">ZonedDateTime</span> local = appointment.getStart().withZoneSameInstant(zone);
+            lines.add(local.format(SHOWN) + <span class="n">&quot;  &quot;</span> + appointment.getTitle()
+                    + <span class="n">&quot; (&quot;</span> + appointment.getLength().toMinutes() + <span class="n">&quot; min)&quot;</span>);
+        }
+        <span class="k">return</span> lines;
+    }
+
+    <span class="k">public</span> <span class="k">void</span> save(<span class="t">Path</span> file) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; lines = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">Appointment</span> appointment : appointments) {
+            lines.add(appointment.toLine());
+        }
+        <span class="t">Files</span>.write(file, lines, <span class="t">StandardCharsets</span>.UTF_8);
+    }
+
+    <span class="c">/** Loads a file. Lines that cannot be read are skipped and listed in getLoadProblems(). */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">Scheduler</span> load(<span class="t">Path</span> file) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="t">Scheduler</span> scheduler = <span class="k">new</span> <span class="t">Scheduler</span>();
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; lines = <span class="t">Files</span>.readAllLines(file, <span class="t">StandardCharsets</span>.UTF_8);
+        <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; lines.size(); i++) {
+            <span class="k">try</span> {
+                scheduler.add(<span class="t">Appointment</span>.fromLine(lines.get(i)));
+            } <span class="k">catch</span> (<span class="t">ScheduleConflictException</span> e) {
+                scheduler.loadProblems.add(<span class="n">&quot;line &quot;</span> + (i + <span class="n">1</span>) + <span class="n">&quot;: &quot;</span> + e.getMessage());
+            } <span class="k">catch</span> (<span class="t">RuntimeException</span> e) {
+                <span class="c">// DateTimeParseException, NumberFormatException and IllegalArgumentException all end up here.</span>
+                scheduler.loadProblems.add(<span class="n">&quot;line &quot;</span> + (i + <span class="n">1</span>) + <span class="n">&quot;: could not read (&quot;</span> + e.getClass().getSimpleName() + <span class="n">&quot;)&quot;</span>);
+            }
+        }
+        <span class="k">return</span> scheduler;
+    }
+
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; getLoadProblems() {
+        <span class="k">return</span> loadProblems;
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- One moment, three clocks ---
+  New York: 2026-03-09T10:00-04:00[America/New_York]
+  London  : 2026-03-09T14:00Z[Europe/London]
+  Kolkata : 2026-03-09T19:30+05:30[Asia/Kolkata]
+  Same Instant in UTC: 2026-03-09T14:00:00Z
+
+--- Booking across zones ---
+  Booked  &quot;Stand-up&quot;
+  Refused &quot;Design review&quot; overlaps &quot;Stand-up&quot;
+  Booked  &quot;Client call&quot;
+  Booked  &quot;Retro&quot;
+
+--- The same agenda on two clocks ---
+  New York:
+    Mon 09 Mar 10:00 -04:00 [America/New_York]  Stand-up (30 min)
+    Mon 09 Mar 11:00 -04:00 [America/New_York]  Client call (60 min)
+    Tue 10 Mar 15:00 -04:00 [America/New_York]  Retro (60 min)
+  Kolkata:
+    Mon 09 Mar 19:30 +05:30 [Asia/Kolkata]  Stand-up (30 min)
+    Mon 09 Mar 20:30 +05:30 [Asia/Kolkata]  Client call (60 min)
+    Wed 11 Mar 00:30 +05:30 [Asia/Kolkata]  Retro (60 min)
+
+--- Clock changes ---
+  2:30 on 8 March does not exist in New York, so Java gives: 2026-03-08T03:30-04:00[America/New_York]
+  1:30 on 1 November happens twice. Default (earlier): 2026-11-01T01:30-04:00[America/New_York]
+  The later one: 2026-11-01T01:30-05:00[America/New_York]
+  Saturday 09:00 plusDays(1)       : 2026-03-08T09:00-04:00[America/New_York]
+  Saturday 09:00 plus 24 hours     : 2026-03-08T10:00-04:00[America/New_York]
+  Hours in 8 March in New York     : 23
+
+--- Saving and loading ---
+  | Stand-up|2026-03-09T10:00-04:00[America/New_York]|30
+  | Client call|2026-03-09T20:30+05:30[Asia/Kolkata]|60
+  | Retro|2026-03-10T15:00-04:00[America/New_York]|60
+  Loaded 3 appointments, 0 problems
+  Every start time survived the round trip: true
+
+--- A damaged file ---
+  Loaded 4 appointments
+  Skipped line 5: could not read (IllegalArgumentException)
+  Skipped line 6: could not read (DateTimeParseException)
+  Skipped line 7: &quot;Overlap&quot; overlaps &quot;Stand-up&quot;
+  Skipped line 8: could not read (NumberFormatException)
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Book a meeting in London.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print every end time.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print the time between two meetings.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Find appointments on a local date.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Cancel an appointment.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Find the first free slot.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: <span class="mono">equals</span> against <span class="mono">isEqual</span>, an unknown zone id, and <span class="mono">Duration.between</span> on dates. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">06-files-io-date/26-appointment-scheduler</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="index.html#phase-7"><span class="k2">Next</span><span class="v">Phase 7: Modern Java</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -7,7 +7,7 @@
 
 <p align="center">
   <img alt="Java 21 or newer" src="https://img.shields.io/badge/Java-21%2B-B83A0E">
-  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-22%20of%2043-0F766E">
+  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-26%20of%2043-0F766E">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-0E1726">
   <a href="https://github.com/codechanakya/core-java/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/codechanakya/core-java/actions/workflows/ci.yml/badge.svg"></a>
 </p>
@@ -23,7 +23,7 @@
 
 It follows a fixed path: smallest building block first, then the next concept that depends on it, until you can design and test a small system yourself.
 
-> **Status:** Phases 1 to 5 are ready (22 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
+> **Status:** Phases 1 to 6 are ready (26 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
 
 ## Start here
 
@@ -126,10 +126,10 @@ Each phase ends with a project that uses everything taught before it. Frameworks
 
 | No. | Program | Concepts | Status |
 |---|---|---|---|
-| 23 | Employee File Management | streams, buffered I/O | Planned |
-| 24 | Log File Analyzer | NIO, `Path` and `Files` | Planned |
-| 25 | Daily Transaction Report | `LocalDate`, formatting | Planned |
-| 26 | Appointment Scheduler | `ZonedDateTime`, file persistence | Planned |
+| 23 | [Employee File Management](06-files-io-date/23-employee-file-management) | streams, buffered I/O | Ready |
+| 24 | [Log File Analyzer](06-files-io-date/24-log-file-analyzer) | NIO, `Path` and `Files` | Ready |
+| 25 | [Daily Transaction Report](06-files-io-date/25-daily-transaction-report) | `LocalDate`, formatting | Ready |
+| 26 | [Appointment Scheduler](06-files-io-date/26-appointment-scheduler) | `ZonedDateTime`, file persistence | Ready |
 
 </details>
 

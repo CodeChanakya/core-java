@@ -3,3 +3,6 @@
 *.sh text eol=lf
 expected-output.txt text eol=lf
 sample-input.txt text eol=lf
+
+# Sample data read by the Phase 6 programs: keep the bytes identical on every machine.
+data/** text eol=lf

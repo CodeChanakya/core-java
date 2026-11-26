@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Log File Analyzer | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 06 · Files, I/O and Date · Program 24 of 43</p>
+    <h1>Log File Analyzer</h1>
+    <div class="tags">
+      <span class="tag">Intermediate</span>
+      <span class="chip" style="background:#fff">NIO</span>
+      <span class="chip" style="background:#fff">Path</span>
+      <span class="chip" style="background:#fff">Files</span>
+      <span class="chip" style="background:#fff">Glob</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A service writes one log file a day. Someone must answer how many errors there were, which component complains most and where the first error is, from plain text with some lines that are not events.</p>
+        <p>Path describes locations, Files does the work and throws precise exceptions, and a glob finds only the .log files.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Level.java, LogEntry.java, LogParser.java</b><span class="d">Parsing one line safely.</span></span></li>
+          <li><span class="badge">2</span><span><b>LogReport.java</b><span class="d">EnumMap, TreeMap and merge.</span></span></li>
+          <li><span class="badge">3</span><span><b>LogFolder.java</b><span class="d">DirectoryStream with a glob.</span></span></li>
+          <li><span class="badge">4</span><span><b>Main.java</b><span class="d">Path and Files in use.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/logs/LogParser.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.logs;
+
+<span class="c">/**
+ * Turns one line of text into a LogEntry.
+ *
+ * Expected layout: date, time, level, component, then the rest of the line as the message.
+ * Columns are separated by one or more spaces, which is why the split uses a pattern.
+ */</span>
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> <span class="t">LogParser</span> {
+
+    <span class="k">private</span> <span class="t">LogParser</span>() {
+    }
+
+    <span class="c">/** Returns the entry, or null when the line is not a log line (a stack trace, a blank line, a note). */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">LogEntry</span> parse(<span class="t">String</span> line) {
+        <span class="t">String</span>[] parts = line.trim().split(<span class="n">&quot;\\s+&quot;</span>, <span class="n">5</span>);     <span class="c">// 5 = at most five pieces; the message keeps its spaces</span>
+        <span class="k">if</span> (parts.length &lt; <span class="n">5</span>) {
+            <span class="k">return</span> <span class="k">null</span>;
+        }
+        <span class="k">try</span> {
+            <span class="t">Level</span> level = <span class="t">Level</span>.valueOf(parts[<span class="n">2</span>]);
+            <span class="k">return</span> <span class="k">new</span> <span class="t">LogEntry</span>(parts[<span class="n">0</span>], parts[<span class="n">1</span>], level, parts[<span class="n">3</span>], parts[<span class="n">4</span>]);
+        } <span class="k">catch</span> (<span class="t">IllegalArgumentException</span> e) {
+            <span class="k">return</span> <span class="k">null</span>;                                    <span class="c">// third word was not a known level, such as TRACE</span>
+        }
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/logs/LogFolder.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.logs;
+
+<span class="k">import</span> java.io.<span class="t">IOException</span>;
+<span class="k">import</span> java.nio.file.<span class="t">DirectoryStream</span>;
+<span class="k">import</span> java.nio.file.<span class="t">Files</span>;
+<span class="k">import</span> java.nio.file.<span class="t">Path</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Collections</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="c">/** Finds log files in a folder using java.nio.file. */</span>
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> <span class="t">LogFolder</span> {
+
+    <span class="k">private</span> <span class="t">LogFolder</span>() {
+    }
+
+    <span class="c">/**
+     * Every *.log file directly inside the folder, sorted by name.
+     * The sort matters: the operating system may list a folder in any order, so
+     * output that depends on it would differ from one machine to the next.
+     */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">List</span>&lt;<span class="t">Path</span>&gt; listLogs(<span class="t">Path</span> folder) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="t">List</span>&lt;<span class="t">Path</span>&gt; found = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="c">// The second argument is a glob pattern. DirectoryStream holds an open handle, so close it.</span>
+        <span class="k">try</span> (<span class="t">DirectoryStream</span>&lt;<span class="t">Path</span>&gt; stream = <span class="t">Files</span>.newDirectoryStream(folder, <span class="n">&quot;*.log&quot;</span>)) {
+            <span class="k">for</span> (<span class="t">Path</span> path : stream) {
+                found.add(path);
+            }
+        }
+        <span class="t">Collections</span>.sort(found);
+        <span class="k">return</span> found;
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- A short tour of Path ---
+  resolve        : data/logs/app-2026-03-01.log
+  getFileName    : app-2026-03-01.log
+  getParent      : data/logs
+  relativize     : app-2026-03-01.log
+  normalize      : data/logs
+  isAbsolute     : false
+  exists / isDir : true / true
+
+--- Finding the log files ---
+  app-2026-03-01.log
+  app-2026-03-02.log
+  (notes.txt is ignored by the *.log pattern)
+
+--- One file at a time ---
+  app-2026-03-01.log: 9 lines, 2 errors, 1 unreadable
+  app-2026-03-02.log: 7 lines, 2 errors, 1 unreadable
+
+--- All files together ---
+  Lines read: 16 (unreadable: 2)
+  DEBUG 1
+  INFO  7
+  WARN  2
+  ERROR 4
+  Errors by component: {AuthService=1, OrderService=2, PaymentService=1}
+  First error in each file:
+    app-2026-03-01.log line 4 at 09:17:03: Payment declined ref=P-1002 reason=INSUFFICIENT_FUNDS
+    app-2026-03-02.log line 3 at 08:06:01: Stock check failed id=O-78 sku=H-300
+
+--- Writing, moving and deleting ---
+  Summary written: 6 lines
+  After move, old path exists: false, new path exists: true
+  Copy has the same lines: true
+  Deleted the copy: true
+  Deleting it again: false
+
+--- A missing file ---
+  Caught NoSuchFileException for data/logs/app-2026-03-03.log
+
+Errors were about 28 percent of readable lines.
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Print the folder and bare file names.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add percentOf().</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Check isRegularFile.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add TRACE to Level.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add a general list(glob).</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Find the busiest component.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: <span class="mono">resolve</span> with an absolute path, <span class="mono">Files.write</span> replacing a file, and a String where a Path belongs. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">06-files-io-date/24-log-file-analyzer</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-25.html"><span class="k2">Next</span><span class="v">25 Daily Transaction Report</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

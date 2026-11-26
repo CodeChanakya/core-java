@@ -1,0 +1,40 @@
+--- A short tour of Path ---
+  resolve        : data/logs/app-2026-03-01.log
+  getFileName    : app-2026-03-01.log
+  getParent      : data/logs
+  relativize     : app-2026-03-01.log
+  normalize      : data/logs
+  isAbsolute     : false
+  exists / isDir : true / true
+
+--- Finding the log files ---
+  app-2026-03-01.log
+  app-2026-03-02.log
+  (notes.txt is ignored by the *.log pattern)
+
+--- One file at a time ---
+  app-2026-03-01.log: 9 lines, 2 errors, 1 unreadable
+  app-2026-03-02.log: 7 lines, 2 errors, 1 unreadable
+
+--- All files together ---
+  Lines read: 16 (unreadable: 2)
+  DEBUG 1
+  INFO  7
+  WARN  2
+  ERROR 4
+  Errors by component: {AuthService=1, OrderService=2, PaymentService=1}
+  First error in each file:
+    app-2026-03-01.log line 4 at 09:17:03: Payment declined ref=P-1002 reason=INSUFFICIENT_FUNDS
+    app-2026-03-02.log line 3 at 08:06:01: Stock check failed id=O-78 sku=H-300
+
+--- Writing, moving and deleting ---
+  Summary written: 6 lines
+  After move, old path exists: false, new path exists: true
+  Copy has the same lines: true
+  Deleted the copy: true
+  Deleting it again: false
+
+--- A missing file ---
+  Caught NoSuchFileException for data/logs/app-2026-03-03.log
+
+Errors were about 28 percent of readable lines.

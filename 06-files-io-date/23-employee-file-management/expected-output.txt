@@ -1,0 +1,33 @@
+--- Reading data/employees.csv ---
+Loaded 6 employees, skipped 2 lines
+  Skipped line 8: expected 4 fields but found 3
+  Skipped line 9: salary is not a number: "seventy thousand"
+
+--- Payroll by department ---
+  Engineering    285000.50
+  Finance        140500.00
+  Support         41000.00
+  Total          466500.50
+
+--- Writing a report, then reading it back ---
+  | ID       Name           Department        Salary
+  | ------------------------------------------------
+  | E-101    Asha Menon     Engineering     92000.00
+  | E-102    Rahul Verma    Finance         68000.00
+  | E-103    Meera Iyer     Engineering    105000.50
+  | E-104    Kiran Rao      Support         41000.00
+  | E-205    Dev Patel      Finance         72500.00
+  | E-208    Neha Joshi     Engineering     88000.00
+  | 6 employees
+
+--- Saving a clean copy, then appending ---
+  Rows after save  : 6
+  Rows after append: 7 (problems: 0)
+
+--- Copying as raw bytes ---
+  Copied 280 bytes; the original is 280 bytes, the copy is 280 bytes
+
+--- When the file is not there ---
+  exists(): false
+  Caught FileNotFoundException
+  FileNotFoundException is an IOException: true
