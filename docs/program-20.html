@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order Processing Queue | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 05 · Collections · Program 20 of 43</p>
+    <h1>Order Processing Queue</h1>
+    <div class="tags">
+      <span class="tag">Intermediate</span>
+      <span class="chip" style="background:#fff">Queue</span>
+      <span class="chip" style="background:#fff">Deque</span>
+      <span class="chip" style="background:#fff">PriorityQueue</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>Orders arrive all day and are handled one at a time. Who goes next, and can the last step be taken back?</p>
+        <p>A queue serves first come first served. A PriorityQueue lets express orders jump the line fairly. A Deque used as a stack gives undo.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Priority.java, QueuedOrder.java</b><span class="d">An enum order and an arrival number.</span></span></li>
+          <li><span class="badge">2</span><span><b>OrderDesk.java</b><span class="d">ArrayDeque, PriorityQueue and a stack.</span></span></li>
+          <li><span class="badge">3</span><span><b>Main.java</b><span class="d">Each structure in turn.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/queue/OrderDesk.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.queue;
+
+<span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">Comparator</span>;
+<span class="k">import</span> java.util.<span class="t">Deque</span>;
+<span class="k">import</span> java.util.<span class="t">PriorityQueue</span>;
+<span class="k">import</span> java.util.<span class="t">Queue</span>;
+
+<span class="c">/**
+ * Two ways of lining orders up, plus a history stack.
+ *
+ *  - fifo:     plain first-come-first-served.
+ *  - urgent:   a PriorityQueue, express before standard, then by arrival.
+ *  - history:  a Deque used as a stack, so the latest finished order is on top.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">OrderDesk</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Queue</span>&lt;<span class="t">QueuedOrder</span>&gt; fifo = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Queue</span>&lt;<span class="t">QueuedOrder</span>&gt; urgent = <span class="k">new</span> <span class="t">PriorityQueue</span>&lt;&gt;(
+            <span class="t">Comparator</span>.comparing(<span class="t">QueuedOrder</span>::getPriority)          <span class="c">// enum order: EXPRESS first</span>
+                    .thenComparingInt(<span class="t">QueuedOrder</span>::getArrival));
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Deque</span>&lt;<span class="t">QueuedOrder</span>&gt; history = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+
+    <span class="c">/**
+     * Every order goes into both lines, only so the demo can compare them side by side.
+     * A real desk would pick one.
+     */</span>
+    <span class="k">public</span> <span class="k">void</span> receive(<span class="t">QueuedOrder</span> order) {
+        fifo.offer(order);
+        urgent.offer(order);
+    }
+
+    <span class="c">/** Next order in plain arrival order, or null when the line is empty. */</span>
+    <span class="k">public</span> <span class="t">QueuedOrder</span> nextInArrivalOrder() {
+        <span class="k">return</span> fifo.poll();
+    }
+
+    <span class="c">/** Next order by urgency, or null when the line is empty. Finished orders go on the history stack. */</span>
+    <span class="k">public</span> <span class="t">QueuedOrder</span> nextMostUrgent() {
+        <span class="t">QueuedOrder</span> order = urgent.poll();
+        <span class="k">if</span> (order != <span class="k">null</span>) {
+            history.push(order);
+        }
+        <span class="k">return</span> order;
+    }
+
+    <span class="c">/** Looks at the head of the plain line without taking it. */</span>
+    <span class="k">public</span> <span class="t">QueuedOrder</span> peekArrivalOrder() {
+        <span class="k">return</span> fifo.peek();
+    }
+
+    <span class="c">/** The same call, but it throws NoSuchElementException on an empty line. */</span>
+    <span class="k">public</span> <span class="t">QueuedOrder</span> mustTakeArrivalOrder() {
+        <span class="k">return</span> fifo.remove();
+    }
+
+    <span class="c">/**
+     * Takes back the most recently finished order and returns it to the urgent line,
+     * where its priority decides its place.
+     */</span>
+    <span class="k">public</span> <span class="t">QueuedOrder</span> undoLast() {
+        <span class="t">QueuedOrder</span> last = history.pollFirst();
+        <span class="k">if</span> (last != <span class="k">null</span>) {
+            urgent.offer(last);
+        }
+        <span class="k">return</span> last;
+    }
+
+    <span class="k">public</span> <span class="k">int</span> waiting() {
+        <span class="k">return</span> urgent.size();
+    }
+
+    <span class="k">public</span> <span class="k">int</span> finished() {
+        <span class="k">return</span> history.size();
+    }
+
+    <span class="k">public</span> <span class="t">QueuedOrder</span> lastFinished() {
+        <span class="k">return</span> history.peekFirst();
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+Orders received: 5
+
+--- A plain queue: first in, first out ---
+  Peek (look, do not take): ORD-1 (Asha, standard)
+  Poll: ORD-1 (Asha, standard)
+  Poll: ORD-2 (Rahul, express)
+  Poll: ORD-3 (Meera, standard)
+
+--- A priority queue: express first, then arrival ---
+  Handle: ORD-2 (Rahul, express)
+  Handle: ORD-4 (Kiran, express)
+  Handle: ORD-1 (Asha, standard)
+  Waiting: 2, finished: 3
+
+--- A deque used as an undo stack ---
+  Last finished: ORD-1 (Asha, standard)
+  Undo it: ORD-1 (Asha, standard)
+  Waiting again: 3, finished: 2
+  Handle next: ORD-1 (Asha, standard)
+
+--- Both ends of a Deque ---
+  Tray: [front, middle, back]
+  Take from front: front, from back: back
+  Left: [middle]
+
+--- Empty queue: null or exception? ---
+  poll() on empty returns: null
+  peek() on empty returns: null
+  remove() on empty throws: NoSuchElementException
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add an express order.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add hasWaiting().</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print the waiting count.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add a BULK priority.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add drain().</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Keep only the last three in history.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: <span class="mono">remove()</span> on an empty queue, trusting a printed PriorityQueue, and <span class="mono">push</span> on a Queue. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">05-collections/20-order-processing-queue</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-21.html"><span class="k2">Next</span><span class="v">21 Employee Directory</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

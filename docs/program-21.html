@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Employee Directory | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 05 · Collections · Program 21 of 43</p>
+    <h1>Employee Directory</h1>
+    <div class="tags">
+      <span class="tag">Intermediate to advanced</span>
+      <span class="chip" style="background:#fff">Map</span>
+      <span class="chip" style="background:#fff">HashMap</span>
+      <span class="chip" style="background:#fff">equals</span>
+      <span class="chip" style="background:#fff">hashCode</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>HR needs to find an employee by id instantly, group people by department and count them. Scanning a list each time does not scale.</p>
+        <p>A Map finds a value from its key. For that to work the key needs a correct equals and hashCode, written together.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Employee.java</b><span class="d">equals and hashCode from one field.</span></span></li>
+          <li><span class="badge">2</span><span><b>Directory.java</b><span class="d">LinkedHashMap, TreeMap, computeIfAbsent and merge.</span></span></li>
+          <li><span class="badge">3</span><span><b>Main.java</b><span class="d">Lookups, replacement, grouping and hashing.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/directory/Employee.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.directory;
+
+<span class="k">import</span> java.util.<span class="t">Objects</span>;
+
+<span class="c">/**
+ * An employee, identified by employee id.
+ *
+ * equals() and hashCode() are written together and from the same field. Two Employee
+ * objects with the same id are the same person, and they must also produce the
+ * same hash code, otherwise a HashMap or HashSet cannot find them again.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Employee</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> id;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> name;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> department;
+
+    <span class="k">public</span> <span class="t">Employee</span>(<span class="t">String</span> id, <span class="t">String</span> name, <span class="t">String</span> department) {
+        <span class="k">this</span>.id = id;
+        <span class="k">this</span>.name = name;
+        <span class="k">this</span>.department = department;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getId() {
+        <span class="k">return</span> id;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getName() {
+        <span class="k">return</span> name;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getDepartment() {
+        <span class="k">return</span> department;
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="k">boolean</span> equals(<span class="t">Object</span> other) {
+        <span class="k">if</span> (<span class="k">this</span> == other) {
+            <span class="k">return</span> <span class="k">true</span>;
+        }
+        <span class="k">if</span> (!(other <span class="k">instanceof</span> <span class="t">Employee</span>)) {
+            <span class="k">return</span> <span class="k">false</span>;
+        }
+        <span class="t">Employee</span> that = (<span class="t">Employee</span>) other;
+        <span class="k">return</span> id.equals(that.id);
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="k">int</span> hashCode() {
+        <span class="k">return</span> <span class="t">Objects</span>.hash(id);
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">String</span> toString() {
+        <span class="k">return</span> id + <span class="n">&quot; &quot;</span> + name + <span class="n">&quot; (&quot;</span> + department + <span class="n">&quot;)&quot;</span>;
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/directory/Directory.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.directory;
+
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">LinkedHashMap</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.<span class="t">TreeMap</span>;
+
+<span class="c">/**
+ * Looks employees up by id and groups them by department.
+ *
+ * A Map answers &quot;given this key, what is the value?&quot; in near constant time,
+ * which a List cannot do without scanning from the start.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Directory</span> {
+
+    <span class="c">// LinkedHashMap so listings come out in the order people joined.</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Employee</span>&gt; byId = <span class="k">new</span> <span class="t">LinkedHashMap</span>&lt;&gt;();
+
+    <span class="c">/** Adds a person. Returns the previous holder of that id, or null when the id was new. */</span>
+    <span class="k">public</span> <span class="t">Employee</span> add(<span class="t">Employee</span> employee) {
+        <span class="k">return</span> byId.put(employee.getId(), employee);
+    }
+
+    <span class="c">/** Adds only when the id is free, leaving an existing record untouched. */</span>
+    <span class="k">public</span> <span class="k">boolean</span> addIfAbsent(<span class="t">Employee</span> employee) {
+        <span class="k">return</span> byId.putIfAbsent(employee.getId(), employee) == <span class="k">null</span>;
+    }
+
+    <span class="c">/** The person with this id, or null. */</span>
+    <span class="k">public</span> <span class="t">Employee</span> find(<span class="t">String</span> id) {
+        <span class="k">return</span> byId.get(id);
+    }
+
+    <span class="k">public</span> <span class="t">Employee</span> remove(<span class="t">String</span> id) {
+        <span class="k">return</span> byId.remove(id);
+    }
+
+    <span class="k">public</span> <span class="k">boolean</span> has(<span class="t">String</span> id) {
+        <span class="k">return</span> byId.containsKey(id);
+    }
+
+    <span class="k">public</span> <span class="k">int</span> size() {
+        <span class="k">return</span> byId.size();
+    }
+
+    <span class="c">/** Names for an id, or a friendly fallback so the caller never sees null. */</span>
+    <span class="k">public</span> <span class="t">String</span> nameOrUnknown(<span class="t">String</span> id) {
+        <span class="t">Employee</span> found = byId.get(id);
+        <span class="k">return</span> found == <span class="k">null</span> ? <span class="n">&quot;(unknown)&quot;</span> : found.getName();
+    }
+
+    <span class="c">/** Department to people, with departments in alphabetical order. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">List</span>&lt;<span class="t">Employee</span>&gt;&gt; byDepartment() {
+        <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">List</span>&lt;<span class="t">Employee</span>&gt;&gt; groups = <span class="k">new</span> <span class="t">TreeMap</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">Employee</span> employee : byId.values()) {
+            <span class="c">// computeIfAbsent: create the list the first time a department appears.</span>
+            groups.computeIfAbsent(employee.getDepartment(), key -&gt; <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;()).add(employee);
+        }
+        <span class="k">return</span> groups;
+    }
+
+    <span class="c">/** Department to head count. merge() adds one each time, starting from 1. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; headCount() {
+        <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; counts = <span class="k">new</span> <span class="t">TreeMap</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">Employee</span> employee : byId.values()) {
+            counts.merge(employee.getDepartment(), <span class="n">1</span>, <span class="t">Integer</span>::sum);
+        }
+        <span class="k">return</span> counts;
+    }
+
+    <span class="k">public</span> <span class="k">void</span> printAll() {
+        <span class="k">for</span> (<span class="t">Map</span>.<span class="t">Entry</span>&lt;<span class="t">String</span>, <span class="t">Employee</span>&gt; entry : byId.entrySet()) {
+            <span class="t">System</span>.out.println(<span class="n">&quot;  &quot;</span> + entry.getKey() + <span class="n">&quot; -&gt; &quot;</span> + entry.getValue().getName());
+        }
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- Lookup by key ---
+  find(E-007)       : E-007 Meera Iyer (Engineering)
+  find(E-999)       : null
+  nameOrUnknown(E-999): (unknown)
+  has(E-350)        : true
+
+--- put() replaces, putIfAbsent() does not ---
+  put returned the old value: E-350 Kiran Rao (Support)
+  addIfAbsent on a taken id : false
+  E-350 is still            : E-350 Kiran Rao (Engineering)
+
+--- Everyone, in joining order ---
+  E-104 -&gt; Asha Menon
+  E-211 -&gt; Rahul Verma
+  E-007 -&gt; Meera Iyer
+  E-350 -&gt; Kiran Rao
+  E-412 -&gt; Dev Patel
+
+--- Grouped by department ---
+  Engineering: Asha Menon, Meera Iyer, Kiran Rao
+  Finance: Rahul Verma, Dev Patel
+  Head count: {Engineering=3, Finance=2}
+
+--- Why equals() and hashCode() matter ---
+  Added the same id twice, set holds: 1
+  first.equals(sameId): true
+  Same hash code: true
+
+--- Counting words with a HashMap ---
+  to=2, be=2, or=1, not=1, missing=null
+  (HashMap makes no promise about iteration order, so we look the keys up one by one.)
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a sixth employee.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add countIn(department).</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Return just the ids.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Rename a department.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Find the largest department.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Write a Badge key class.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: equals without hashCode, a key that changes after storing, and unboxing a missing value. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">05-collections/21-employee-directory</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-22.html"><span class="k2">Next</span><span class="v">22 Product Inventory</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

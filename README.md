@@ -7,7 +7,7 @@
 
 <p align="center">
   <img alt="Java 21 or newer" src="https://img.shields.io/badge/Java-21%2B-B83A0E">
-  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-17%20of%2043-0F766E">
+  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-22%20of%2043-0F766E">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-0E1726">
   <a href="https://github.com/codechanakya/core-java/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/codechanakya/core-java/actions/workflows/ci.yml/badge.svg"></a>
 </p>
@@ -23,7 +23,7 @@
 
 It follows a fixed path: smallest building block first, then the next concept that depends on it, until you can design and test a small system yourself.
 
-> **Status:** Phases 1, 2, 3 and 4 are ready (17 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
+> **Status:** Phases 1 to 5 are ready (22 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
 
 ## Start here
 
@@ -113,11 +113,11 @@ Each phase ends with a project that uses everything taught before it. Frameworks
 
 | No. | Program | Concepts | Status |
 |---|---|---|---|
-| 18 | Online Shopping Cart | `List`, `Iterator`, `Comparator` | Planned |
-| 19 | Customer Search | `Set`, `Comparable` | Planned |
-| 20 | Order Processing Queue | `Queue`, `Deque` | Planned |
-| 21 | Employee Directory | `HashMap`, `equals` / `hashCode` | Planned |
-| 22 | Product Inventory | `Map` and `List` together, generics | Planned |
+| 18 | [Online Shopping Cart](05-collections/18-online-shopping-cart) | `List`, `Iterator`, `Comparator` | Ready |
+| 19 | [Customer Search](05-collections/19-customer-search) | `Set`, `Comparable` | Ready |
+| 20 | [Order Processing Queue](05-collections/20-order-processing-queue) | `Queue`, `Deque` | Ready |
+| 21 | [Employee Directory](05-collections/21-employee-directory) | `HashMap`, `equals` / `hashCode` | Ready |
+| 22 | [Product Inventory](05-collections/22-product-inventory) | `Map` and `List` together, generics | Ready |
 
 </details>
 

@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product Inventory | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 05 · Collections · Program 22 of 43</p>
+    <h1>Product Inventory</h1>
+    <div class="tags">
+      <span class="tag">Advanced</span>
+      <span class="chip" style="background:#fff">Map</span>
+      <span class="chip" style="background:#fff">List</span>
+      <span class="chip" style="background:#fff">Set</span>
+      <span class="chip" style="background:#fff">Deque</span>
+      <span class="chip" style="background:#fff">Phase project</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A shop needs stock control: find by SKU, receive and sell, group by category, list what to reorder and undo the last change.</p>
+        <p>No single collection does all of it. This Phase 5 project gives each job to the collection that suits it, and uses enums, exceptions and generics from Phase 4.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Product.java, Category.java</b><span class="d">The model.</span></span></li>
+          <li><span class="badge">2</span><span><b>MapUtil.java</b><span class="d">A generic helper for maps of lists.</span></span></li>
+          <li><span class="badge">3</span><span><b>Inventory.java</b><span class="d">Four collections, four jobs.</span></span></li>
+          <li><span class="badge">4</span><span><b>Main.java</b><span class="d">A day at the shop, with an undo.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/inventory/Inventory.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.inventory;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Collections</span>;
+<span class="k">import</span> java.util.<span class="t">Comparator</span>;
+<span class="k">import</span> java.util.<span class="t">Deque</span>;
+<span class="k">import</span> java.util.<span class="t">EnumMap</span>;
+<span class="k">import</span> java.util.<span class="t">LinkedHashMap</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.<span class="t">TreeSet</span>;
+<span class="k">import</span> java.util.<span class="t">Set</span>;
+
+<span class="c">/**
+ * The shop&#x27;s stock, using one collection for each job it suits.
+ *
+ *  - Map&lt;String, Product&gt;      find a product by SKU quickly, keep the order they were added.
+ *  - Map&lt;Category, List&lt;...&gt;&gt;  group products for reports.
+ *  - Deque&lt;StockMovement&gt;      a stack of changes, so the latest can be undone.
+ *  - Set&lt;Category&gt;             &quot;which families have something to reorder?&quot; with no repeats.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Inventory</span> {
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">Comparator</span>&lt;<span class="t">Product</span>&gt; LOWEST_STOCK_FIRST =
+            <span class="t">Comparator</span>.comparingInt(<span class="t">Product</span>::getStock).thenComparing(<span class="t">Product</span>::getName);
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Product</span>&gt; products = <span class="k">new</span> <span class="t">LinkedHashMap</span>&lt;&gt;();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Deque</span>&lt;<span class="t">StockMovement</span>&gt; movements = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+
+    <span class="k">public</span> <span class="k">void</span> add(<span class="t">Product</span> product) {
+        products.put(product.getSku(), product);
+    }
+
+    <span class="k">private</span> <span class="t">Product</span> require(<span class="t">String</span> sku) <span class="k">throws</span> <span class="t">UnknownProductException</span> {
+        <span class="t">Product</span> product = products.get(sku);
+        <span class="k">if</span> (product == <span class="k">null</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">UnknownProductException</span>(sku);
+        }
+        <span class="k">return</span> product;
+    }
+
+    <span class="k">public</span> <span class="k">void</span> receive(<span class="t">String</span> sku, <span class="k">int</span> units) <span class="k">throws</span> <span class="t">UnknownProductException</span> {
+        <span class="t">Product</span> product = require(sku);
+        product.changeStock(units);
+        movements.push(<span class="k">new</span> <span class="t">StockMovement</span>(sku, units, <span class="n">&quot;received&quot;</span>));
+    }
+
+    <span class="k">public</span> <span class="k">void</span> sell(<span class="t">String</span> sku, <span class="k">int</span> units) <span class="k">throws</span> <span class="t">UnknownProductException</span>, <span class="t">OutOfStockException</span> {
+        <span class="t">Product</span> product = require(sku);
+        <span class="k">if</span> (units &gt; product.getStock()) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">OutOfStockException</span>(product.getName(), units, product.getStock());
+        }
+        product.changeStock(-units);
+        movements.push(<span class="k">new</span> <span class="t">StockMovement</span>(sku, -units, <span class="n">&quot;sold&quot;</span>));
+    }
+
+    <span class="c">/** Reverses the latest movement. Returns it, or null when there is nothing to undo. */</span>
+    <span class="k">public</span> <span class="t">StockMovement</span> undoLast() {
+        <span class="t">StockMovement</span> last = movements.poll();
+        <span class="k">if</span> (last != <span class="k">null</span>) {
+            products.get(last.getSku()).changeStock(-last.getChange());
+        }
+        <span class="k">return</span> last;
+    }
+
+    <span class="c">/** Products grouped by category, categories in their declared order. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">Category</span>, <span class="t">List</span>&lt;<span class="t">Product</span>&gt;&gt; byCategory() {
+        <span class="t">Map</span>&lt;<span class="t">Category</span>, <span class="t">List</span>&lt;<span class="t">Product</span>&gt;&gt; groups = <span class="k">new</span> <span class="t">EnumMap</span>&lt;&gt;(<span class="t">Category</span>.<span class="k">class</span>);
+        <span class="k">for</span> (<span class="t">Product</span> product : products.values()) {
+            <span class="t">MapUtil</span>.addToGroup(groups, product.getCategory(), product);
+        }
+        <span class="k">return</span> groups;
+    }
+
+    <span class="c">/** Money tied up in stock for each category. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">Category</span>, <span class="t">BigDecimal</span>&gt; valueByCategory() {
+        <span class="t">Map</span>&lt;<span class="t">Category</span>, <span class="t">BigDecimal</span>&gt; totals = <span class="k">new</span> <span class="t">EnumMap</span>&lt;&gt;(<span class="t">Category</span>.<span class="k">class</span>);
+        <span class="k">for</span> (<span class="t">Product</span> product : products.values()) {
+            totals.merge(product.getCategory(), product.stockValue(), <span class="t">BigDecimal</span>::add);
+        }
+        <span class="k">return</span> totals;
+    }
+
+    <span class="c">/** Products at or below their reorder level, emptiest first. */</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">Product</span>&gt; reorderList() {
+        <span class="t">List</span>&lt;<span class="t">Product</span>&gt; low = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">Product</span> product : products.values()) {
+            <span class="k">if</span> (product.needsReorder()) {
+                low.add(product);
+            }
+        }
+        low.sort(LOWEST_STOCK_FIRST);
+        <span class="k">return</span> low;
+    }
+
+    <span class="c">/** Categories that have at least one product to reorder, with no repeats. */</span>
+    <span class="k">public</span> <span class="t">Set</span>&lt;<span class="t">Category</span>&gt; categoriesToReorder() {
+        <span class="t">Set</span>&lt;<span class="t">Category</span>&gt; categories = <span class="k">new</span> <span class="t">TreeSet</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">Product</span> product : reorderList()) {
+            categories.add(product.getCategory());
+        }
+        <span class="k">return</span> categories;
+    }
+
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">StockMovement</span>&gt; recentMovements() {
+        <span class="k">return</span> <span class="t">Collections</span>.unmodifiableList(<span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(movements));
+    }
+
+    <span class="k">public</span> <span class="t">Product</span> find(<span class="t">String</span> sku) {
+        <span class="k">return</span> products.get(sku);
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/inventory/MapUtil.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.inventory;
+
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+
+<span class="c">/** Small generic helpers for maps whose values are lists. */</span>
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> <span class="t">MapUtil</span> {
+
+    <span class="k">private</span> <span class="t">MapUtil</span>() {
+        <span class="c">// Only static methods; nobody should create one of these.</span>
+    }
+
+    <span class="c">/**
+     * Adds a value to the list stored under a key, creating the list on first use.
+     * Works for any key type K and any value type V, which is the point of the two type parameters.
+     */</span>
+    <span class="k">public</span> <span class="k">static</span> &lt;K, V&gt; <span class="k">void</span> addToGroup(<span class="t">Map</span>&lt;K, <span class="t">List</span>&lt;V&gt;&gt; groups, K key, V value) {
+        groups.computeIfAbsent(key, ignored -&gt; <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;()).add(value);
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- Stock by category ---
+ELECTRONICS:
+  E-100  USB-C Cable      ELECTRONICS   299.00  stock  40
+  E-110  Headphones       ELECTRONICS  1999.00  stock   6
+STATIONERY:
+  S-200  Notebook         STATIONERY     85.50  stock 120
+  S-210  Pen Pack         STATIONERY     40.00  stock  25
+HOME:
+  H-300  Desk Lamp        HOME         1250.00  stock   3
+
+--- Value of stock per category ---
+  ELECTRONICS: 23954.00
+  STATIONERY: 11260.00
+  HOME: 3750.00
+
+--- Reorder list, emptiest first ---
+  Desk Lamp: 3 left, reorder at 5
+  Headphones: 6 left, reorder at 8
+  Pen Pack: 25 left, reorder at 25
+  Categories affected: [ELECTRONICS, STATIONERY, HOME]
+
+--- Selling and receiving ---
+  Three movements recorded.
+  Refused: Cannot sell 10 of Headphones, only 6 in stock
+  Short by: 4
+  Refused: No product with SKU X-999
+
+--- Movement history, newest first ---
+  +12 H-300 (received)
+  -100 S-200 (sold)
+  -15 E-100 (sold)
+
+--- Undo the last two movements ---
+  Undid: +12 H-300 (received)
+  Undid: -100 S-200 (sold)
+  Notebook stock is back to 120
+  Lamp stock is back to     3
+
+--- Reorder list now ---
+  Desk Lamp: 3 left
+  Headphones: 6 left
+  Pen Pack: 25 left
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a sixth product.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add totalUnits().</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Count products per category.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add search(text).</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Refuse zero or negative units.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Add redo.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: the wrong value type in a map, a null key in a TreeMap, and removing from a map while looping. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">05-collections/22-product-inventory</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="index.html#phase-6"><span class="k2">Next</span><span class="v">Phase 6: Files, I/O and Date</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
