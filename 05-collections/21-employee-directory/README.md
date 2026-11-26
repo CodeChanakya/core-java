@@ -12,6 +12,29 @@ HR needs to answer "who is E-211?" instantly, and "who is in Finance?", and "how
 
 A `Map` stores **key to value** pairs and finds a value from its key without scanning. The price: the key type must have a correct `equals` and `hashCode`, which is the part of Java that most often goes wrong.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-21.svg"><img alt="Flow of Program 21, Employee Directory, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-21.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A phone book: look up by name in one step instead of reading every page. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | A HashMap finds a bucket with hashCode, then compares with equals. TreeMap and LinkedHashMap trade speed for order. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Employees with an id** (input): equals and hashCode are written from the same field. (`Employee.java`)
+2. **HashMap by id** (store): Lookup by id is effectively one step. (`Directory.java`)
+3. **Group by department** (work): A Map from department to a list of people. (`Directory.java`)
+4. **Replace and count** (work): put replaces; merge counts per department. (`merge`)
+5. **Lookups and groups** (result): Why equals and hashCode must go together is shown. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

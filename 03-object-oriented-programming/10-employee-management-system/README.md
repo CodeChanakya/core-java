@@ -12,6 +12,29 @@ A company pays developers, managers and interns, and each is paid by a different
 
 The naive answer is one `Employee` class with a `type` field and a chain of `if (type.equals("MANAGER"))` in every method. Every new kind of employee means editing every one of those chains. Inheritance gives each kind its own class instead.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-10.svg"><img alt="Flow of Program 10, Employee Management System, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-10.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | One staff form, three kinds of job: everyone shares the basics, and each role adds its own pay rule. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Polymorphism removes type switches. The variable's declared type, not the object, decides what you may call. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Build the team** (input): Developers, managers and interns go into one Employee array. (`Main.java`)
+2. **Each class overrides pay** (work): Developer adds on-call, Manager adds a per-person bonus, Intern is fixed. (`@Override`)
+3. **Payroll loops once** (work): No if on type: the right pay() runs by itself. (`Payroll.java`)
+4. **Apply a raise to all** (work): Intern deliberately ignores it. (`raise`)
+5. **Payroll before and after** (result): The report shows each role's own rule at work. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

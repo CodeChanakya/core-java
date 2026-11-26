@@ -10,6 +10,29 @@ Concepts: `record`, compact constructors, `Optional`, text blocks, local records
 
 The bank exports transactions as lines of text. The program turns each line into a value that is always valid, reports on them, and answers questions like "what is the largest deposit?" or "what is the latest transaction for ACC-3?", where the honest answer is sometimes "there is none". Records make the data short to write and safe to share, and `Optional` makes "maybe nothing" part of the method's signature.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-28.svg"><img alt="Flow of Program 28, Transaction Reporting, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-28.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A transaction slip that cannot be filled in wrongly, and a lookup that is allowed to say none. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Records are immutable, value-based carriers. Optional belongs on return types, not fields or parameters. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **A text block of lines** (input): Several lines of CSV in one Java string. (`Main.java`)
+2. **Parse each line** (check): Transaction.parse returns Optional; bad lines are listed. (`Transaction.java`)
+3. **Compact constructor validates** (check): Amount must be positive; scale is fixed to two places. (`Transaction.java`)
+4. **Ask the ledger** (work): findById, largestDeposit, latestFor each return Optional. (`Ledger.java`)
+5. **Account summaries** (result): Deposits, withdrawals and net per account. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

@@ -12,6 +12,29 @@ A bank branch exports its transactions as a CSV. The operations team wants a dai
 
 Every one of those is a question about the calendar. Java has had date classes since 1996, and the old ones (`Date`, `Calendar`) are confusing and easy to misuse. Since Java 8 the `java.time` package replaces them, and it is the only one you should use now.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-25.svg"><img alt="Flow of Program 25, Daily Transaction Report, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-25.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A bank statement clerk: the calendar tells which day a payment counts, and weekends do not count. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | java.time types are immutable and thread-safe. Pass the date in rather than calling now() so results are repeatable. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Read transactions.csv** (input): Date and time become LocalDate and LocalTime. (`TransactionReader.java`)
+2. **Is the date real?** (check): An impossible date is rejected with its line. (`parse`)
+3. **Group by day, week and month** (work): TemporalAdjusters, YearMonth and a TreeMap. (`DailyReport.java`)
+4. **Find late-night and weekend activity** (work): Time comparisons and DayOfWeek. (`Calendar.java`)
+5. **Settlement date** (result): Next business day, which is not always tomorrow. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

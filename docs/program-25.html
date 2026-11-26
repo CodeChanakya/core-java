@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>A bank exports transactions as a CSV. Operations want a daily statement, weekly and monthly totals, late-night activity and settlement dates, all of which depend on the calendar.</p>
         <p>The java.time classes replace the old Date and Calendar. They are immutable, so every change returns a new object.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-25.svg"><img src="flows/program-25.svg" alt="Flow of Program 25, Daily Transaction Report, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A bank statement clerk: the calendar tells which day a payment counts, and weekends do not count.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>java.time types are immutable and thread-safe. Pass the date in rather than calling now() so results are repeatable.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Read transactions.csv</b> (input): Date and time become LocalDate and LocalTime.</li><li><b>Is the date real?</b> (check): An impossible date is rejected with its line.</li><li><b>Group by day, week and month</b> (work): TemporalAdjusters, YearMonth and a TreeMap.</li><li><b>Find late-night and weekend activity</b> (work): Time comparisons and DayOfWeek.</li><li><b>Settlement date</b> (result): Next business day, which is not always tomorrow.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

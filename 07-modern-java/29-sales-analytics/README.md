@@ -10,6 +10,29 @@ Concepts: `Collectors`, `groupingBy`, `partitioningBy`, `toMap`, `teeing`, `flat
 
 Management wants numbers from sixteen sales: revenue per region, units sold, average units per order, who sells the most, how many big orders there were. In SQL this is `GROUP BY`. In Java it is `Collectors`, and this program shows the whole set.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-29.svg"><img alt="Flow of Program 29, Sales Analytics, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-29.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A pivot table made with code: sort sales into piles, then total each pile. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Collectors compose: the third argument of groupingBy is itself a collector. Name the map so the order is yours. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Sixteen sales** (input): Each Sale is a record that knows its revenue. (`SalesData.java`)
+2. **groupingBy a key** (work): Region or category picks the pile. (`Analytics.java`)
+3. **Downstream collector** (work): counting, summing, averaging or mapping answers the question per pile. (`Collectors`)
+4. **Split, rank, combine** (work): partitioningBy, toMap with a merge rule, teeing. (`Analytics.java`)
+5. **Ordered results** (result): TreeMap and EnumMap make the output stable. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

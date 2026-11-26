@@ -10,6 +10,29 @@ Concepts: `File`, `Reader` and `Writer`, `InputStream` and `OutputStream`, buffe
 
 Until now every program started with its data typed into `Main` and forgot it all when it ended. Real programs read data from files and write results back. HR keeps employees in a CSV file, and the program has to read it, cope with the bad rows every real file has, produce a report, and add a new employee without damaging the rest.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-23.svg"><img alt="Flow of Program 23, Employee File Management, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-23.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | An office clerk working from a paper file: read it, skip the damaged rows, write a clean copy. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | try-with-resources closes every file. Naming the charset and writing explicit line endings make output identical on every OS. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Read employees.csv** (input): BufferedReader with UTF-8 reads one line at a time. (`EmployeeFile.java`)
+2. **Is the row usable?** (check): Bad rows are skipped with a line number and a reason. (`parseRow`)
+3. **Write a report** (work): PrintWriter over a BufferedWriter makes a text report. (`writeReport`)
+4. **Save a clean CSV, append one** (store): Append mode adds without damaging the rest. (`save`)
+5. **Copy bytes, handle a missing file** (result): A stream copy, then a FileNotFoundException. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

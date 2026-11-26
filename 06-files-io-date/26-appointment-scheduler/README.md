@@ -12,6 +12,29 @@ A team in New York, London and Kolkata books meetings. Everybody types a time on
 
 Three problems at once: time zones, daylight saving (clocks that skip and repeat an hour), and persistence. This project builds on everything from Phases 4 and 5 too: a checked exception, `Comparable`, sorted collections, and file reading with careful error handling.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-26.svg"><img alt="Flow of Program 26, Appointment Scheduler (Phase 6 project), in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-26.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A shared diary across time zones: everyone sees the same moment on their own clock. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Compare instants, never local times from different zones. Daylight saving makes plusDays and a 24-hour Duration differ. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Book with a zone** (input): ZonedDateTime for New York, London or Kolkata. (`Appointment.java`)
+2. **Does it clash?** (check): overlaps compares instants; a checked exception carries the clash. (`ScheduleConflictException.java`)
+3. **Keep the list sorted** (store): Comparable orders appointments by instant. (`Scheduler.java`)
+4. **Show on another clock** (work): withZoneSameInstant converts without changing the moment. (`withZoneSameInstant`)
+5. **Save and load** (result): One line per appointment; a damaged line is reported. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

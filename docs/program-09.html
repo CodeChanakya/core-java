@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>Running Main and reading the output does not scale. A unit test calls one method with known input and checks the result, and all tests run in one command.</p>
         <p>This lab writes nine tests for the Account class from Program 8.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-09.svg"><img src="flows/program-09.svg" alt="Flow of Program 09, JUnit Starter Lab, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A quality inspector who checks the bank every time you change it, in seconds.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Tests are independent and repeatable. BigDecimal assertions need compareTo or an agreed scale.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>The class under test</b> (input): Account, copied unchanged from Program 8.</li><li><b>Arrange</b> (work): Each test builds the objects it needs.</li><li><b>Act</b> (work): Call one method with known input.</li><li><b>Assert</b> (check): assertEquals, assertThrows and friends compare with what you expect.</li><li><b>A pass or fail report</b> (result): The launcher lists every test and its result.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

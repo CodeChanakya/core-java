@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -41,6 +41,22 @@
         <p>Customers, products and orders all need save, find and list. Copying a store per type means keeping several classes in step.</p>
         <p>A generic repository is written once for any type, and the compiler rejects a product in the customer store.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-16.svg"><img src="flows/program-16.svg" alt="Flow of Program 16, Generic Repository, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>One shelf design for any item: the same save, find, list and delete rules, for customers or products.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Bounded types (T extends Identifiable&lt;ID&gt;) let the compiler prove what you can call. Wildcards express producer and consumer roles.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>An Identifiable item</b> (input): Anything with an id of any type, such as Customer or Product.</li><li><b>One repository contract</b> (work): Repository&lt;T, ID&gt; declares save, find, list, delete.</li><li><b>One implementation</b> (store): InMemoryRepository stores items by id.</li><li><b>Generic helpers</b> (work): Methods and wildcards work on any type that fits.</li><li><b>Two repositories, one class</b> (result): The same code serves both customers and products.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

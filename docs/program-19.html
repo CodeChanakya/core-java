@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>A sign-up form lets people submit twice. Marketing wants unique customers, a sorted list of cities and a search by name.</p>
         <p>A Set never holds the same thing twice. Three kinds of Set give three orders, and Comparable decides what counts as the same customer in a TreeSet.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-19.svg"><img src="flows/program-19.svg" alt="Flow of Program 19, Customer Search, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A guest list: no one is on it twice, and you can ask who is on one list but not the other.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Choose the Set by the guarantee you need: speed, sorted, or insertion order. compareTo must agree with equals.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Customers, with duplicates</b> (input): The same person can submit twice.</li><li><b>HashSet removes duplicates</b> (work): equals decides who counts as the same.</li><li><b>TreeSet sorts</b> (work): compareTo defines the order.</li><li><b>LinkedHashSet keeps arrival order</b> (work): Same uniqueness, predictable order.</li><li><b>Set maths</b> (result): Newsletter but no purchase: removeAll, retainAll, addAll.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

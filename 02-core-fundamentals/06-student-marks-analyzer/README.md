@@ -12,6 +12,29 @@ A teacher has four students and four subjects. She wants a report card line for 
 
 Until now every value has had its own variable. That stops working the moment there are 4 students, 40 or 400. An *array* holds many values of the same type under one name.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-06.svg"><img alt="Flow of Program 06, Student Marks Analyzer, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-06.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A teacher's mark sheet: many marks under one name, so one rule can score everyone. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Arrays are fixed-size and zero-indexed. Small single-purpose methods (total, average) are overloaded to reuse the code. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Two arrays** (input): Students and a table of marks, four of each. (`MarksAnalyzer.java`)
+2. **Total and average per student** (work): A for loop walks one row at a time. (`total, average`)
+3. **Pick a grade** (check): Average against fixed bands gives A to F. (`grade`)
+4. **Class figures** (work): Class average, highest mark, topper and each subject average. (`highest`)
+5. **Report card lines** (result): One line per student, then class statistics. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Read in this order
 
 | Step | File | What to look for |

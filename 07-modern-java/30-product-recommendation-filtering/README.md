@@ -12,6 +12,29 @@ An online shop sells books, gadgets and groceries. Each shopper has a budget, a 
 
 This is the **phase project**. It uses lambdas and streams (27), records and `Optional` (28), collectors (29), and adds sealed types and pattern matching.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-30.svg"><img alt="Flow of Program 30, Product Recommendation Filtering, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-30.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A shop assistant with a rulebook: shoppers state wishes, the rulebook picks and ranks the right products. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Sealed types make a closed set the compiler can check. Rules as data can be evaluated, printed and compared; lambdas cannot be printed. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Products as a sealed set** (input): Book, Gadget or Grocery, nothing else. (`Product.java`)
+2. **Wishes become one Rule** (work): A tree of records: MinRating, MaxPrice, OfKind, Not, AllOf, AnyOf. (`Shopper.java`)
+3. **Match with an exhaustive switch** (check): Record patterns, no default: the compiler checks every case. (`RuleEngine.java`)
+4. **Score and sort** (work): Streams filter, score and order the matches. (`Recommender.java`)
+5. **Ranked picks and a best pick** (result): Each has a reason; Optional says none when nothing matches. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

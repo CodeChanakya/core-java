@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>It is the smallest useful program in Java. Before you can build a bank or an online shop, you need to see one program go from a text file to something running.</p>
       </section>
 
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-01.svg"><img src="flows/program-01.svg" alt="Flow of Program 01, Personal Profile Generator, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>Like writing your name on a card and handing it to a printer: you write once, the computer prints it.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Source to bytecode to JVM is the same pipeline every later program uses. The file name must match the public class.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Write the source file</b> (input): PersonalProfile.java holds a few facts about a person.</li><li><b>javac translates it</b> (work): The compiler checks the spelling and makes bytecode (.class).</li><li><b>The JVM runs the bytecode</b> (work): java starts the Java Virtual Machine at main.</li><li><b>main prints each line</b> (work): System.out.println writes one line of text at a time.</li><li><b>A neat card on screen</b> (result): Name, age, city, role and what they are learning.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

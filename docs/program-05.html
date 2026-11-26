@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>A customer enters a PIN, then uses a menu to check the balance, deposit, withdraw or quit. Bad input must not crash the program.</p>
         <p>The program reads from the keyboard, so <span class="mono">run.sh --check</span> feeds it a prepared <span class="mono">sample-input.txt</span>.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-05.svg"><img src="flows/program-05.svg" alt="Flow of Program 05, ATM Menu Simulation, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A cash machine: ask for the PIN, then keep showing the menu until the customer says exit.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Every console app is a loop around a menu. A scripted input file makes the run repeatable for testing.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Read the PIN (three tries)</b> (input): Scanner reads the keystrokes.</li><li><b>Is the PIN right?</b> (check): Three wrong tries block the card.</li><li><b>Show the menu and read a choice</b> (work): A loop repeats until Exit.</li><li><b>Is the action allowed?</b> (check): Withdrawals must be a multiple of 100 and not above the balance.</li><li><b>Print the result and loop</b> (result): Balance, deposit or refusal, then the menu again.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

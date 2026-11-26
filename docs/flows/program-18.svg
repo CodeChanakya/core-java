@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 854" width="880" height="854" role="img" aria-labelledby="t d">
+<title id="t">Program 18 flow: Online Shopping Cart</title><desc id="d">Flow of Program 18, Online Shopping Cart: 1. Add products; 2. Sort by name, price or line cost; 3. Remove safely; 4. Guard the wrong turns; 5. Cart views</desc>
+<rect width="880" height="854" rx="18" fill="#F8FAFC"/>
+<clipPath id="c"><rect width="880" height="854" rx="18"/></clipPath>
+<g clip-path="url(#c)">
+<rect x="0" y="0" width="880" height="86" fill="#0E1726"/>
+<rect x="0" y="86" width="880" height="5" fill="#B83A0E"/>
+<text x="30" y="34" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#F4A582" letter-spacing="1.2">PHASE 05 · COLLECTIONS · PROGRAM 18 OF 43</text>
+<text x="30" y="68" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="27" font-weight="700" fill="#FFFFFF">Online Shopping Cart</text>
+<rect x="30" y="112" width="820" height="55" rx="12" fill="#FFF7ED" stroke="#FDBA74"/>
+<text x="50" y="135" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#B83A0E" letter-spacing="1.1">IN EVERYDAY WORDS</text>
+<text x="50" y="158" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="15.5" font-style="italic" fill="#1E293B">A shopping basket you can add to, remove from and sort every way you like.</text>
+<text x="30" y="193" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#475569" letter-spacing="1.1">HOW IT FLOWS, STEP BY STEP</text>
+<rect x="30" y="207" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="207" width="7" height="72" rx="3" fill="#334155"/>
+<circle cx="73" cy="243.0" r="17" fill="#334155"/>
+<text x="73" y="249.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="106" y="235" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Add products</text>
+<text x="106" y="257" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">ArrayList grows as items are added, including duplicates.</text>
+<rect x="756" y="221" width="74" height="22" rx="11" fill="#334155" fill-opacity="0.12"/>
+<text x="793" y="236" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#334155" text-anchor="middle" letter-spacing="1">INPUT</text>
+<text x="830" y="263" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">ShoppingCart.java</text>
+<path d="M73 282 L73 298 M67 292 L73 299 L79 292" stroke="#94A3B8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="303" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="303" width="7" height="72" rx="3" fill="#0F766E"/>
+<circle cx="73" cy="339.0" r="17" fill="#0F766E"/>
+<text x="73" y="345.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="106" y="331" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Sort by name, price or line cost</text>
+<text x="106" y="353" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">Three Comparators give three orders without changing the items.</text>
+<rect x="756" y="317" width="74" height="22" rx="11" fill="#0F766E" fill-opacity="0.12"/>
+<text x="793" y="332" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#0F766E" text-anchor="middle" letter-spacing="1">WORK</text>
+<text x="830" y="359" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">Comparator</text>
+<path d="M73 378 L73 394 M67 388 L73 395 L79 388" stroke="#94A3B8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="399" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="399" width="7" height="72" rx="3" fill="#0F766E"/>
+<circle cx="73" cy="435.0" r="17" fill="#0F766E"/>
+<text x="73" y="441.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="106" y="427" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Remove safely</text>
+<text x="106" y="449" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">An Iterator removes while walking the list.</text>
+<rect x="756" y="413" width="74" height="22" rx="11" fill="#0F766E" fill-opacity="0.12"/>
+<text x="793" y="428" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#0F766E" text-anchor="middle" letter-spacing="1">WORK</text>
+<text x="830" y="455" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">iterator.remove</text>
+<path d="M73 474 L73 490 M67 484 L73 491 L79 484" stroke="#94A3B8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="495" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="495" width="7" height="72" rx="3" fill="#B45309"/>
+<circle cx="73" cy="531.0" r="17" fill="#B45309"/>
+<text x="73" y="537.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="106" y="523" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Guard the wrong turns</text>
+<text x="106" y="545" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">Four common failures are shown on purpose.</text>
+<rect x="756" y="509" width="74" height="22" rx="11" fill="#B45309" fill-opacity="0.12"/>
+<text x="793" y="524" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#B45309" text-anchor="middle" letter-spacing="1">CHECK</text>
+<text x="830" y="551" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">Main.java</text>
+<path d="M73 570 L73 586 M67 580 L73 587 L79 580" stroke="#94A3B8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="591" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="591" width="7" height="72" rx="3" fill="#B83A0E"/>
+<circle cx="73" cy="627.0" r="17" fill="#B83A0E"/>
+<text x="73" y="633.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">5</text>
+<text x="106" y="619" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Cart views</text>
+<text x="106" y="641" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">The same list, shown in different orders.</text>
+<rect x="756" y="605" width="74" height="22" rx="11" fill="#B83A0E" fill-opacity="0.12"/>
+<text x="793" y="620" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#B83A0E" text-anchor="middle" letter-spacing="1">RESULT</text>
+<text x="830" y="647" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">expected-output.txt</text>
+<rect x="30" y="691" width="402" height="109" rx="12" fill="#FEF2F2" stroke="#FCA5A5"/>
+<text x="48" y="716" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#B91C1C" letter-spacing="1.1">IF IT GOES WRONG</text>
+<text x="48" y="739" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#450A0A">Removing inside a for-each throws</text>
+<text x="48" y="758" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#450A0A">ConcurrentModificationException, and List.of</text>
+<text x="48" y="777" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#450A0A">cannot be changed.</text>
+<rect x="448" y="691" width="402" height="109" rx="12" fill="#F0FDFA" stroke="#5EEAD4"/>
+<text x="466" y="716" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#0F766E" letter-spacing="1.1">FOR EXPERTS</text>
+<text x="466" y="739" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#042F2E">A List keeps order and allows duplicates.</text>
+<text x="466" y="758" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#042F2E">Comparators separate how to sort from what is</text>
+<text x="466" y="777" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#042F2E">sorted.</text>
+<circle cx="36" cy="826" r="6" fill="#334155"/>
+<text x="48" y="830" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Input</text>
+<circle cx="136" cy="826" r="6" fill="#0F766E"/>
+<text x="148" y="830" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Work</text>
+<circle cx="236" cy="826" r="6" fill="#B45309"/>
+<text x="248" y="830" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Check</text>
+<circle cx="336" cy="826" r="6" fill="#6D28D9"/>
+<text x="348" y="830" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Store</text>
+<circle cx="436" cy="826" r="6" fill="#B83A0E"/>
+<text x="448" y="830" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Result</text>
+<text x="850" y="830" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="600" fill="#64748B" text-anchor="end">CodeChanakya · Core Java</text>
+</g>
+<rect x="0.5" y="0.5" width="879" height="853" rx="18" fill="none" stroke="#CBD5E1"/>
+</svg>

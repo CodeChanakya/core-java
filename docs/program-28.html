@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>The bank exports transactions as text. The program turns each line into a value that is always valid, reports per account, and answers questions where the honest answer is sometimes none.</p>
         <p>A record gives you the fields, accessors, equals, hashCode and toString in one line. Its compact constructor validates, so an invalid one cannot exist. Optional puts "maybe nothing" in the type.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-28.svg"><img src="flows/program-28.svg" alt="Flow of Program 28, Transaction Reporting, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A transaction slip that cannot be filled in wrongly, and a lookup that is allowed to say none.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Records are immutable, value-based carriers. Optional belongs on return types, not fields or parameters.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>A text block of lines</b> (input): Several lines of CSV in one Java string.</li><li><b>Parse each line</b> (check): Transaction.parse returns Optional; bad lines are listed.</li><li><b>Compact constructor validates</b> (check): Amount must be positive; scale is fixed to two places.</li><li><b>Ask the ledger</b> (work): findById, largestDeposit, latestFor each return Optional.</li><li><b>Account summaries</b> (result): Deposits, withdrawals and net per account.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

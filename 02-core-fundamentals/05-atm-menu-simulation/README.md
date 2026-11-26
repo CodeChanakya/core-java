@@ -12,6 +12,29 @@ A customer inserts a card. The ATM asks for the PIN (three tries), then shows a 
 
 Every ATM program is a loop around a menu. Learn the shape once and you will recognise it in most console applications.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-05.svg"><img alt="Flow of Program 05, ATM Menu Simulation, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-05.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A cash machine: ask for the PIN, then keep showing the menu until the customer says exit. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Every console app is a loop around a menu. A scripted input file makes the run repeatable for testing. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Read the PIN (three tries)** (input): Scanner reads the keystrokes. (`AtmSimulator.java`)
+2. **Is the PIN right?** (check): Three wrong tries block the card. (`checkPin`)
+3. **Show the menu and read a choice** (work): A loop repeats until Exit. (`main loop`)
+4. **Is the action allowed?** (check): Withdrawals must be a multiple of 100 and not above the balance. (`withdraw`)
+5. **Print the result and loop** (result): Balance, deposit or refusal, then the menu again. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Read in this order
 
 | Step | File | What to look for |

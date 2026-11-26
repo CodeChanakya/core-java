@@ -10,6 +10,29 @@ Concepts: lambdas, functional interfaces, method references, streams, `Comparato
 
 A marketing team keeps a list of customers and asks a new question every day: who is active in Pune, who are the top spenders, which email domains do we have. Each question used to mean another loop. This program answers them with small pieces of behaviour passed around as values: lambdas.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-27.svg"><img alt="Flow of Program 27, Customer Data Processing, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-27.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | Asking a list questions in one sentence: keep the active ones in Pune, give me their names. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Lazy, single-use pipelines. A lambda is a functional interface value; captured variables must be effectively final. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Ten customers** (input): A plain list of Customer objects. (`CustomerData.java`)
+2. **stream() starts a pipeline** (work): Nothing runs yet; the pipeline is only described. (`Main.java`)
+3. **filter with a Predicate** (check): Small yes/no lambdas combine with and, or, negate. (`Predicate`)
+4. **map, sorted, distinct** (work): Method references such as Customer::getName shorten the steps. (`map`)
+5. **A terminal step runs it** (result): toList, count, sum or findFirst finishes the stream. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

@@ -10,6 +10,29 @@ Concepts: Strings, `StringBuilder`, `String.format`, methods, arrays, `BigDecima
 
 A small stationery shop wants a receipt. Each cart has several items with a quantity and a unit price. The customer may type a coupon code. The receipt must show every line, a subtotal, the discount, 18% GST and the final total, with the columns lined up.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-07.svg"><img alt="Flow of Program 07, Shopping Cart Calculator (Phase 2 project), in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-07.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A shop till: scan the items, add them up, apply the discount and tax, print the receipt. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | String is immutable; StringBuilder is the right tool for building text in a loop. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Cart of items** (input): Names, prices and quantities. (`CartCalculator.java`)
+2. **Line totals and subtotal** (work): lineTotal then subtotal, one job each. (`subtotal`)
+3. **Discount if the cart is big enough** (check): discountFor decides by the subtotal. (`discountFor`)
+4. **Add GST** (work): Tax is worked out on the discounted amount. (`buildReceipt`)
+5. **A formatted receipt** (result): StringBuilder assembles the text line by line. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

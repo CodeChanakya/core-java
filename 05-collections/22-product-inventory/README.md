@@ -12,6 +12,29 @@ A shop needs stock control. Find a product by SKU, receive and sell stock, group
 
 No single collection does all of it. This project uses each collection for the job it is good at, which is the real skill of this phase.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-22.svg"><img alt="Flow of Program 22, Product Inventory (Phase 5 project), in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-22.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A stockroom ledger: every item findable by code, every change recorded, and the last one reversible. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | This project joins enums, exceptions, generics and collections. Each data structure is chosen for exactly one job. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Receive or sell stock** (input): Product SKUs are looked up in a map. (`Inventory.java`)
+2. **Is it allowed?** (check): UnknownProductException or OutOfStockException says why not. (`exceptions`)
+3. **Four collections, four jobs** (store): Map by SKU, lists by category, a log, and an undo stack. (`Inventory.java`)
+4. **Reorder list and undo** (work): Low stock is listed; undo reverses the last movement. (`undo`)
+5. **A day at the shop** (result): Stock levels and the reorder list. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

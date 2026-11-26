@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>A company wants to work out an employee's monthly pay: basic salary, an allowance, a deduction, and the amount that reaches the bank.</p>
         <p>The program shows how Java stores whole numbers and decimals, and where casting quietly loses information.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-02.svg"><img src="flows/program-02.svg" alt="Flow of Program 02, Employee Salary Calculator, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A payslip: start with the base pay, add and subtract the usual items, pay only for days worked.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>int and double behave differently. Mixed arithmetic widens to double; narrowing needs an explicit cast.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Basic salary and days worked</b> (input): Plain variables hold the numbers.</li><li><b>Add HRA, 40 percent of basic</b> (work): Each value is built from the ones above it.</li><li><b>Subtract PF 12 percent and tax</b> (work): Provident fund is a percentage; professional tax is a flat amount.</li><li><b>Pay for days worked only</b> (work): A ratio of days worked to days in the month scales the result.</li><li><b>Print the salary slip</b> (result): Every step shows, so the clerk can check the arithmetic.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

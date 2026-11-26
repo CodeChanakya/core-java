@@ -12,6 +12,29 @@ A payroll clerk has an employee's basic salary and a few rules: house rent allow
 
 The program is a straight line of calculations. Its real job is to show you how Java treats numbers, including two places where it quietly does something you may not expect.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-02.svg"><img alt="Flow of Program 02, Employee Salary Calculator, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-02.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A payslip: start with the base pay, add and subtract the usual items, pay only for days worked. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | int and double behave differently. Mixed arithmetic widens to double; narrowing needs an explicit cast. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Basic salary and days worked** (input): Plain variables hold the numbers. (`SalaryCalculator.java`)
+2. **Add HRA, 40 percent of basic** (work): Each value is built from the ones above it. (`hra`)
+3. **Subtract PF 12 percent and tax** (work): Provident fund is a percentage; professional tax is a flat amount. (`deductions`)
+4. **Pay for days worked only** (work): A ratio of days worked to days in the month scales the result. (`attendance`)
+5. **Print the salary slip** (result): Every step shows, so the clerk can check the arithmetic. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Read in this order
 
 | Step | File | What to look for |

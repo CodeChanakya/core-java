@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>A teacher has four students and four subjects. She wants a row for each student, the class average, the topper and the average of each subject.</p>
         <p>One variable per mark stops working at four students. Arrays hold many values under one name.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-06.svg"><img src="flows/program-06.svg" alt="Flow of Program 06, Student Marks Analyzer, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A teacher&#x27;s mark sheet: many marks under one name, so one rule can score everyone.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Arrays are fixed-size and zero-indexed. Small single-purpose methods (total, average) are overloaded to reuse the code.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Two arrays</b> (input): Students and a table of marks, four of each.</li><li><b>Total and average per student</b> (work): A for loop walks one row at a time.</li><li><b>Pick a grade</b> (check): Average against fixed bands gives A to F.</li><li><b>Class figures</b> (work): Class average, highest mark, topper and each subject average.</li><li><b>Report card lines</b> (result): One line per student, then class statistics.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">
