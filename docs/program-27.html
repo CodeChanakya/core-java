@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>A marketing team keeps a list of customers and asks a new question every day: who is active in Pune, who spends most, which email domains do we have. Each question used to mean another loop.</p>
         <p>Lambdas pass small pieces of behaviour around as values, and a stream pipeline says what you want instead of how to loop. Streams are lazy and can be used only once.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-27.svg"><img src="flows/program-27.svg" alt="Flow of Program 27, Customer Data Processing, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>Asking a list questions in one sentence: keep the active ones in Pune, give me their names.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Lazy, single-use pipelines. A lambda is a functional interface value; captured variables must be effectively final.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Ten customers</b> (input): A plain list of Customer objects.</li><li><b>stream() starts a pipeline</b> (work): Nothing runs yet; the pipeline is only described.</li><li><b>filter with a Predicate</b> (check): Small yes/no lambdas combine with and, or, negate.</li><li><b>map, sorted, distinct</b> (work): Method references such as Customer::getName shorten the steps.</li><li><b>A terminal step runs it</b> (result): toList, count, sum or findFirst finishes the stream.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

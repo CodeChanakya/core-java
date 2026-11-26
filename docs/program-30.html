@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>An online shop sells books, gadgets and groceries. Each shopper has a budget, a minimum rating, wanted kinds and maybe a dietary rule. The shop wants ordered recommendations with a reason for each, and when a new kind of product is added the compiler should point out every place to update.</p>
         <p>This Phase 7 project combines records, sealed interfaces, exhaustive pattern-matching switches without a default, rules held as data, streams and Optional.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-30.svg"><img src="flows/program-30.svg" alt="Flow of Program 30, Product Recommendation Filtering, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A shop assistant with a rulebook: shoppers state wishes, the rulebook picks and ranks the right products.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Sealed types make a closed set the compiler can check. Rules as data can be evaluated, printed and compared; lambdas cannot be printed.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Products as a sealed set</b> (input): Book, Gadget or Grocery, nothing else.</li><li><b>Wishes become one Rule</b> (work): A tree of records: MinRating, MaxPrice, OfKind, Not, AllOf, AnyOf.</li><li><b>Match with an exhaustive switch</b> (check): Record patterns, no default: the compiler checks every case.</li><li><b>Score and sort</b> (work): Streams filter, score and order the matches.</li><li><b>Ranked picks and a best pick</b> (result): Each has a reason; Optional says none when nothing matches.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

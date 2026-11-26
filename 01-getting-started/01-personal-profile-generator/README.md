@@ -12,6 +12,29 @@ You want a program that introduces a person: it knows a few facts about them and
 
 It is the smallest useful program in Java. Before you can build a bank or an online shop, you need to see one program go from a text file to something running.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-01.svg"><img alt="Flow of Program 01, Personal Profile Generator, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-01.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | Like writing your name on a card and handing it to a printer: you write once, the computer prints it. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Source to bytecode to JVM is the same pipeline every later program uses. The file name must match the public class. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Write the source file** (input): PersonalProfile.java holds a few facts about a person. (`PersonalProfile.java`)
+2. **javac translates it** (work): The compiler checks the spelling and makes bytecode (.class). (`javac`)
+3. **The JVM runs the bytecode** (work): java starts the Java Virtual Machine at main. (`java -cp out`)
+4. **main prints each line** (work): System.out.println writes one line of text at a time. (`main`)
+5. **A neat card on screen** (result): Name, age, city, role and what they are learning. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Read in this order
 
 | Step | File | What to look for |

@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>A stationery shop wants a receipt: every line, a subtotal, a coupon discount, 18% GST and the total, in aligned columns.</p>
         <p>This is the Phase 2 project. It uses variables, BigDecimal, decisions, loops, methods, arrays and Strings together.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-07.svg"><img src="flows/program-07.svg" alt="Flow of Program 07, Shopping Cart Calculator (Phase 2 project), in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A shop till: scan the items, add them up, apply the discount and tax, print the receipt.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>String is immutable; StringBuilder is the right tool for building text in a loop.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Cart of items</b> (input): Names, prices and quantities.</li><li><b>Line totals and subtotal</b> (work): lineTotal then subtotal, one job each.</li><li><b>Discount if the cart is big enough</b> (check): discountFor decides by the subtotal.</li><li><b>Add GST</b> (work): Tax is worked out on the discounted amount.</li><li><b>A formatted receipt</b> (result): StringBuilder assembles the text line by line.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

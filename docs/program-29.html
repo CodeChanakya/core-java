@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>Management wants revenue per region, units sold, averages, the top salespeople and how many orders were big, from sixteen sales. In SQL this is GROUP BY.</p>
         <p>In Java it is Collectors. groupingBy takes a key, a map to build and a downstream collector; change the downstream collector and the same grouping answers a different question.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-29.svg"><img src="flows/program-29.svg" alt="Flow of Program 29, Sales Analytics, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A pivot table made with code: sort sales into piles, then total each pile.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Collectors compose: the third argument of groupingBy is itself a collector. Name the map so the order is yours.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Sixteen sales</b> (input): Each Sale is a record that knows its revenue.</li><li><b>groupingBy a key</b> (work): Region or category picks the pile.</li><li><b>Downstream collector</b> (work): counting, summing, averaging or mapping answers the question per pile.</li><li><b>Split, rank, combine</b> (work): partitioningBy, toMap with a merge rule, teeing.</li><li><b>Ordered results</b> (result): TreeMap and EnumMap make the output stable.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

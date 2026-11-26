@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>Developers, managers and interns are paid by different rules, yet HR wants one payroll report and one raise that apply to all of them.</p>
         <p>Each kind of employee becomes a subclass that overrides only what differs, and the payroll code never asks which kind it is dealing with.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-10.svg"><img src="flows/program-10.svg" alt="Flow of Program 10, Employee Management System, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>One staff form, three kinds of job: everyone shares the basics, and each role adds its own pay rule.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Polymorphism removes type switches. The variable&#x27;s declared type, not the object, decides what you may call.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Build the team</b> (input): Developers, managers and interns go into one Employee array.</li><li><b>Each class overrides pay</b> (work): Developer adds on-call, Manager adds a per-person bonus, Intern is fixed.</li><li><b>Payroll loops once</b> (work): No if on type: the right pay() runs by itself.</li><li><b>Apply a raise to all</b> (work): Intern deliberately ignores it.</li><li><b>Payroll before and after</b> (result): The report shows each role&#x27;s own rule at work.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

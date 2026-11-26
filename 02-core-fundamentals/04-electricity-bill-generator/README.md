@@ -20,6 +20,29 @@ Given the units a customer used in a month, work out the bill.
 
 The trap is applying one rate to every unit. A customer who used 250 units pays the low rate on the first 100, not the high rate on all 250.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-04.svg"><img alt="Flow of Program 04, Electricity Bill Generator, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-04.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A tiered price list: the first units are cheap, the later ones cost more, and each band is billed on its own. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Constants name the rules. Splitting billFor and slabFor keeps each method to one job and one test. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Units used this month** (input): A few readings are tried, including 100 and 101. (`Main.java`)
+2. **Which slab is each unit in?** (check): if / else if picks the band: first 100, up to 200, above 200. (`slabFor`)
+3. **Bill each slab at its own rate** (work): Three named constants hold the rates. (`billFor`)
+4. **Add the slabs together** (work): The result is a BigDecimal total. (`billFor`)
+5. **A table of bills** (result): The boundary rows prove the cut-offs are right. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Read in this order
 
 | Step | File | What to look for |

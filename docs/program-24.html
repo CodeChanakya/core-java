@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>A service writes one log file a day. Someone must answer how many errors there were, which component complains most and where the first error is, from plain text with some lines that are not events.</p>
         <p>Path describes locations, Files does the work and throws precise exceptions, and a glob finds only the .log files.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-24.svg"><img src="flows/program-24.svg" alt="Flow of Program 24, Log File Analyzer, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A detective reading yesterday&#x27;s diary: scan every .log file and tell me where it hurt.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Path and Files throw precise exceptions. Sorting directory results removes the dependence on file-system order.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Find the .log files</b> (input): DirectoryStream with a glob, sorted.</li><li><b>Read each file</b> (work): Files.readAllLines gives the lines.</li><li><b>Is the line an event?</b> (check): split with a limit; valueOf for a safe level.</li><li><b>Count by level and component</b> (work): EnumMap and TreeMap with merge.</li><li><b>Errors, noisy component, first error</b> (result): Printed with / in file names, the same everywhere.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

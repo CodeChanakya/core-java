@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -42,6 +42,22 @@
         <p>HR keeps employees in a CSV file. The program has to read it, cope with the bad rows every real file has, write a report and add a new employee without damaging the rest.</p>
         <p>Readers and Writers handle text, streams handle raw bytes, and buffering makes both fast. Try-with-resources closes every file even when something fails.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-23.svg"><img src="flows/program-23.svg" alt="Flow of Program 23, Employee File Management, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>An office clerk working from a paper file: read it, skip the damaged rows, write a clean copy.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>try-with-resources closes every file. Naming the charset and writing explicit line endings make output identical on every OS.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Read employees.csv</b> (input): BufferedReader with UTF-8 reads one line at a time.</li><li><b>Is the row usable?</b> (check): Bad rows are skipped with a line number and a reason.</li><li><b>Write a report</b> (work): PrintWriter over a BufferedWriter makes a text report.</li><li><b>Save a clean CSV, append one</b> (store): Append mode adds without damaging the rest.</li><li><b>Copy bytes, handle a missing file</b> (result): A stream copy, then a FileNotFoundException.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

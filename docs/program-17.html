@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -41,6 +41,22 @@
         <p>An application should gain behaviour by adding one class, with no edit to the main code.</p>
         <p>This Phase 4 project reads class names from a file, inspects them with reflection, checks the @PluginInfo annotation and runs the plugins in phase and order.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-17.svg"><img src="flows/program-17.svg" alt="Flow of Program 17, Plugin Discovery Demonstration (Phase 4 project), in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A building with sockets: new devices plug in without rewiring the building.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Reflection trades compile-time safety for flexibility. Retention RUNTIME makes the annotation readable.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>A list of class names</b> (input): plugins.txt names the plug-ins to load.</li><li><b>Load each class by name</b> (work): Class.forName finds it at run time.</li><li><b>Four questions to every class</b> (check): Does it exist, carry @PluginInfo, implement Plugin, and is it enabled?</li><li><b>Sort by phase and order</b> (work): LoadedPlugin is Comparable, giving the run order.</li><li><b>Run, then reflect</b> (result): Each plug-in runs; its annotation is read back.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

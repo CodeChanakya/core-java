@@ -12,6 +12,29 @@ A shop wants to accept payments by card, UPI and wallet. Each has its own rules:
 
 With inheritance you would write `CardProcessor`, `UpiProcessor`, `WalletProcessor`, and then ask what happens when the fee rule changes independently of the payment method. Three methods times three fee rules is nine classes, and every new method or rule multiplies the count.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-12.svg"><img alt="Flow of Program 12, Payment Processing System, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-12.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A till with plug-in parts: swap the card reader or the fee rule without rebuilding the till. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Composition over inheritance: 3 methods and 3 fee rules need 6 classes, not 9. Depend on interfaces, inject the parts. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Pick a payment method** (input): Card, UPI or wallet, behind one PaymentMethod interface. (`PaymentMethod.java`)
+2. **Pick a fee rule** (input): FlatFee or PercentageFee, behind FeePolicy. (`FeePolicy.java`)
+3. **Processor asks both** (work): It only knows the interfaces, never the concrete classes. (`PaymentProcessor.java`)
+4. **Is the payment allowed?** (check): Limits and balances belong to each method. (`charge`)
+5. **A result and a ledger** (result): PaymentResult is built by a named success or failure factory. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

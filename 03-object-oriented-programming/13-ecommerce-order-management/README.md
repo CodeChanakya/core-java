@@ -10,6 +10,29 @@ Concepts: object relationships (association, composition), a service class, all-
 
 A small online shop sells physical goods and downloads. A customer places an order of several items. The shop must check stock, work out a total with a loyalty discount, shipping and GST, and then move the order through payment and dispatch, never skipping a step.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-13.svg"><img alt="Flow of Program 13, E-commerce Order Management (Phase 3 project), in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-13.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | An online order from start to finish, with checks first so it either all happens or none of it does. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Two-pass validation gives atomic behaviour without transactions. Defensive copies stop shared mutable state. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Customer picks products** (input): Physical and digital products, found by SKU in the catalogue. (`Catalog.java`)
+2. **Pass 1: check everything** (check): Stock and rules checked before changing anything. (`OrderService.java`)
+3. **Pass 2: apply the changes** (work): Stock reduces, items are added, loyalty discount applies. (`OrderService.java`)
+4. **The order owns its items** (store): Status moves only through two guarded methods. (`Order.java`)
+5. **Order summary and stock report** (result): A refused order leaves stock untouched. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

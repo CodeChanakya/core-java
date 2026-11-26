@@ -14,6 +14,29 @@ Orders arrive all day. A warehouse handles them one at a time, and two questions
 - Express orders jump the line, and ties keep arrival order: a priority queue.
 - "Oops, undo that": a stack, which is a deque used from one end.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-20.svg"><img alt="Flow of Program 20, Order Processing Queue, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-20.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A warehouse line: the urgent orders jump ahead, and the last step can be taken back. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Queue and Deque are interfaces; pick the implementation for the policy. PriorityQueue orders on removal, not on iteration. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Orders arrive** (input): Each gets an arrival number so ties stay fair. (`QueuedOrder.java`)
+2. **FIFO line** (work): ArrayDeque serves first come, first served. (`OrderDesk.java`)
+3. **Priority line** (work): PriorityQueue serves URGENT before NORMAL. (`PriorityQueue`)
+4. **Undo with a stack** (work): A Deque used as a stack remembers the last step. (`push, pop`)
+5. **The order they are served** (result): Each structure shown in turn. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**

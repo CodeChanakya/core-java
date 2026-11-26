@@ -12,6 +12,29 @@ A shop prints an invoice: 3 items at 499.99, plus 18% GST. The total must be exa
 
 In Program 2 the salary slip kept rupees in `double`. That was fine for learning arithmetic, but it is a known source of real bugs. This lab shows the problem, then the fix.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-03.svg"><img alt="Flow of Program 03, Money Handling Mini-Lab, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-03.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | Counting coins instead of weighing sand: exact decimal numbers so the paisa always adds up. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | BigDecimal is immutable and carries a scale. Compare with compareTo, not equals, when scale may differ. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Price, quantity and GST rate** (input): Created from text such as "499.99", never from a double. (`MoneyLab.java`)
+2. **Show the double problem first** (work): 0.1 + 0.2 is not exactly 0.3 in binary. (`part 1`)
+3. **Multiply and add with BigDecimal** (work): add, multiply: no operators, each call returns a new number. (`part 2`)
+4. **Round on purpose** (check): setScale with a RoundingMode says how and when to round. (`part 3`)
+5. **An invoice exact to the paisa** (result): Subtotal, GST and total match the hand calculation. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Read in this order
 
 | Step | File | What to look for |

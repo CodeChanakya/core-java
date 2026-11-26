@@ -14,7 +14,7 @@
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
-    <a class="text-link" href="index.html#programs">Back to all programs</a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
   </div>
 </header>
 
@@ -41,6 +41,22 @@
         <p>Add 0.1 and 0.2 with <span class="mono">double</span> and you do not get 0.3. For a shop, a bank or a payroll, a paisa out is a bug.</p>
         <p>The lab runs five short experiments that show the problem and the fix: <span class="mono">BigDecimal</span> built from Strings, with explicit rounding.</p>
       </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-03.svg"><img src="flows/program-03.svg" alt="Flow of Program 03, Money Handling Mini-Lab, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>Counting coins instead of weighing sand: exact decimal numbers so the paisa always adds up.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>BigDecimal is immutable and carries a scale. Compare with compareTo, not equals, when scale may differ.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Price, quantity and GST rate</b> (input): Created from text such as &quot;499.99&quot;, never from a double.</li><li><b>Show the double problem first</b> (work): 0.1 + 0.2 is not exactly 0.3 in binary.</li><li><b>Multiply and add with BigDecimal</b> (work): add, multiply: no operators, each call returns a new number.</li><li><b>Round on purpose</b> (check): setScale with a RoundingMode says how and when to round.</li><li><b>An invoice exact to the paisa</b> (result): Subtotal, GST and total match the hand calculation.</li></ol></details>
+      </section>
+<!--/flow-->
       <section>
         <h2>Read in this order</h2>
         <ol class="files">

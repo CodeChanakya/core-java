@@ -12,6 +12,29 @@ Program 13 kept an order's status as a `String`: `"NEW"`, `"PAID"`, `"SHIPPED"`.
 
 This program replaces the strings with a proper type that lists every legal status, and moves the rules about which status may follow which into that type, where they cannot be forgotten.
 
+<!--flow-->
+## The flow at a glance
+
+<p align="center"><a href="../../docs/flows/program-14.svg"><img alt="Flow of Program 14, Order Status Management, in 5 steps. The steps are listed in text below the picture." src="../../docs/flows/program-14.svg" width="760"></a></p>
+
+| If you are | Read it like this |
+|---|---|
+| New to coding | A parcel's journey: it can only move to the next legal stop, and the compiler knows every stop. |
+| Learning | Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card. |
+| Experienced | Enums replace stringly-typed state. static belongs to the class and final fixes a value; EnumMap is compact and ordered. |
+
+<details>
+<summary>Text version of the flow</summary>
+
+1. **Order status as an enum** (input): NEW, PAID, SHIPPED and so on, each with a label. (`OrderStatus.java`)
+2. **Is the move allowed?** (check): nextStates() lists what may follow each status. (`nextStates`)
+3. **moveTo changes the order** (work): Illegal moves are refused. (`Order.java`)
+4. **Count by status** (store): An EnumMap keeps the board in enum order. (`OrderBoard.java`)
+5. **Five journeys** (result): Each order takes a different route. (`expected-output.txt`)
+
+</details>
+<!--/flow-->
+
 ## Requirements
 
 **Functional**
