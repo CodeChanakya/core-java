@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales Analytics | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 07 · Modern Java · Program 29 of 43</p>
+    <h1>Sales Analytics</h1>
+    <div class="tags">
+      <span class="tag">Intermediate</span>
+      <span class="chip" style="background:#fff">Collectors</span>
+      <span class="chip" style="background:#fff">groupingBy</span>
+      <span class="chip" style="background:#fff">partitioningBy</span>
+      <span class="chip" style="background:#fff">teeing</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>Management wants revenue per region, units sold, averages, the top salespeople and how many orders were big, from sixteen sales. In SQL this is GROUP BY.</p>
+        <p>In Java it is Collectors. groupingBy takes a key, a map to build and a downstream collector; change the downstream collector and the same grouping answers a different question.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Category.java, Sale.java</b><span class="d">An enum and a record that knows its revenue.</span></span></li>
+          <li><span class="badge">2</span><span><b>SalesData.java</b><span class="d">Sixteen sales.</span></span></li>
+          <li><span class="badge">3</span><span><b>Analytics.java</b><span class="d">One method per question. The file to study.</span></span></li>
+          <li><span class="badge">4</span><span><b>Main.java</b><span class="d">Calls each one and prints.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/analytics/Analytics.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.analytics;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.math.<span class="t">RoundingMode</span>;
+<span class="k">import</span> java.util.<span class="t">Comparator</span>;
+<span class="k">import</span> java.util.<span class="t">EnumMap</span>;
+<span class="k">import</span> java.util.<span class="t">IntSummaryStatistics</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.<span class="t">TreeMap</span>;
+<span class="k">import</span> java.util.<span class="t">TreeSet</span>;
+<span class="k">import</span> java.util.stream.<span class="t">Collectors</span>;
+
+<span class="c">/**
+ * Reports over a list of sales, each built from one Collector.
+ *
+ * Collectors.groupingBy(f) means &quot;put each item in the bucket named by f(item)&quot;, and a second
+ * argument says what to do with each bucket&#x27;s items. Every map here is created with a TreeMap
+ * (or EnumMap) so the output order is fixed. A plain HashMap would work, but its order is not
+ * promised and could differ between Java versions.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Analytics</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">List</span>&lt;<span class="t">Sale</span>&gt; sales;
+
+    <span class="k">public</span> <span class="t">Analytics</span>(<span class="t">List</span>&lt;<span class="t">Sale</span>&gt; sales) {
+        <span class="k">this</span>.sales = sales;
+    }
+
+    <span class="c">/** Region to total revenue. reducing() folds each bucket&#x27;s items into one value. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">BigDecimal</span>&gt; revenueByRegion() {
+        <span class="k">return</span> sales.stream().collect(<span class="t">Collectors</span>.groupingBy(<span class="t">Sale</span>::region, <span class="t">TreeMap</span>::<span class="k">new</span>,
+                <span class="t">Collectors</span>.reducing(<span class="t">BigDecimal</span>.ZERO, <span class="t">Sale</span>::revenue, <span class="t">BigDecimal</span>::add)));
+    }
+
+    <span class="c">/** Category to number of orders. counting() gives a Long. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">Category</span>, <span class="t">Long</span>&gt; ordersByCategory() {
+        <span class="k">return</span> sales.stream().collect(<span class="t">Collectors</span>.groupingBy(<span class="t">Sale</span>::category,
+                () -&gt; <span class="k">new</span> <span class="t">EnumMap</span>&lt;&gt;(<span class="t">Category</span>.<span class="k">class</span>), <span class="t">Collectors</span>.counting()));
+    }
+
+    <span class="c">/** Region to total units. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; unitsByRegion() {
+        <span class="k">return</span> sales.stream().collect(<span class="t">Collectors</span>.groupingBy(<span class="t">Sale</span>::region, <span class="t">TreeMap</span>::<span class="k">new</span>,
+                <span class="t">Collectors</span>.summingInt(<span class="t">Sale</span>::units)));
+    }
+
+    <span class="c">/** Region to the average number of units per order. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Double</span>&gt; averageUnitsByRegion() {
+        <span class="k">return</span> sales.stream().collect(<span class="t">Collectors</span>.groupingBy(<span class="t">Sale</span>::region, <span class="t">TreeMap</span>::<span class="k">new</span>,
+                <span class="t">Collectors</span>.averagingInt(<span class="t">Sale</span>::units)));
+    }
+
+    <span class="c">/** Region to the distinct salespeople who sold there, in alphabetical order. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">TreeSet</span>&lt;<span class="t">String</span>&gt;&gt; peopleByRegion() {
+        <span class="k">return</span> sales.stream().collect(<span class="t">Collectors</span>.groupingBy(<span class="t">Sale</span>::region, <span class="t">TreeMap</span>::<span class="k">new</span>,
+                <span class="t">Collectors</span>.mapping(<span class="t">Sale</span>::salesperson, <span class="t">Collectors</span>.toCollection(<span class="t">TreeSet</span>::<span class="k">new</span>))));
+    }
+
+    <span class="c">/** Region to the order id of its single biggest sale. maxBy gives an Optional; collectingAndThen opens it. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">String</span>&gt; biggestSaleByRegion() {
+        <span class="k">return</span> sales.stream().collect(<span class="t">Collectors</span>.groupingBy(<span class="t">Sale</span>::region, <span class="t">TreeMap</span>::<span class="k">new</span>,
+                <span class="t">Collectors</span>.collectingAndThen(
+                        <span class="t">Collectors</span>.maxBy(<span class="t">Comparator</span>.comparing(<span class="t">Sale</span>::revenue)),
+                        best -&gt; best.map(<span class="t">Sale</span>::orderId).orElse(<span class="n">&quot;none&quot;</span>))));
+    }
+
+    <span class="c">/** Salesperson to total revenue. toMap needs a rule for two items with the same key: here, add them. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">BigDecimal</span>&gt; revenueBySalesperson() {
+        <span class="k">return</span> sales.stream().collect(<span class="t">Collectors</span>.toMap(<span class="t">Sale</span>::salesperson, <span class="t">Sale</span>::revenue,
+                <span class="t">BigDecimal</span>::add, <span class="t">TreeMap</span>::<span class="k">new</span>));
+    }
+
+    <span class="c">/** The n best salespeople by revenue, best first, ties broken by name. */</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">Map</span>.<span class="t">Entry</span>&lt;<span class="t">String</span>, <span class="t">BigDecimal</span>&gt;&gt; topSalespeople(<span class="k">int</span> n) {
+        <span class="k">return</span> revenueBySalesperson().entrySet().stream()
+                .sorted(<span class="t">Map</span>.<span class="t">Entry</span>.&lt;<span class="t">String</span>, <span class="t">BigDecimal</span>&gt;comparingByValue().reversed()
+                        .thenComparing(<span class="t">Map</span>.<span class="t">Entry</span>.comparingByKey()))
+                .limit(n)
+                .toList();
+    }
+
+    <span class="c">/** True: orders worth at least the limit. False: the rest. partitioningBy always has both keys. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">Boolean</span>, <span class="t">Long</span>&gt; splitByOrderValue(<span class="t">BigDecimal</span> limit) {
+        <span class="k">return</span> sales.stream().collect(<span class="t">Collectors</span>.partitioningBy(
+                sale -&gt; sale.revenue().compareTo(limit) &gt;= <span class="n">0</span>, <span class="t">Collectors</span>.counting()));
+    }
+
+    <span class="c">/** Each region&#x27;s share of all revenue, as a percentage with one decimal place. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">BigDecimal</span>&gt; shareByRegion() {
+        <span class="t">BigDecimal</span> total = revenueByRegion().values().stream().reduce(<span class="t">BigDecimal</span>.ZERO, <span class="t">BigDecimal</span>::add);
+        <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">BigDecimal</span>&gt; shares = <span class="k">new</span> <span class="t">TreeMap</span>&lt;&gt;();
+        revenueByRegion().forEach((region, revenue) -&gt;
+                shares.put(region, revenue.multiply(<span class="t">BigDecimal</span>.valueOf(<span class="n">100</span>)).divide(total, <span class="n">1</span>, <span class="t">RoundingMode</span>.HALF_UP)));
+        <span class="k">return</span> shares;
+    }
+
+    <span class="c">/** Count and sum in one pass over the data, using teeing to run two collectors at once. */</span>
+    <span class="k">public</span> <span class="t">String</span> unitsAndOrders() {
+        <span class="k">return</span> sales.stream().collect(<span class="t">Collectors</span>.teeing(
+                <span class="t">Collectors</span>.summingInt(<span class="t">Sale</span>::units),
+                <span class="t">Collectors</span>.counting(),
+                (units, orders) -&gt; units + <span class="n">&quot; units in &quot;</span> + orders + <span class="n">&quot; orders&quot;</span>));
+    }
+
+    <span class="c">/** min, max, average, sum and count of the unit numbers, from one call. */</span>
+    <span class="k">public</span> <span class="t">IntSummaryStatistics</span> unitStatistics() {
+        <span class="k">return</span> sales.stream().collect(<span class="t">Collectors</span>.summarizingInt(<span class="t">Sale</span>::units));
+    }
+
+    <span class="c">/** Grouped lists flattened back into one sorted stream of order ids. */</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; orderIdsGroupedThenFlattened() {
+        <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">List</span>&lt;<span class="t">Sale</span>&gt;&gt; byRegion = sales.stream()
+                .collect(<span class="t">Collectors</span>.groupingBy(<span class="t">Sale</span>::region, <span class="t">TreeMap</span>::<span class="k">new</span>, <span class="t">Collectors</span>.toList()));
+        <span class="k">return</span> byRegion.values().stream()
+                .flatMap(<span class="t">List</span>::stream)            <span class="c">// one stream from many lists</span>
+                .map(<span class="t">Sale</span>::orderId)
+                .sorted()
+                .toList();
+    }
+
+    <span class="c">/** Names joined into one string: the simplest collector. */</span>
+    <span class="k">public</span> <span class="t">String</span> regionNamesJoined() {
+        <span class="k">return</span> sales.stream().map(<span class="t">Sale</span>::region).distinct().sorted().collect(<span class="t">Collectors</span>.joining(<span class="n">&quot;, &quot;</span>, <span class="n">&quot;[&quot;</span>, <span class="n">&quot;]&quot;</span>));
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- Total per bucket ---
+  Revenue by region    : {East=13542.00, North=13657.00, South=14384.50, West=17896.00}
+  Units by region      : {East=111, North=54, South=33, West=70}
+  Orders by category   : {ELECTRONICS=7, STATIONERY=4, HOME=5}
+
+--- Averages and shares ---
+  East averages 27.8 units per order
+  North averages 13.5 units per order
+  South averages 8.3 units per order
+  West averages 17.5 units per order
+  East is 22.8 percent of revenue
+  North is 23.0 percent of revenue
+  South is 24.2 percent of revenue
+  West is 30.1 percent of revenue
+
+--- What is inside each bucket ---
+  Salespeople by region: {East=[Dev, Kiran], North=[Asha, Neha], South=[Meera, Rahul], West=[Farah, Zoya]}
+  Biggest sale by region: {East=S-05, North=S-01, South=S-04, West=S-08}
+
+--- Ranking salespeople ---
+  Zoya: 10496.00
+  Asha: 9417.00
+  Meera: 8249.00
+  Everyone (toMap with a merge rule): {Asha=9417.00, Dev=5544.00, Farah=7400.00, Kiran=7998.00, Meera=8249.00, Neha=4240.00, Rahul=6135.50, Zoya=10496.00}
+
+--- Splitting in two ---
+  Orders of 5000 or more: 4, smaller: 12
+
+--- Several answers in one pass ---
+  teeing: 268 units in 16 orders
+  Units per order: min 1, max 100, sum 268, count 16
+
+--- Group, then flatten ---
+  [S-01, S-02, S-03, S-04, S-05, S-06, S-07, S-08, S-09, S-10, S-11, S-12, S-13, S-14, S-15, S-16]
+  Regions: [East, North, South, West]
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Work out West revenue with reduce.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Revenue by category in an EnumMap.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Count different salespeople.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Orders per salesperson, sorted.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Partition order ids by electronics.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Top category in each region.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: <span class="mono">toMap</span> with a repeated key, grouping on a null key, and the wrong declared result type. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">07-modern-java/29-sales-analytics</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-30.html"><span class="k2">Next</span><span class="v">30 Product Recommendation Filtering</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

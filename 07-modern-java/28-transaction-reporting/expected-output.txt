@@ -1,0 +1,39 @@
+--- What a record gives you for free ---
+  toString : Transaction[id=T-1, account=ACC-1, kind=DEPOSIT, amount=100.00, date=2026-03-02]
+  accessor : id() = T-1, amount() = 100.00
+  equals   : true (same values, so equal; different objects: true)
+  hashCode : true
+  In a HashSet twice: 1 item
+  withAmount made a new one: 250.00, the old one is still 100.00
+
+--- Validation in the compact constructor ---
+  Refused: Amount must be positive for T-2
+
+--- Loading a text block ---
+  Loaded 6 transactions, rejected 4
+    line 7: T-1006,ACC-1,TRANSFER,100.00,2026-03-04
+    line 8: T-1007,ACC-3,WITHDRAWAL,-50.00,2026-03-05
+    line 9: T-1008,ACC-1,DEPOSIT,1000.00,not-a-date
+    line 11: T-1010,ACC-1
+
+--- Optional: an answer that may not exist ---
+  isPresent        : true
+  map the amount   : 800.00
+  missing id, orElse: (none)
+  ifPresent        : T-1004 belongs to ACC-3
+  ifPresentOrElse  : T-9999 is not in the ledger
+  Largest deposit  : T-1001
+  Latest for ACC-3 : T-1004
+  Latest for ACC-9 : (no transactions)
+
+--- orElseThrow when "no" is a real error ---
+  Transaction T-9999 does not exist
+
+--- A report from records ---
+  ACC-1  2 tx  in   5000.00  out    300.00  net   4700.00
+  ACC-2  3 tx  in   4250.00  out   1200.50  net   3049.50
+  ACC-3  1 tx  in    800.00  out      0.00  net    800.00
+  AccountSummary[account=ACC-1, count=2, deposits=5000.00, withdrawals=300.00]
+
+--- A record can live inside a method ---
+  Range[low=250.00, high=5000.00]

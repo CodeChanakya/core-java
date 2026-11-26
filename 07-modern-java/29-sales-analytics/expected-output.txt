@@ -1,0 +1,35 @@
+--- Total per bucket ---
+  Revenue by region    : {East=13542.00, North=13657.00, South=14384.50, West=17896.00}
+  Units by region      : {East=111, North=54, South=33, West=70}
+  Orders by category   : {ELECTRONICS=7, STATIONERY=4, HOME=5}
+
+--- Averages and shares ---
+  East averages 27.8 units per order
+  North averages 13.5 units per order
+  South averages 8.3 units per order
+  West averages 17.5 units per order
+  East is 22.8 percent of revenue
+  North is 23.0 percent of revenue
+  South is 24.2 percent of revenue
+  West is 30.1 percent of revenue
+
+--- What is inside each bucket ---
+  Salespeople by region: {East=[Dev, Kiran], North=[Asha, Neha], South=[Meera, Rahul], West=[Farah, Zoya]}
+  Biggest sale by region: {East=S-05, North=S-01, South=S-04, West=S-08}
+
+--- Ranking salespeople ---
+  Zoya: 10496.00
+  Asha: 9417.00
+  Meera: 8249.00
+  Everyone (toMap with a merge rule): {Asha=9417.00, Dev=5544.00, Farah=7400.00, Kiran=7998.00, Meera=8249.00, Neha=4240.00, Rahul=6135.50, Zoya=10496.00}
+
+--- Splitting in two ---
+  Orders of 5000 or more: 4, smaller: 12
+
+--- Several answers in one pass ---
+  teeing: 268 units in 16 orders
+  Units per order: min 1, max 100, sum 268, count 16
+
+--- Group, then flatten ---
+  [S-01, S-02, S-03, S-04, S-05, S-06, S-07, S-08, S-09, S-10, S-11, S-12, S-13, S-14, S-15, S-16]
+  Regions: [East, North, South, West]

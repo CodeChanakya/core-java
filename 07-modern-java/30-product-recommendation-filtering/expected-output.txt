@@ -1,0 +1,41 @@
+--- Rules are values ---
+  Rule : (costs no more than 500 and rated at least 4.0)
+  Match: USB-C Cable, Fresh Paneer 200g, Chicken Sausages
+  Rule : is not (is a grocery)
+  Match: The Pragmatic Programmer, Clean Code, Java Concurrency in Practice, A Pocket Guide to SQL, Noise-Cancelling Headphones, USB-C Cable, Mechanical Keyboard
+  Raw record: AllOf[rules=[MaxPrice[value=500], MinRating[value=4.0]]]
+
+--- One switch, many shapes ---
+  The Pragmatic Programmer: a quick read by Hunt and Thomas
+  Clean Code: a quick read by Robert Martin
+  Java Concurrency in Practice: a long read by Brian Goetz
+  Noise-Cancelling Headphones: wireless, with 24 months of warranty
+  Fresh Paneer 200g: vegetarian, fresh: use within 3 days
+  Chicken Sausages: contains meat, fresh: use within 5 days
+
+--- Recommendations ---
+  Developer on a budget:
+    wants: (rated at least 4.3 and costs no more than 2000 and (is a book or is a gadget))
+    50.0  The Pragmatic Programmer - a quick read by Hunt and Thomas
+    49.0  Java Concurrency in Practice - a long read by Brian Goetz
+    47.0  Noise-Cancelling Headphones - wireless, with 24 months of warranty
+    best pick: The Pragmatic Programmer
+  Vegetarian shopper:
+    wants: (rated at least 4.0 and costs no more than 700 and (is a grocery or is a book) and is vegetarian when it is food)
+    43.0  Basmati Rice 5kg - vegetarian, keeps for 365 days
+    36.0  Fresh Paneer 200g - vegetarian, fresh: use within 3 days
+    best pick: Basmati Rice 5kg
+  Very picky:
+    wants: (rated at least 4.9 and costs no more than 100 and (is a book))
+    nothing matches
+    best pick: none
+
+--- Pattern matching on a single value ---
+  a book called The Pragmatic Programmer by Hunt and Thomas
+  a long string (8 characters)
+  the integer 42
+  a rule: rated at least 3.5
+  something else: [1, 2]
+
+--- Counting the catalogue by kind ---
+  {Book=4, Gadget=3, Grocery=3}
