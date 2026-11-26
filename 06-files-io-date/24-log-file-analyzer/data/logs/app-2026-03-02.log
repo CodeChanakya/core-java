@@ -1,0 +1,7 @@
+2026-03-02 08:02:11 INFO  AuthService     Login ok user=kiran
+2026-03-02 08:05:33 INFO  OrderService    Order created id=O-78
+2026-03-02 08:06:01 ERROR OrderService    Stock check failed id=O-78 sku=H-300
+2026-03-02 08:06:02 ERROR OrderService    Order rolled back id=O-78
+2026-03-02 08:20:14 TRACE AuthService     Token refreshed
+2026-03-02 08:45:50 WARN  PaymentService  Retrying payment ref=P-1003
+2026-03-02 08:45:53 INFO  PaymentService  Payment accepted ref=P-1003

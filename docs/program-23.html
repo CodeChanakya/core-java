@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Employee File Management | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 06 · Files, I/O and Date · Program 23 of 43</p>
+    <h1>Employee File Management</h1>
+    <div class="tags">
+      <span class="tag">Intermediate</span>
+      <span class="chip" style="background:#fff">java.io</span>
+      <span class="chip" style="background:#fff">BufferedReader</span>
+      <span class="chip" style="background:#fff">Streams</span>
+      <span class="chip" style="background:#fff">try-with-resources</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>HR keeps employees in a CSV file. The program has to read it, cope with the bad rows every real file has, write a report and add a new employee without damaging the rest.</p>
+        <p>Readers and Writers handle text, streams handle raw bytes, and buffering makes both fast. Try-with-resources closes every file even when something fails.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Employee.java, LoadResult.java</b><span class="d">A row, and good rows plus problems.</span></span></li>
+          <li><span class="badge">2</span><span><b>EmployeeFile.java</b><span class="d">Every java.io class used, and why.</span></span></li>
+          <li><span class="badge">3</span><span><b>Main.java</b><span class="d">Six short scenarios.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/files/EmployeeFile.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.files;
+
+<span class="k">import</span> java.io.<span class="t">BufferedReader</span>;
+<span class="k">import</span> java.io.<span class="t">BufferedWriter</span>;
+<span class="k">import</span> java.io.<span class="t">File</span>;
+<span class="k">import</span> java.io.<span class="t">FileInputStream</span>;
+<span class="k">import</span> java.io.<span class="t">FileOutputStream</span>;
+<span class="k">import</span> java.io.<span class="t">FileReader</span>;
+<span class="k">import</span> java.io.<span class="t">FileWriter</span>;
+<span class="k">import</span> java.io.<span class="t">IOException</span>;
+<span class="k">import</span> java.io.<span class="t">InputStream</span>;
+<span class="k">import</span> java.io.<span class="t">OutputStream</span>;
+<span class="k">import</span> java.io.<span class="t">PrintWriter</span>;
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.nio.charset.<span class="t">StandardCharsets</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="c">/**
+ * Reads and writes the employee CSV using the classic java.io classes.
+ *
+ * Two families of class appear here, and the split is worth learning early:
+ *  - Reader and Writer handle TEXT (characters). They need a charset.
+ *  - InputStream and OutputStream handle BYTES. They know nothing about text.
+ * Every file is opened with try-with-resources, so it is closed even when an exception is thrown.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">EmployeeFile</span> {
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">String</span> HEADER = <span class="n">&quot;id,name,department,salary&quot;</span>;
+
+    <span class="c">/**
+     * Reads every employee from the file. Rows that cannot be used are skipped and described
+     * in the result. A file that cannot be opened at all throws IOException.
+     */</span>
+    <span class="k">public</span> <span class="t">LoadResult</span> load(<span class="t">File</span> file) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="t">LoadResult</span> result = <span class="k">new</span> <span class="t">LoadResult</span>();
+        <span class="c">// FileReader reads characters one at a time from disk; BufferedReader wraps it so lines</span>
+        <span class="c">// come from a memory buffer instead of a disk read each time.</span>
+        <span class="k">try</span> (<span class="t">BufferedReader</span> reader = <span class="k">new</span> <span class="t">BufferedReader</span>(<span class="k">new</span> <span class="t">FileReader</span>(file, <span class="t">StandardCharsets</span>.UTF_8))) {
+            <span class="t">String</span> line;
+            <span class="k">int</span> lineNumber = <span class="n">0</span>;
+            <span class="k">while</span> ((line = reader.readLine()) != <span class="k">null</span>) {
+                lineNumber++;
+                <span class="k">if</span> (lineNumber == <span class="n">1</span> &amp;&amp; line.equals(HEADER)) {
+                    <span class="k">continue</span>;                       <span class="c">// the header names the columns; it is not data</span>
+                }
+                <span class="k">if</span> (line.isBlank()) {
+                    <span class="k">continue</span>;                       <span class="c">// blank lines are harmless, so no complaint</span>
+                }
+                parseRow(line, lineNumber, result);
+            }
+        }
+        <span class="k">return</span> result;
+    }
+
+    <span class="k">private</span> <span class="k">void</span> parseRow(<span class="t">String</span> line, <span class="k">int</span> lineNumber, <span class="t">LoadResult</span> result) {
+        <span class="t">String</span>[] parts = line.split(<span class="n">&quot;,&quot;</span>, -<span class="n">1</span>);       <span class="c">// -1 keeps empty trailing fields instead of dropping them</span>
+        <span class="k">if</span> (parts.length != <span class="n">4</span>) {
+            result.addProblem(<span class="n">&quot;line &quot;</span> + lineNumber + <span class="n">&quot;: expected 4 fields but found &quot;</span> + parts.length);
+            <span class="k">return</span>;
+        }
+        <span class="k">try</span> {
+            <span class="t">BigDecimal</span> salary = <span class="k">new</span> <span class="t">BigDecimal</span>(parts[<span class="n">3</span>].trim());
+            result.addEmployee(<span class="k">new</span> <span class="t">Employee</span>(parts[<span class="n">0</span>].trim(), parts[<span class="n">1</span>].trim(), parts[<span class="n">2</span>].trim(), salary));
+        } <span class="k">catch</span> (<span class="t">NumberFormatException</span> e) {
+            result.addProblem(<span class="n">&quot;line &quot;</span> + lineNumber + <span class="n">&quot;: salary is not a number: \&quot;&quot;</span> + parts[<span class="n">3</span>].trim() + <span class="n">&quot;\&quot;&quot;</span>);
+        }
+    }
+
+    <span class="c">/** Writes a fresh file, replacing anything already there. */</span>
+    <span class="k">public</span> <span class="k">void</span> save(<span class="t">File</span> file, <span class="t">List</span>&lt;<span class="t">Employee</span>&gt; employees) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="k">try</span> (<span class="t">BufferedWriter</span> writer = <span class="k">new</span> <span class="t">BufferedWriter</span>(<span class="k">new</span> <span class="t">FileWriter</span>(file, <span class="t">StandardCharsets</span>.UTF_8))) {
+            writer.write(HEADER + <span class="n">&quot;\n&quot;</span>);            <span class="c">// &quot;\n&quot; rather than newLine(), so the file is the same on every OS</span>
+            <span class="k">for</span> (<span class="t">Employee</span> employee : employees) {
+                writer.write(employee.toCsv() + <span class="n">&quot;\n&quot;</span>);
+            }
+        }
+    }
+
+    <span class="c">/** Adds one line to the end of an existing file. The third argument, true, means append. */</span>
+    <span class="k">public</span> <span class="k">void</span> append(<span class="t">File</span> file, <span class="t">Employee</span> employee) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="k">try</span> (<span class="t">BufferedWriter</span> writer = <span class="k">new</span> <span class="t">BufferedWriter</span>(<span class="k">new</span> <span class="t">FileWriter</span>(file, <span class="t">StandardCharsets</span>.UTF_8, <span class="k">true</span>))) {
+            writer.write(employee.toCsv() + <span class="n">&quot;\n&quot;</span>);
+        }
+    }
+
+    <span class="c">/** Writes a readable, aligned text report. PrintWriter adds printf and println to a Writer. */</span>
+    <span class="k">public</span> <span class="k">void</span> writeReport(<span class="t">File</span> file, <span class="t">List</span>&lt;<span class="t">Employee</span>&gt; employees) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="k">try</span> (<span class="t">PrintWriter</span> out = <span class="k">new</span> <span class="t">PrintWriter</span>(<span class="k">new</span> <span class="t">BufferedWriter</span>(<span class="k">new</span> <span class="t">FileWriter</span>(file, <span class="t">StandardCharsets</span>.UTF_8)))) {
+            out.printf(<span class="n">&quot;%-8s %-14s %-12s %11s\n&quot;</span>, <span class="n">&quot;ID&quot;</span>, <span class="n">&quot;Name&quot;</span>, <span class="n">&quot;Department&quot;</span>, <span class="n">&quot;Salary&quot;</span>);
+            out.print(<span class="n">&quot;-&quot;</span>.repeat(<span class="n">48</span>) + <span class="n">&quot;\n&quot;</span>);
+            <span class="k">for</span> (<span class="t">Employee</span> employee : employees) {
+                out.printf(<span class="n">&quot;%-8s %-14s %-12s %11s\n&quot;</span>, employee.getId(), employee.getName(),
+                        employee.getDepartment(), employee.getSalary());
+            }
+            out.printf(<span class="n">&quot;%d employees\n&quot;</span>, employees.size());
+        }
+    }
+
+    <span class="c">/** Reads every line of a text file. Fine for small files; for huge ones, read line by line instead. */</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; readAllLines(<span class="t">File</span> file) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; lines = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">try</span> (<span class="t">BufferedReader</span> reader = <span class="k">new</span> <span class="t">BufferedReader</span>(<span class="k">new</span> <span class="t">FileReader</span>(file, <span class="t">StandardCharsets</span>.UTF_8))) {
+            <span class="t">String</span> line;
+            <span class="k">while</span> ((line = reader.readLine()) != <span class="k">null</span>) {
+                lines.add(line);
+            }
+        }
+        <span class="k">return</span> lines;
+    }
+
+    <span class="c">/**
+     * Copies any file, text or not, byte for byte. Returns how many bytes were copied.
+     * A 4 KB buffer means one disk read per 4096 bytes rather than one per byte.
+     */</span>
+    <span class="k">public</span> <span class="k">long</span> copyBytes(<span class="t">File</span> from, <span class="t">File</span> to) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="k">long</span> total = <span class="n">0</span>;
+        <span class="k">try</span> (<span class="t">InputStream</span> in = <span class="k">new</span> <span class="t">FileInputStream</span>(from);
+             <span class="t">OutputStream</span> out = <span class="k">new</span> <span class="t">FileOutputStream</span>(to)) {
+            byte[] buffer = <span class="k">new</span> byte[<span class="n">4096</span>];
+            <span class="k">int</span> count;
+            <span class="k">while</span> ((count = in.read(buffer)) != -<span class="n">1</span>) {
+                out.write(buffer, <span class="n">0</span>, count);        <span class="c">// write only what was actually read this time</span>
+                total += count;
+            }
+        }
+        <span class="k">return</span> total;
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- Reading data/employees.csv ---
+Loaded 6 employees, skipped 2 lines
+  Skipped line 8: expected 4 fields but found 3
+  Skipped line 9: salary is not a number: &quot;seventy thousand&quot;
+
+--- Payroll by department ---
+  Engineering    285000.50
+  Finance        140500.00
+  Support         41000.00
+  Total          466500.50
+
+--- Writing a report, then reading it back ---
+  | ID       Name           Department        Salary
+  | ------------------------------------------------
+  | E-101    Asha Menon     Engineering     92000.00
+  | E-102    Rahul Verma    Finance         68000.00
+  | E-103    Meera Iyer     Engineering    105000.50
+  | E-104    Kiran Rao      Support         41000.00
+  | E-205    Dev Patel      Finance         72500.00
+  | E-208    Neha Joshi     Engineering     88000.00
+  | 6 employees
+
+--- Saving a clean copy, then appending ---
+  Rows after save  : 6
+  Rows after append: 7 (problems: 0)
+
+--- Copying as raw bytes ---
+  Copied 280 bytes; the original is 280 bytes, the copy is 280 bytes
+
+--- When the file is not there ---
+  exists(): false
+  Caught FileNotFoundException
+  FileNotFoundException is an IOException: true
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Print the highest-paid employee.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add countLines().</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add a total to the report.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Export one department.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Reject negative salaries.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Merge two files.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a writer that is never closed, an unhandled <span class="mono">IOException</span>, and catch blocks in the wrong order. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">06-files-io-date/23-employee-file-management</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-24.html"><span class="k2">Next</span><span class="v">24 Log File Analyzer</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

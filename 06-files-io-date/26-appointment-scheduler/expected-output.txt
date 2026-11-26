@@ -1,0 +1,43 @@
+--- One moment, three clocks ---
+  New York: 2026-03-09T10:00-04:00[America/New_York]
+  London  : 2026-03-09T14:00Z[Europe/London]
+  Kolkata : 2026-03-09T19:30+05:30[Asia/Kolkata]
+  Same Instant in UTC: 2026-03-09T14:00:00Z
+
+--- Booking across zones ---
+  Booked  "Stand-up"
+  Refused "Design review" overlaps "Stand-up"
+  Booked  "Client call"
+  Booked  "Retro"
+
+--- The same agenda on two clocks ---
+  New York:
+    Mon 09 Mar 10:00 -04:00 [America/New_York]  Stand-up (30 min)
+    Mon 09 Mar 11:00 -04:00 [America/New_York]  Client call (60 min)
+    Tue 10 Mar 15:00 -04:00 [America/New_York]  Retro (60 min)
+  Kolkata:
+    Mon 09 Mar 19:30 +05:30 [Asia/Kolkata]  Stand-up (30 min)
+    Mon 09 Mar 20:30 +05:30 [Asia/Kolkata]  Client call (60 min)
+    Wed 11 Mar 00:30 +05:30 [Asia/Kolkata]  Retro (60 min)
+
+--- Clock changes ---
+  2:30 on 8 March does not exist in New York, so Java gives: 2026-03-08T03:30-04:00[America/New_York]
+  1:30 on 1 November happens twice. Default (earlier): 2026-11-01T01:30-04:00[America/New_York]
+  The later one: 2026-11-01T01:30-05:00[America/New_York]
+  Saturday 09:00 plusDays(1)       : 2026-03-08T09:00-04:00[America/New_York]
+  Saturday 09:00 plus 24 hours     : 2026-03-08T10:00-04:00[America/New_York]
+  Hours in 8 March in New York     : 23
+
+--- Saving and loading ---
+  | Stand-up|2026-03-09T10:00-04:00[America/New_York]|30
+  | Client call|2026-03-09T20:30+05:30[Asia/Kolkata]|60
+  | Retro|2026-03-10T15:00-04:00[America/New_York]|60
+  Loaded 3 appointments, 0 problems
+  Every start time survived the round trip: true
+
+--- A damaged file ---
+  Loaded 4 appointments
+  Skipped line 5: could not read (IllegalArgumentException)
+  Skipped line 6: could not read (DateTimeParseException)
+  Skipped line 7: "Overlap" overlaps "Stand-up"
+  Skipped line 8: could not read (NumberFormatException)

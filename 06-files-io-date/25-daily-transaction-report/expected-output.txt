@@ -1,0 +1,46 @@
+Read 11 transactions for the report dated Fri 06 Mar 2026
+  Skipped line 12: bad date or time "2026-13-40 10:00"
+
+--- Net movement per day ---
+  Fri 27 Feb 2026   1 tx     5000.00
+  Sat 28 Feb 2026   1 tx    -1200.00  (weekend)
+  Sun 01 Mar 2026   1 tx     -300.00  (weekend)
+  Mon 02 Mar 2026   3 tx     3149.25
+  Tue 03 Mar 2026   1 tx     -999.99
+  Wed 04 Mar 2026   2 tx     3800.00
+  Thu 05 Mar 2026   1 tx     1000.00
+  Fri 06 Mar 2026   1 tx      600.00
+
+--- Per week (weeks start on Monday) and per month ---
+  Week of Mon 23 Feb 2026: 3500.00
+  Week of Mon 02 Mar 2026: 7549.26
+  2026-02 has 28 days, net 3800.00
+  2026-03 has 31 days, net 7249.26
+
+--- Times of day ---
+  After 22:00: ACC-1 at 23:50 on 2026-03-01
+  After 22:00: ACC-2 at 22:40 on 2026-03-04
+  Monday 2 March was busy for 8 h 55 min
+
+--- Distances between dates ---
+  First 2026-02-27, last 2026-03-06
+  Days between: 7
+  As a period : 0 month(s) and 7 day(s)
+  Days from the first transaction to the report date: 7
+  Report date is after the last transaction: false
+
+--- Settlement: the next business day ---
+  Thu 26 Feb 2026 -> Fri 27 Feb 2026
+  Fri 27 Feb 2026 -> Mon 02 Mar 2026
+  Sun 01 Mar 2026 -> Mon 02 Mar 2026
+
+--- Formatting and parsing ---
+  "05/03/2026" read as day/month/year: 2026-03-05, THURSDAY
+  Back to text: 05/03/2026
+
+--- Dates that surprise people ---
+  31 Jan 2026 plus one month: 2026-02-28 (clamped to the last valid day)
+  28 Feb 2028 plus one day  : 2028-02-29 (2028 is a leap year: true)
+  End of March 2026 is a TUESDAY
+  30 Feb 2026 is refused: Invalid date 'FEBRUARY 30'
+  Parsing 05/03/2026 with no formatter fails: DateTimeParseException

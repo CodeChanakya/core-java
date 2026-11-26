@@ -1,0 +1,1 @@
+Rotated by the nightly job. Only *.log files are analysed.
