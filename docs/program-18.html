@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Online Shopping Cart | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 05 · Collections · Program 18 of 43</p>
+    <h1>Online Shopping Cart</h1>
+    <div class="tags">
+      <span class="tag">Intermediate</span>
+      <span class="chip" style="background:#fff">List</span>
+      <span class="chip" style="background:#fff">ArrayList</span>
+      <span class="chip" style="background:#fff">Iterator</span>
+      <span class="chip" style="background:#fff">Comparator</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A shopper adds, removes and re-adds products, and wants the cart sorted by name, price or line total. An array cannot grow, shrink or sort by several rules.</p>
+        <p>A List holds items in order with repeats allowed. A Comparator describes each sort rule, and an Iterator removes items safely while looping.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>CartItem.java</b><span class="d">One line of the cart.</span></span></li>
+          <li><span class="badge">2</span><span><b>ShoppingCart.java</b><span class="d">The ArrayList, three comparators and iterator removal.</span></span></li>
+          <li><span class="badge">3</span><span><b>Main.java</b><span class="d">Sorting, removing and four common failures.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/cart/ShoppingCart.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.cart;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Collections</span>;
+<span class="k">import</span> java.util.<span class="t">Comparator</span>;
+<span class="k">import</span> java.util.<span class="t">Iterator</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="c">/**
+ * A cart backed by an ArrayList.
+ *
+ * A List is the right choice here because the order items were added matters
+ * to the shopper, the same product can be looked at by position, and the cart
+ * stays small enough that scanning it is never a problem.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">ShoppingCart</span> {
+
+    <span class="c">/** Alphabetical by product name. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">final</span> <span class="t">Comparator</span>&lt;<span class="t">CartItem</span>&gt; BY_NAME =
+            <span class="t">Comparator</span>.comparing(<span class="t">CartItem</span>::getName);
+
+    <span class="c">/** Biggest spend first. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">final</span> <span class="t">Comparator</span>&lt;<span class="t">CartItem</span>&gt; BY_LINE_TOTAL_DESC =
+            <span class="t">Comparator</span>.comparing(<span class="t">CartItem</span>::lineTotal).reversed();
+
+    <span class="c">/** Most copies first, and by name when the quantities tie. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">final</span> <span class="t">Comparator</span>&lt;<span class="t">CartItem</span>&gt; BY_QUANTITY_THEN_NAME =
+            <span class="t">Comparator</span>.comparingInt(<span class="t">CartItem</span>::getQuantity).reversed()
+                    .thenComparing(<span class="t">CartItem</span>::getName);
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">List</span>&lt;<span class="t">CartItem</span>&gt; items = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+
+    <span class="c">/** Adds a product, or tops up the existing line when the SKU is already in the cart. */</span>
+    <span class="k">public</span> <span class="k">void</span> add(<span class="t">String</span> sku, <span class="t">String</span> name, <span class="t">String</span> price, <span class="k">int</span> quantity) {
+        <span class="k">for</span> (<span class="t">CartItem</span> existing : items) {
+            <span class="k">if</span> (existing.getSku().equals(sku)) {
+                existing.addQuantity(quantity);
+                <span class="k">return</span>;
+            }
+        }
+        items.add(<span class="k">new</span> <span class="t">CartItem</span>(sku, name, <span class="k">new</span> <span class="t">BigDecimal</span>(price), quantity));
+    }
+
+    <span class="c">/** Removes the line with this SKU. Returns false when there was no such line. */</span>
+    <span class="k">public</span> <span class="k">boolean</span> remove(<span class="t">String</span> sku) {
+        <span class="t">Iterator</span>&lt;<span class="t">CartItem</span>&gt; it = items.iterator();
+        <span class="k">while</span> (it.hasNext()) {
+            <span class="k">if</span> (it.next().getSku().equals(sku)) {
+                it.remove();
+                <span class="k">return</span> <span class="k">true</span>;
+            }
+        }
+        <span class="k">return</span> <span class="k">false</span>;
+    }
+
+    <span class="c">/**
+     * Drops every line worth less than the given amount, returning how many went.
+     * An Iterator is the safe way to delete while walking a list.
+     */</span>
+    <span class="k">public</span> <span class="k">int</span> removeLinesBelow(<span class="t">BigDecimal</span> minimum) {
+        <span class="k">int</span> removed = <span class="n">0</span>;
+        <span class="t">Iterator</span>&lt;<span class="t">CartItem</span>&gt; it = items.iterator();
+        <span class="k">while</span> (it.hasNext()) {
+            <span class="k">if</span> (it.next().lineTotal().compareTo(minimum) &lt; <span class="n">0</span>) {
+                it.remove();
+                removed++;
+            }
+        }
+        <span class="k">return</span> removed;
+    }
+
+    <span class="c">/** A sorted copy. The cart itself keeps its original order. */</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">CartItem</span>&gt; sortedBy(<span class="t">Comparator</span>&lt;<span class="t">CartItem</span>&gt; order) {
+        <span class="t">List</span>&lt;<span class="t">CartItem</span>&gt; copy = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(items);
+        copy.sort(order);
+        <span class="k">return</span> copy;
+    }
+
+    <span class="c">/** A read-only window onto the cart. Callers can look, but not change it. */</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">CartItem</span>&gt; view() {
+        <span class="k">return</span> <span class="t">Collections</span>.unmodifiableList(items);
+    }
+
+    <span class="k">public</span> <span class="t">BigDecimal</span> total() {
+        <span class="t">BigDecimal</span> sum = <span class="t">BigDecimal</span>.ZERO.setScale(<span class="n">2</span>);
+        <span class="k">for</span> (<span class="t">CartItem</span> item : items) {
+            sum = sum.add(item.lineTotal());
+        }
+        <span class="k">return</span> sum;
+    }
+
+    <span class="k">public</span> <span class="k">int</span> lineCount() {
+        <span class="k">return</span> items.size();
+    }
+
+    <span class="c">/** Items as a plain array, for code that still expects one. */</span>
+    <span class="k">public</span> <span class="t">CartItem</span>[] toArray() {
+        <span class="k">return</span> items.toArray(<span class="k">new</span> <span class="t">CartItem</span>[<span class="n">0</span>]);
+    }
+
+    <span class="k">public</span> <span class="k">void</span> print(<span class="t">String</span> heading) {
+        <span class="t">System</span>.out.println(heading);
+        <span class="k">for</span> (<span class="t">CartItem</span> item : items) {
+            <span class="t">System</span>.out.println(<span class="n">&quot;  &quot;</span> + item);
+        }
+        <span class="t">System</span>.out.println(<span class="n">&quot;  Lines: &quot;</span> + items.size() + <span class="n">&quot;, total &quot;</span> + total());
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- The cart, in the order things were added ---
+  P-101  USB-C Cable       3 x   299.00 =    897.00
+  P-205  Notebook          6 x    85.50 =    513.00
+  P-310  Desk Lamp         1 x  1250.00 =   1250.00
+  P-412  Pen Pack          3 x    40.00 =    120.00
+  P-520  Headphones        1 x  1999.00 =   1999.00
+  Lines: 5, total 4779.00
+
+--- Sorted copies (the cart itself is not reordered) ---
+By name:
+  P-310  Desk Lamp         1 x  1250.00 =   1250.00
+  P-520  Headphones        1 x  1999.00 =   1999.00
+  P-205  Notebook          6 x    85.50 =    513.00
+  P-412  Pen Pack          3 x    40.00 =    120.00
+  P-101  USB-C Cable       3 x   299.00 =    897.00
+By line total, biggest first:
+  P-520  Headphones        1 x  1999.00 =   1999.00
+  P-310  Desk Lamp         1 x  1250.00 =   1250.00
+  P-101  USB-C Cable       3 x   299.00 =    897.00
+  P-205  Notebook          6 x    85.50 =    513.00
+  P-412  Pen Pack          3 x    40.00 =    120.00
+By quantity, then name:
+  P-205  Notebook          6 x    85.50 =    513.00
+  P-412  Pen Pack          3 x    40.00 =    120.00
+  P-101  USB-C Cable       3 x   299.00 =    897.00
+  P-310  Desk Lamp         1 x  1250.00 =   1250.00
+  P-520  Headphones        1 x  1999.00 =   1999.00
+Still first in the cart: USB-C Cable
+
+--- Removing with an Iterator ---
+Remove P-310: true
+Remove P-999: false
+Lines worth less than 150.00 removed: 1
+After clean-up
+  P-101  USB-C Cable       3 x   299.00 =    897.00
+  P-205  Notebook          6 x    85.50 =    513.00
+  P-520  Headphones        1 x  1999.00 =   1999.00
+  Lines: 3, total 3409.00
+
+--- What goes wrong ---
+Removing inside a for-each: ConcurrentModificationException
+Adding to the read-only view: UnsupportedOperationException
+Adding to List.of(...): UnsupportedOperationException
+get(10) on a short list: Index 10 out of bounds for length 3
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a seventh product.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add contains(sku).</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print the last item.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Sort by unit price.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add updateQuantity().</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Merge two carts.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: removing inside a for-each, changing <span class="mono">List.of</span>, and sorting items with no order. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">05-collections/18-online-shopping-cart</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-19.html"><span class="k2">Next</span><span class="v">19 Customer Search</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

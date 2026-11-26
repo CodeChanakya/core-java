@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Search | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <a class="text-link" href="index.html#programs">Back to all programs</a>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 05 · Collections · Program 19 of 43</p>
+    <h1>Customer Search</h1>
+    <div class="tags">
+      <span class="tag">Intermediate</span>
+      <span class="chip" style="background:#fff">Set</span>
+      <span class="chip" style="background:#fff">TreeSet</span>
+      <span class="chip" style="background:#fff">LinkedHashSet</span>
+      <span class="chip" style="background:#fff">Comparable</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A sign-up form lets people submit twice. Marketing wants unique customers, a sorted list of cities and a search by name.</p>
+        <p>A Set never holds the same thing twice. Three kinds of Set give three orders, and Comparable decides what counts as the same customer in a TreeSet.</p>
+      </section>
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Customer.java</b><span class="d">Comparable by name, then email.</span></span></li>
+          <li><span class="badge">2</span><span><b>CustomerDirectory.java</b><span class="d">HashSet, LinkedHashSet and TreeSet, each with a reason.</span></span></li>
+          <li><span class="badge">3</span><span><b>Main.java</b><span class="d">The same data in three Sets, and set maths.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/customers/Customer.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.customers;
+
+<span class="c">/**
+ * A customer, ordered naturally by name and then by email.
+ *
+ * Implementing Comparable gives the class one &quot;default&quot; order, which
+ * TreeSet and Collections.sort use when nobody passes a Comparator.
+ * Email is the tie-break because two people can share a name, but not a mailbox.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Customer</span> <span class="k">implements</span> <span class="t">Comparable</span>&lt;<span class="t">Customer</span>&gt; {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> name;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> email;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> city;
+
+    <span class="k">public</span> <span class="t">Customer</span>(<span class="t">String</span> name, <span class="t">String</span> email, <span class="t">String</span> city) {
+        <span class="k">this</span>.name = name;
+        <span class="k">this</span>.email = email.toLowerCase();    <span class="c">// mailboxes are not case-sensitive in practice</span>
+        <span class="k">this</span>.city = city;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getName() {
+        <span class="k">return</span> name;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getEmail() {
+        <span class="k">return</span> email;
+    }
+
+    <span class="k">public</span> <span class="t">String</span> getCity() {
+        <span class="k">return</span> city;
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="k">int</span> compareTo(<span class="t">Customer</span> other) {
+        <span class="k">int</span> byName = name.compareToIgnoreCase(other.name);
+        <span class="k">if</span> (byName != <span class="n">0</span>) {
+            <span class="k">return</span> byName;
+        }
+        <span class="k">return</span> email.compareTo(other.email);
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">String</span> toString() {
+        <span class="k">return</span> name + <span class="n">&quot; &lt;&quot;</span> + email + <span class="n">&quot;&gt; &quot;</span> + city;
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/customers/CustomerDirectory.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.customers;
+
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">LinkedHashSet</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Set</span>;
+<span class="k">import</span> java.util.<span class="t">TreeSet</span>;
+
+<span class="c">/**
+ * Holds customers and answers search questions with Sets.
+ *
+ * A Set never holds the same thing twice, which is the whole reason to use one:
+ * &quot;which cities do we serve?&quot; and &quot;who is on the list?&quot; have no duplicates by nature.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">CustomerDirectory</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">List</span>&lt;<span class="t">Customer</span>&gt; signUps = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+
+    <span class="k">public</span> <span class="k">void</span> signUp(<span class="t">Customer</span> customer) {
+        signUps.add(customer);
+    }
+
+    <span class="c">/**
+     * Customers in sign-up order, with repeat emails dropped.
+     * LinkedHashSet remembers insertion order, so the first sign-up wins.
+     */</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">Customer</span>&gt; firstSignUps() {
+        <span class="t">Set</span>&lt;<span class="t">String</span>&gt; seenEmails = <span class="k">new</span> <span class="t">LinkedHashSet</span>&lt;&gt;();
+        <span class="t">List</span>&lt;<span class="t">Customer</span>&gt; unique = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">Customer</span> customer : signUps) {
+            <span class="k">if</span> (seenEmails.add(customer.getEmail())) {     <span class="c">// add() says false for a repeat</span>
+                unique.add(customer);
+            }
+        }
+        <span class="k">return</span> unique;
+    }
+
+    <span class="c">/** Every city we deliver to, alphabetical and without repeats. */</span>
+    <span class="k">public</span> <span class="t">Set</span>&lt;<span class="t">String</span>&gt; cities() {
+        <span class="t">Set</span>&lt;<span class="t">String</span>&gt; cities = <span class="k">new</span> <span class="t">TreeSet</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">Customer</span> customer : signUps) {
+            cities.add(customer.getCity());
+        }
+        <span class="k">return</span> cities;
+    }
+
+    <span class="c">/** Customers whose name starts with the text, in natural order, repeats collapsed. */</span>
+    <span class="k">public</span> <span class="t">Set</span>&lt;<span class="t">Customer</span>&gt; searchByName(<span class="t">String</span> prefix) {
+        <span class="t">Set</span>&lt;<span class="t">Customer</span>&gt; found = <span class="k">new</span> <span class="t">TreeSet</span>&lt;&gt;();
+        <span class="t">String</span> wanted = prefix.toLowerCase();
+        <span class="k">for</span> (<span class="t">Customer</span> customer : signUps) {
+            <span class="k">if</span> (customer.getName().toLowerCase().startsWith(wanted)) {
+                found.add(customer);
+            }
+        }
+        <span class="k">return</span> found;
+    }
+
+    <span class="c">/** Names of everyone in one city, alphabetical. */</span>
+    <span class="k">public</span> <span class="t">Set</span>&lt;<span class="t">String</span>&gt; namesIn(<span class="t">String</span> city) {
+        <span class="t">Set</span>&lt;<span class="t">String</span>&gt; names = <span class="k">new</span> <span class="t">TreeSet</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">Customer</span> customer : signUps) {
+            <span class="k">if</span> (customer.getCity().equalsIgnoreCase(city)) {
+                names.add(customer.getName());
+            }
+        }
+        <span class="k">return</span> names;
+    }
+
+    <span class="k">public</span> <span class="k">int</span> signUpCount() {
+        <span class="k">return</span> signUps.size();
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+Sign-ups received: 7
+
+--- First sign-up per email (LinkedHashSet keeps arrival order) ---
+  Asha Menon &lt;asha@example.com&gt; Kochi
+  Rahul Verma &lt;rahul@example.com&gt; Pune
+  Meera Iyer &lt;meera@example.com&gt; Chennai
+  Kiran Rao &lt;kiran@example.com&gt; Pune
+  Anil Kumar &lt;anil@example.com&gt; Kochi
+  Asha Menon &lt;asha.m@example.com&gt; Chennai
+
+--- Cities served (TreeSet keeps them sorted) ---
+  [Chennai, Kochi, Pune]
+
+--- Search: names starting with &quot;as&quot; ---
+  Asha Menon &lt;asha.m@example.com&gt; Chennai
+  Asha Menon &lt;asha@example.com&gt; Kochi
+Two sign-ups from asha@example.com collapsed into one result,
+because compareTo() said they are the same customer.
+
+--- Same data, three kinds of Set ---
+  LinkedHashSet (insertion order): [vip, new, pune, kochi]
+  TreeSet (sorted order)         : [kochi, new, pune, vip]
+  HashSet size                   : 4 (its order is not promised)
+
+--- Set maths: newsletter list against buyers ---
+  Newsletter : [Asha Menon, Kiran Rao, Meera Iyer, Rahul Verma]
+  Buyers     : [Anil Kumar, Asha Menon, Meera Iyer]
+  Both       : [Asha Menon, Meera Iyer]
+  Either     : [Anil Kumar, Asha Menon, Kiran Rao, Meera Iyer, Rahul Verma]
+  Newsletter only: [Kiran Rao, Rahul Verma]
+
+--- Set facts ---
+  First add(&quot;a&quot;) returns : true
+  Second add(&quot;a&quot;) returns: false (already there, nothing changes)
+  Is Asha a buyer? true
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a customer in Mumbai.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add cityCount().</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print names from Z to A.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Sort by city, then name.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">List the email domains.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Return names between two names.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a TreeSet of items with no order, <span class="mono">get(0)</span> on a Set, and a compareTo that is too broad. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">05-collections/19-customer-search</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-20.html"><span class="k2">Next</span><span class="v">20 Order Processing Queue</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

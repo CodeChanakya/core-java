@@ -1,0 +1,42 @@
+--- Stock by category ---
+ELECTRONICS:
+  E-100  USB-C Cable      ELECTRONICS   299.00  stock  40
+  E-110  Headphones       ELECTRONICS  1999.00  stock   6
+STATIONERY:
+  S-200  Notebook         STATIONERY     85.50  stock 120
+  S-210  Pen Pack         STATIONERY     40.00  stock  25
+HOME:
+  H-300  Desk Lamp        HOME         1250.00  stock   3
+
+--- Value of stock per category ---
+  ELECTRONICS: 23954.00
+  STATIONERY: 11260.00
+  HOME: 3750.00
+
+--- Reorder list, emptiest first ---
+  Desk Lamp: 3 left, reorder at 5
+  Headphones: 6 left, reorder at 8
+  Pen Pack: 25 left, reorder at 25
+  Categories affected: [ELECTRONICS, STATIONERY, HOME]
+
+--- Selling and receiving ---
+  Three movements recorded.
+  Refused: Cannot sell 10 of Headphones, only 6 in stock
+  Short by: 4
+  Refused: No product with SKU X-999
+
+--- Movement history, newest first ---
+  +12 H-300 (received)
+  -100 S-200 (sold)
+  -15 E-100 (sold)
+
+--- Undo the last two movements ---
+  Undid: +12 H-300 (received)
+  Undid: -100 S-200 (sold)
+  Notebook stock is back to 120
+  Lamp stock is back to     3
+
+--- Reorder list now ---
+  Desk Lamp: 3 left
+  Headphones: 6 left
+  Pen Pack: 25 left

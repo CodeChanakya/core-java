@@ -1,0 +1,44 @@
+--- The cart, in the order things were added ---
+  P-101  USB-C Cable       3 x   299.00 =    897.00
+  P-205  Notebook          6 x    85.50 =    513.00
+  P-310  Desk Lamp         1 x  1250.00 =   1250.00
+  P-412  Pen Pack          3 x    40.00 =    120.00
+  P-520  Headphones        1 x  1999.00 =   1999.00
+  Lines: 5, total 4779.00
+
+--- Sorted copies (the cart itself is not reordered) ---
+By name:
+  P-310  Desk Lamp         1 x  1250.00 =   1250.00
+  P-520  Headphones        1 x  1999.00 =   1999.00
+  P-205  Notebook          6 x    85.50 =    513.00
+  P-412  Pen Pack          3 x    40.00 =    120.00
+  P-101  USB-C Cable       3 x   299.00 =    897.00
+By line total, biggest first:
+  P-520  Headphones        1 x  1999.00 =   1999.00
+  P-310  Desk Lamp         1 x  1250.00 =   1250.00
+  P-101  USB-C Cable       3 x   299.00 =    897.00
+  P-205  Notebook          6 x    85.50 =    513.00
+  P-412  Pen Pack          3 x    40.00 =    120.00
+By quantity, then name:
+  P-205  Notebook          6 x    85.50 =    513.00
+  P-412  Pen Pack          3 x    40.00 =    120.00
+  P-101  USB-C Cable       3 x   299.00 =    897.00
+  P-310  Desk Lamp         1 x  1250.00 =   1250.00
+  P-520  Headphones        1 x  1999.00 =   1999.00
+Still first in the cart: USB-C Cable
+
+--- Removing with an Iterator ---
+Remove P-310: true
+Remove P-999: false
+Lines worth less than 150.00 removed: 1
+After clean-up
+  P-101  USB-C Cable       3 x   299.00 =    897.00
+  P-205  Notebook          6 x    85.50 =    513.00
+  P-520  Headphones        1 x  1999.00 =   1999.00
+  Lines: 3, total 3409.00
+
+--- What goes wrong ---
+Removing inside a for-each: ConcurrentModificationException
+Adding to the read-only view: UnsupportedOperationException
+Adding to List.of(...): UnsupportedOperationException
+get(10) on a short list: Index 10 out of bounds for length 3

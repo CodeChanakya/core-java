@@ -1,0 +1,29 @@
+Orders received: 5
+
+--- A plain queue: first in, first out ---
+  Peek (look, do not take): ORD-1 (Asha, standard)
+  Poll: ORD-1 (Asha, standard)
+  Poll: ORD-2 (Rahul, express)
+  Poll: ORD-3 (Meera, standard)
+
+--- A priority queue: express first, then arrival ---
+  Handle: ORD-2 (Rahul, express)
+  Handle: ORD-4 (Kiran, express)
+  Handle: ORD-1 (Asha, standard)
+  Waiting: 2, finished: 3
+
+--- A deque used as an undo stack ---
+  Last finished: ORD-1 (Asha, standard)
+  Undo it: ORD-1 (Asha, standard)
+  Waiting again: 3, finished: 2
+  Handle next: ORD-1 (Asha, standard)
+
+--- Both ends of a Deque ---
+  Tray: [front, middle, back]
+  Take from front: front, from back: back
+  Left: [middle]
+
+--- Empty queue: null or exception? ---
+  poll() on empty returns: null
+  peek() on empty returns: null
+  remove() on empty throws: NoSuchElementException

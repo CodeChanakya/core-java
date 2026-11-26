@@ -1,0 +1,31 @@
+--- Lookup by key ---
+  find(E-007)       : E-007 Meera Iyer (Engineering)
+  find(E-999)       : null
+  nameOrUnknown(E-999): (unknown)
+  has(E-350)        : true
+
+--- put() replaces, putIfAbsent() does not ---
+  put returned the old value: E-350 Kiran Rao (Support)
+  addIfAbsent on a taken id : false
+  E-350 is still            : E-350 Kiran Rao (Engineering)
+
+--- Everyone, in joining order ---
+  E-104 -> Asha Menon
+  E-211 -> Rahul Verma
+  E-007 -> Meera Iyer
+  E-350 -> Kiran Rao
+  E-412 -> Dev Patel
+
+--- Grouped by department ---
+  Engineering: Asha Menon, Meera Iyer, Kiran Rao
+  Finance: Rahul Verma, Dev Patel
+  Head count: {Engineering=3, Finance=2}
+
+--- Why equals() and hashCode() matter ---
+  Added the same id twice, set holds: 1
+  first.equals(sameId): true
+  Same hash code: true
+
+--- Counting words with a HashMap ---
+  to=2, be=2, or=1, not=1, missing=null
+  (HashMap makes no promise about iteration order, so we look the keys up one by one.)

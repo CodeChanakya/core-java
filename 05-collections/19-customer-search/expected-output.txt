@@ -1,0 +1,35 @@
+Sign-ups received: 7
+
+--- First sign-up per email (LinkedHashSet keeps arrival order) ---
+  Asha Menon <asha@example.com> Kochi
+  Rahul Verma <rahul@example.com> Pune
+  Meera Iyer <meera@example.com> Chennai
+  Kiran Rao <kiran@example.com> Pune
+  Anil Kumar <anil@example.com> Kochi
+  Asha Menon <asha.m@example.com> Chennai
+
+--- Cities served (TreeSet keeps them sorted) ---
+  [Chennai, Kochi, Pune]
+
+--- Search: names starting with "as" ---
+  Asha Menon <asha.m@example.com> Chennai
+  Asha Menon <asha@example.com> Kochi
+Two sign-ups from asha@example.com collapsed into one result,
+because compareTo() said they are the same customer.
+
+--- Same data, three kinds of Set ---
+  LinkedHashSet (insertion order): [vip, new, pune, kochi]
+  TreeSet (sorted order)         : [kochi, new, pune, vip]
+  HashSet size                   : 4 (its order is not promised)
+
+--- Set maths: newsletter list against buyers ---
+  Newsletter : [Asha Menon, Kiran Rao, Meera Iyer, Rahul Verma]
+  Buyers     : [Anil Kumar, Asha Menon, Meera Iyer]
+  Both       : [Asha Menon, Meera Iyer]
+  Either     : [Anil Kumar, Asha Menon, Kiran Rao, Meera Iyer, Rahul Verma]
+  Newsletter only: [Kiran Rao, Rahul Verma]
+
+--- Set facts ---
+  First add("a") returns : true
+  Second add("a") returns: false (already there, nothing changes)
+  Is Asha a buyer? true
