@@ -7,7 +7,7 @@
 
 <p align="center">
   <img alt="Java 21 or newer" src="https://img.shields.io/badge/Java-21%2B-B83A0E">
-  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-30%20of%2043-0F766E">
+  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-34%20of%2043-0F766E">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-0E1726">
   <a href="https://github.com/codechanakya/core-java/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/codechanakya/core-java/actions/workflows/ci.yml/badge.svg"></a>
 </p>
@@ -24,7 +24,7 @@
 
 It follows a fixed path: smallest building block first, then the next concept that depends on it, until you can design and test a small system yourself.
 
-> **Status:** Phases 1 to 7 are ready (30 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
+> **Status:** Phases 1 to 8 are ready (34 of 43 programs). Program 9 downloads the JUnit launcher on its first run, so it needs an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
 
 ## Start here
 
@@ -113,6 +113,14 @@ Each ready program has a flow diagram in three layers: a story in everyday words
     <td align="center" valign="top"><a href="07-modern-java/28-transaction-reporting"><img alt="Flow of Program 28, Transaction Reporting, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-28.svg" width="290"></a><br><b>28 · Transaction Reporting</b></td>
     <td align="center" valign="top"><a href="07-modern-java/29-sales-analytics"><img alt="Flow of Program 29, Sales Analytics, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-29.svg" width="290"></a><br><b>29 · Sales Analytics</b></td>
     <td align="center" valign="top"><a href="07-modern-java/30-product-recommendation-filtering"><img alt="Flow of Program 30, Product Recommendation Filtering, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-30.svg" width="290"></a><br><b>30 · Product Recommendation Filtering</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="08-concurrency/31-background-report-generator"><img alt="Flow of Program 31, Background Report Generator, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-31.svg" width="290"></a><br><b>31 · Background Report Generator</b></td>
+    <td align="center" valign="top"><a href="08-concurrency/32-concurrent-order-processor"><img alt="Flow of Program 32, Concurrent Order Processor, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-32.svg" width="290"></a><br><b>32 · Concurrent Order Processor</b></td>
+    <td align="center" valign="top"><a href="08-concurrency/33-parallel-data-processing"><img alt="Flow of Program 33, Parallel Data Processing, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-33.svg" width="290"></a><br><b>33 · Parallel Data Processing</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="08-concurrency/34-asynchronous-payment-status-simulator"><img alt="Flow of Program 34, Asynchronous Payment Status Simulator, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-34.svg" width="290"></a><br><b>34 · Asynchronous Payment Status Simulator</b></td>
   </tr>
 </table>
 
@@ -212,10 +220,10 @@ Colour code: slate is input, teal is work, amber is a check, violet is stored da
 
 | No. | Program | Concepts | Status |
 |---|---|---|---|
-| 31 | Background Report Generator | threads, `ExecutorService` | Planned |
-| 32 | Concurrent Order Processor | `synchronized`, race conditions | Planned |
-| 33 | Parallel Data Processing | `Future`, thread safety | Planned |
-| 34 | Asynchronous Payment Status Simulator | `CompletableFuture` | Planned |
+| 31 | [Background Report Generator](08-concurrency/31-background-report-generator) | threads, `ExecutorService` | Ready |
+| 32 | [Concurrent Order Processor](08-concurrency/32-concurrent-order-processor) | `synchronized`, race conditions | Ready |
+| 33 | [Parallel Data Processing](08-concurrency/33-parallel-data-processing) | `Future`, thread safety | Ready |
+| 34 | [Asynchronous Payment Status Simulator](08-concurrency/34-asynchronous-payment-status-simulator) | `CompletableFuture` | Ready |
 
 </details>
 

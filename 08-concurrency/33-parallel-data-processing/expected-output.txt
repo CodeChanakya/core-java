@@ -1,0 +1,49 @@
+--- The data ---
+  1000000 readings, the first five are [7, 38, 69, 100, 131]
+  Every block of 1000 holds each value from 0 to 999 once, so the sum should be 1000 x 499500.
+
+--- One thread, the plain loop ---
+  1000000 readings, sum 499500000, 99000 above 900, highest 999
+
+--- Cutting the work into chunks ---
+  1,000,000 in 4 : [Chunk[from=0, to=250000], Chunk[from=250000, to=500000], Chunk[from=500000, to=750000], Chunk[from=750000, to=1000000]]
+  10 in 3        : [Chunk[from=0, to=4], Chunk[from=4, to=7], Chunk[from=7, to=10]]   (the remainder goes to the first chunks)
+
+--- Four workers, four tickets ---
+  Tickets handed out: 4
+  Chunk 1: 250000 readings, sum 124875000, 24750 above 900, highest 999
+  Chunk 2: 250000 readings, sum 124875000, 24750 above 900, highest 999
+  Chunk 3: 250000 readings, sum 124875000, 24750 above 900, highest 999
+  Chunk 4: 250000 readings, sum 124875000, 24750 above 900, highest 999
+  Merged: 1000000 readings, sum 499500000, 99000 above 900, highest 999
+  Same as the single thread: true
+
+--- Does the number of chunks change the answer? ---
+   1 chunks: sum 499500000
+   2 chunks: sum 499500000
+   3 chunks: sum 499500000
+   7 chunks: sum 499500000
+  16 chunks: sum 499500000
+  Every answer equals the baseline: true
+
+--- Parallel streams do the chunking for you ---
+  parallel sum equals the baseline: true
+  Readings per band of 100: {0=100000, 1=100000, 2=100000, 3=100000, 4=100000, 5=100000, 6=100000, 7=100000, 8=100000, 9=100000}
+  The result is the same however the threads were scheduled; only the speed changes.
+
+--- Three ways to share a total ---
+  one AtomicLong  : 499500000
+  one LongAdder   : 499500000
+  private totals  : 499500000
+  All equal the baseline: true
+
+--- Waiting with a deadline ---
+  Gave up after 100 ms: TimeoutException
+  cancel(true) returned true
+
+--- One bad reading in the data ---
+  Chunk 1: ok, 250000 readings
+  Chunk 2: ok, 250000 readings
+  Chunk 3: failed. Bad reading -1 at position 600000
+  Chunk 4: ok, 250000 readings
+  Only the chunk that held the bad reading failed.

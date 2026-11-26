@@ -1,0 +1,39 @@
+--- A thread by hand ---
+  Main is running on thread main
+  Before start(), the worker is NEW
+  Hello from thread report-worker
+  After join(), the worker is TERMINATED
+
+--- One thread doing everything ---
+  Sales: 1200 rows, checksum 199892
+  Inventory: 800 rows, checksum 457531
+  Payroll: 450 rows, checksum 351826
+  Attendance: 2000 rows, checksum 769152
+  Tax: 300 rows, checksum 677226
+  Audit: 1500 rows, checksum 138478
+  Each report waited for the one before it.
+
+--- A pool of three workers ---
+  Handed over 6 requests without waiting.
+  Sales: 1200 rows, checksum 199892
+  Inventory: 800 rows, checksum 457531
+  Payroll: 450 rows, checksum 351826
+  Attendance: 2000 rows, checksum 769152
+  Tax: 300 rows, checksum 677226
+  Audit: 1500 rows, checksum 138478
+  Worker threads used: 3 (never more than 3: true)
+
+--- When one report fails ---
+  Sales: 1200 rows, checksum 199892
+  Broken failed: Report Broken needs at least one row
+  Tax: 300 rows, checksum 677226
+  The other two reports were not affected.
+
+--- Stopping a task that runs too long ---
+  cancel(true) returned true, isCancelled() is true
+  The task noticed the interrupt: true
+
+--- Shutting down properly ---
+  Before close(), isShutdown is false
+  After close(),  isShutdown is true
+  A new request is refused: RejectedExecutionException
