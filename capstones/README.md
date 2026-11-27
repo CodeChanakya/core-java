@@ -8,8 +8,8 @@ rules, tests, and the documentation a teammate would need.
 | 39 | [Enterprise Banking System](39-enterprise-banking-system) | Transactions, a contract test run on two stores, a rule held in both code and database. |
 | 40 | [E-commerce Order Management](40-ecommerce-order-management) | Streams for reports, strategy by interface, an enum state machine, an atomic stock check. |
 | 41 | [Employee Management System](41-employee-management-system) | The date and time API doing real work, a soft delete, payslips. |
-| 42 | Concurrent Order Processing System | Planned: `CompletableFuture` and thread safety. |
-| 43 | Library Management System | Planned: you build it alone and grade yourself with a rubric. |
+| 42 | [Concurrent Order Processing System](42-concurrent-order-processing) | `CompletableFuture`, atomic stock, timeouts, and output that stays the same however the threads run. |
+| 43 | [Library Management System](43-library-management-system) | You build it alone from a brief and 48 acceptance tests, and a rubric marks it. |
 
 ## How each capstone is laid out
 
@@ -33,5 +33,7 @@ NN-name/
 3. Read the tests before the code they test. They are the specification.
 4. Do the exercises. Run `./run.sh --test` after every change.
 5. Run the programs in `broken/` and say what is wrong before you read the explanation.
+
+Program 43 is laid out differently, because you write it: `starter/` is the project with the answer left out, `reference/` is a finished solution, and `RUBRIC.md`, `GRADING-SHEET.md` and `hints/` replace the solutions. Program 42 needs no database.
 
 Every capstone runs the same way on every machine: the clock is fixed, the database is in memory, and nothing is written to disk.

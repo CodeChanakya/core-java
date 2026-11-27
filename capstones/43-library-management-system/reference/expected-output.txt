@@ -1,0 +1,39 @@
+== Setting up
+  4 books, 3 members
+  Search "java": [Effective Java]
+  Search "eric": [Design Patterns, Domain-Driven Design]
+
+== Day 0: borrowing
+  Asha borrows Clean Code: loan 1, due 2025-07-14
+  Asha borrows Effective Java: loan 2, due 2025-07-14
+  Bilal borrows Design Patterns: loan 3, due 2025-07-30
+  Chitra borrows Effective Java (no copy left): refused, No copy of 978-0134685991 is available. It can be reserved.
+  Asha borrows Clean Code again: refused, Asha Rao already has a copy of 978-0132350884.
+  Chitra reserves Effective Java: reservation 1
+  Chitra reserves Clean Code (a copy is free): refused, 978-0132350884 is on the shelf. Borrow it instead of reserving it.
+
+== Day 10: renewing
+  Asha renews Clean Code: loan 1, due 2025-07-21
+  Asha renews Clean Code again: refused, Loan 1 has already been renewed once.
+  Asha renews Effective Java (Chitra is waiting): refused, Someone is waiting for 978-0134685991, so it cannot be renewed.
+
+== Day 17: Effective Java is 3 days late
+  Overdue: loan 2, due 2025-07-14
+  Asha borrows Domain-Driven Design (she has an overdue book): refused, Asha Rao has an overdue book and must return it first.
+  Asha returns Effective Java, fine 6.00
+  Asha owes 6.00
+  Asha borrows Effective Java (Chitra is first in the queue): refused, 978-0134685991 is held for another member who reserved it first.
+  Chitra borrows Effective Java: loan 4, due 2025-07-31
+
+== Day 26: Clean Code is 5 days late, Design Patterns is 4 days early
+  Asha returns Clean Code, fine 10.00
+  Bilal returns Design Patterns, fine 0.00
+  Asha owes 16.00
+  Asha pays 4.00, still owes 12.00
+  Asha pays 100.00: refused, The payment of 100.00 is more than the 12.00 owed.
+
+== Shelf at the end
+  Clean Code             2 of 2 on the shelf
+  Effective Java         0 of 1 on the shelf
+  Design Patterns        1 of 1 on the shelf
+  Domain-Driven Design   1 of 1 on the shelf

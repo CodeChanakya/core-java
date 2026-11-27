@@ -23,6 +23,8 @@ jobs:
             03-object-oriented-programming/09-junit-starter-lab/lib
             09-professional-java/*/lib
             capstones/*/lib
+            capstones/*/reference/lib
+            capstones/*/starter/lib
           key: jars-junit-1.11.4-derby-10.16.1.1
       - name: Compile and check every program
         run: bash scripts/check-all.sh
@@ -34,6 +36,10 @@ jobs:
             echo "== $dir"
             bash "$dir/run.sh" --test
           done
+      - name: Grade the Program 43 reference (expects 48 of 48) and compile the starter
+        run: |
+          bash capstones/43-library-management-system/reference/run.sh --grade
+          bash capstones/43-library-management-system/starter/run.sh --compile
 
   maven:
     # Builds the Phase 9 projects and the capstones with real Maven, the way a team would.
@@ -53,5 +59,7 @@ jobs:
           done
           for dir in capstones/*/; do
             echo "== $dir"
-            mvn -B -q -f "$dir/pom.xml" verify
+            # Program 43 keeps its projects in reference/ and starter/. Only the reference is built: the starter fails its tests until you write it.
+            pom="$dir/pom.xml"; [ -f "$pom" ] || pom="$dir/reference/pom.xml"
+            mvn -B -q -f "$pom" verify
           done

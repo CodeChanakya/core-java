@@ -1,0 +1,22 @@
+== Orders, all processed at the same time
+  order 1: COMPLETED    paid and confirmed
+  order 2: COMPLETED    paid and confirmed
+  order 3: DECLINED     card declined
+  order 4: FAILED       gateway unavailable
+  order 5: TIMED_OUT    no answer from the payment gateway
+  order 6: OUT_OF_STOCK not enough stock of TY-401
+  order 7: COMPLETED    paid, but the confirmation failed
+  order 8: OUT_OF_STOCK not enough stock of ZZ-999
+
+== Confirmations sent for those orders (sorted, because threads finish in no fixed order)
+  asha@example.com: order 1 confirmed
+  bilal@example.com: order 2 confirmed
+
+== Burst: 40 buyers for the last 3 keyboards
+  {COMPLETED=3, OUT_OF_STOCK=37}  (which three buyers won is not fixed, but the count always is)
+
+== Stock at the end (every failed order gave its stock back)
+  BK-101  15
+  EL-202   0
+  HM-301   4
+  TY-401   7
