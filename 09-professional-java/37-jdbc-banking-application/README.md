@@ -200,4 +200,4 @@ The `CHECK (balance >= 0)` in the table is a safety net below the Java code. Eve
 
 ## How this was checked
 
-Compiled and run with OpenJDK 21.0.13 on Linux against the real Apache Derby 10.16.1.1 jars. `./run.sh --check` passes and the output is the same on every run. The download part of `run.sh` was tested against a local folder laid out like Maven Central, not against Maven Central itself, and `./run.sh --maven` could not be tried because Maven had no route to Maven Central where this program was written. Not yet run on Java 25, Windows or macOS.
+While the program was written, it was compiled and run with OpenJDK 21.0.13 on Linux, `./run.sh --check` passed, and the output was the same on every run. The database part ran against the real Apache Derby 10.16.1.1 jars. The project's GitHub Actions run then confirmed it on Linux with Java 21 and Java 25, including real Maven (`mvn verify`) and the real JUnit jar. Not yet run on Windows or macOS.

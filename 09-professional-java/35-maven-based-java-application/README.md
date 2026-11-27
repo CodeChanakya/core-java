@@ -197,4 +197,4 @@ Programs 36 and 37 add exactly this kind of block.
 
 ## How this was checked
 
-Compiled and run with OpenJDK 21.0.13 on Linux using `javac`; `./run.sh --check` passes and the output is the same on every run. `pom.xml` is well-formed XML, but Maven itself could not be run where this program was written (no route to Maven Central), so `./run.sh --maven` is not yet confirmed. Not yet run on Java 25, Windows or macOS.
+While the program was written, it was compiled and run with OpenJDK 21.0.13 on Linux, `./run.sh --check` passed, and the output was the same on every run. The project's GitHub Actions run then confirmed it on Linux with Java 21 and Java 25, including real Maven (`mvn verify`) and the real JUnit jar. Not yet run on Windows or macOS.

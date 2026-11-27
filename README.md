@@ -7,7 +7,7 @@
 
 <p align="center">
   <img alt="Java 21 or newer" src="https://img.shields.io/badge/Java-21%2B-B83A0E">
-  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-38%20of%2043-0F766E">
+  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-41%20of%2043-0F766E">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-0E1726">
   <a href="https://github.com/codechanakya/core-java/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/codechanakya/core-java/actions/workflows/ci.yml/badge.svg"></a>
 </p>
@@ -24,7 +24,7 @@
 
 It follows a fixed path: smallest building block first, then the next concept that depends on it, until you can design and test a small system yourself.
 
-> **Status:** Phases 1 to 9 are ready (38 of 43 programs). Programs 9, 36 and 38 download the JUnit launcher, and Programs 37 and 38 download a small database driver, on their first run, so those need an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
+> **Status:** Phases 1 to 9 and the first three capstones are ready (41 of 43 programs). Programs 9, 36 and 38 download the JUnit launcher, and Programs 37 to 41 download a small database driver, on their first run, so those need an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
 
 ## Start here
 
@@ -127,6 +127,11 @@ Each ready program has a flow diagram in three layers: a story in everyday words
   <tr>
     <td align="center" valign="top"><a href="09-professional-java/37-jdbc-banking-application"><img alt="Flow of Program 37, JDBC Banking Application, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-37.svg" width="290"></a><br><b>37 · JDBC Banking Application</b></td>
     <td align="center" valign="top"><a href="09-professional-java/38-employee-database-management"><img alt="Flow of Program 38, Employee Database Management, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-38.svg" width="290"></a><br><b>38 · Employee Database Management</b></td>
+    <td align="center" valign="top"><a href="capstones/39-enterprise-banking-system"><img alt="Flow of Program 39, Enterprise Banking System, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-39.svg" width="290"></a><br><b>39 · Enterprise Banking System</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="capstones/40-ecommerce-order-management"><img alt="Flow of Program 40, E-commerce Order Management, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-40.svg" width="290"></a><br><b>40 · E-commerce Order Management</b></td>
+    <td align="center" valign="top"><a href="capstones/41-employee-management-system"><img alt="Flow of Program 41, Employee Management System, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-41.svg" width="290"></a><br><b>41 · Employee Management System</b></td>
   </tr>
 </table>
 
@@ -250,9 +255,9 @@ Colour code: slate is input, teal is work, amber is a check, violet is stored da
 
 | No. | Program | Concepts | Status |
 |---|---|---|---|
-| 39 | Enterprise Banking System | JDBC, collections, tests | Planned |
-| 40 | E-commerce Order Management | streams, interfaces, database | Planned |
-| 41 | Employee Management System | CRUD, date and time, JUnit | Planned |
+| 39 | [Enterprise Banking System](capstones/39-enterprise-banking-system) | JDBC, collections, tests | Ready |
+| 40 | [E-commerce Order Management](capstones/40-ecommerce-order-management) | streams, interfaces, database | Ready |
+| 41 | [Employee Management System](capstones/41-employee-management-system) | CRUD, date and time, JUnit | Ready |
 | 42 | Concurrent Order Processing System | `CompletableFuture`, thread safety | Planned |
 | 43 | Library Management System | built on your own, graded by a rubric | Planned |
 

@@ -63,11 +63,11 @@ Be clear about this when you rely on the phase. Everything below was run on Open
 | Program 37 and 38 against the real Apache Derby 10.16.1.1 jars | checked |
 | Jar download in `run.sh` (against a local folder laid out like Maven Central) | checked |
 | Program 36 and 38 tests, on a small stand-in for the JUnit 5 API written only for checking | checked, and broken code makes them fail |
-| The tests on the real JUnit 5 jar | **not yet run** |
-| `mvn` on any `pom.xml` (the files are well-formed XML) | **not yet run** |
-| Java 25, Windows, macOS | **not yet run** |
+| The tests on the real JUnit 5 jar (GitHub Actions, Java 21 and 25) | checked |
+| `mvn verify` on all four `pom.xml` files (GitHub Actions) | checked |
+| Windows, macOS | **not yet run** |
 
-The CI file now runs the Maven projects with real Maven and runs the Program 38 tests with the real JUnit jar, so the first green build on GitHub will close the two open items.
+The first sections of this table were checked while the programs were written. The two rows marked GitHub Actions were checked afterwards, by the project's CI, which runs the Maven projects with real Maven and the Program 38 tests with the real JUnit jar.
 
 ## Mastery checkpoint
 

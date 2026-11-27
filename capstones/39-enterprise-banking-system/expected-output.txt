@@ -1,0 +1,43 @@
+== Opening accounts
+  1  Asha Rao     SAVINGS      12000.00
+  2  Bilal Khan   CURRENT       3000.00
+  3  Chitra Nair  SAVINGS      75000.00
+
+== Everyday banking
+  Deposit 2500.50 to Asha: done
+  Withdraw 4000 from Bilal: done
+  Withdraw 9000 more from Bilal (overdraft): done
+  Withdraw 5000 more from Bilal (past the overdraft): refused, Account 2 would go below its lowest allowed balance
+  Withdraw 14100 from Asha (below the minimum): refused, Account 1 would go below its lowest allowed balance
+  Withdraw 40000 from Chitra: done
+  Withdraw 20000 more from Chitra (daily limit): refused, Daily withdrawal limit of 50000.00 exceeded (already withdrawn 40000.00)
+  Deposit -5 to Asha: refused, The amount must be positive, but was -5
+  Deposit to account 99: refused, No account with id 99
+  Open a savings account with 100: refused, A SAVINGS account needs at least 500.00 to open, but 100.00 was given
+
+== Transfers
+  Transfer 5000 from Chitra to Bilal: done
+  Transfer 50000 from Asha to Bilal (Asha is too poor): refused, Account 1 would go below its lowest allowed balance
+  Transfer 100 from Chitra to account 99: refused, No account with id 99
+  Transfer 100 from Asha to Asha: refused, Cannot transfer to the same account
+  Total deposits in the bank: 39500.50
+
+== Month end
+  Interest paid to 2 savings accounts
+  1  Asha Rao     SAVINGS      14548.84
+  2  Bilal Khan   CURRENT      -5000.00
+  3  Chitra Nair  SAVINGS      30100.00
+
+== Statement
+Statement for account 2 (Bilal Khan, CURRENT)
+  2025-06-30  OPENING            3000.00  balance      3000.00  Account opened
+  2025-06-30  WITHDRAWAL        -4000.00  balance     -1000.00  Withdrawal
+  2025-06-30  WITHDRAWAL        -9000.00  balance    -10000.00  Withdrawal
+  2025-06-30  TRANSFER_IN        5000.00  balance     -5000.00  Transfer from 3
+  Closing balance: -5000.00
+
+Statement for account 1 (Asha Rao, SAVINGS)
+  2025-06-30  OPENING           12000.00  balance     12000.00  Account opened
+  2025-06-30  DEPOSIT            2500.50  balance     14500.50  Deposit
+  2025-06-30  INTEREST             48.34  balance     14548.84  Monthly interest
+  Closing balance: 14548.84

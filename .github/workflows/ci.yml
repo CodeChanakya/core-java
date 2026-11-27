@@ -22,14 +22,21 @@ jobs:
           path: |
             03-object-oriented-programming/09-junit-starter-lab/lib
             09-professional-java/*/lib
+            capstones/*/lib
           key: jars-junit-1.11.4-derby-10.16.1.1
       - name: Compile and check every program
         run: bash scripts/check-all.sh
       - name: Run the tests of the Phase 9 project
         run: bash 09-professional-java/38-employee-database-management/run.sh --test
+      - name: Run the tests of the capstones
+        run: |
+          for dir in capstones/*/; do
+            echo "== $dir"
+            bash "$dir/run.sh" --test
+          done
 
   maven:
-    # Builds the Phase 9 projects with real Maven, the way a team would.
+    # Builds the Phase 9 projects and the capstones with real Maven, the way a team would.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -41,6 +48,10 @@ jobs:
       - name: Build and test the Maven projects
         run: |
           for dir in 09-professional-java/3[5-8]-*/; do
+            echo "== $dir"
+            mvn -B -q -f "$dir/pom.xml" verify
+          done
+          for dir in capstones/*/; do
             echo "== $dir"
             mvn -B -q -f "$dir/pom.xml" verify
           done

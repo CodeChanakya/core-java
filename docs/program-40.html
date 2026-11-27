@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E-commerce Order Management | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 10 · Capstones · Program 40 of 43</p>
+    <h1>E-commerce Order Management</h1>
+    <div class="tags">
+      <span class="tag">Capstone</span>
+      <span class="chip" style="background:#fff">Streams</span>
+      <span class="chip" style="background:#fff">Interfaces</span>
+      <span class="chip" style="background:#fff">Strategy pattern</span>
+      <span class="chip" style="background:#fff">Database</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A shop must answer three questions correctly every time. Can we really sell this, when two customers want the last keyboard? What does the order cost, when offers change every month? And what is allowed next, when a shipped order cannot be cancelled?</p>
+        <p>Stock is taken with a single UPDATE that checks and changes together, so the last item sells once. Discounts are a list of small policies, so a new offer is one new lambda. The reports at the end are plain stream pipelines over a list of orders.</p>
+      </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-40.svg"><img src="flows/program-40.svg" alt="Flow of Program 40, E-commerce Order Management, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A warehouse with a till and a rule book: the last item sells once, every offer is a small card in a stack, and a parcel only moves forward.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Strategy by interface keeps offers out of the order code. Reports are pure functions of a list, so they are tested with no database.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Customers place orders</b> (input): Product codes and quantities, and sometimes a coupon.</li><li><b>Price the order with a list of offers</b> (work): Each DiscountPolicy is one lambda, and the service adds them up.</li><li><b>Take the stock in one statement</b> (check): UPDATE ... WHERE stock &gt;= ? checks and changes together, inside one transaction.</li><li><b>Move the order along its allowed steps</b> (work): OrderStatus says what may come next, and a gateway takes payment.</li><li><b>Reports written as stream pipelines</b> (result): Revenue by category, best sellers, top customers, in a fixed order.</li></ol></details>
+      </section>
+<!--/flow-->
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>OrderStatus.java</b><span class="d">An enum that knows its own allowed next steps.</span></span></li>
+          <li><span class="badge">2</span><span><b>DiscountPolicy.java, Discounts.java</b><span class="d">One method, so each offer is a lambda.</span></span></li>
+          <li><span class="badge">3</span><span><b>JdbcShopStore.java</b><span class="d">All the SQL. The stock check and the order save are one transaction.</span></span></li>
+          <li><span class="badge">4</span><span><b>OrderService.java</b><span class="d">Prices, discounts, payment and status changes.</span></span></li>
+          <li><span class="badge">5</span><span><b>Reports.java</b><span class="d">Eight pure stream functions.</span></span></li>
+          <li><span class="badge">6</span><span><b>Main.java</b><span class="d">Eight order attempts and a full order life.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/shop/JdbcShopStore.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.shop;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.sql.<span class="t">Connection</span>;
+<span class="k">import</span> java.sql.<span class="t">Date</span>;
+<span class="k">import</span> java.sql.<span class="t">PreparedStatement</span>;
+<span class="k">import</span> java.sql.<span class="t">ResultSet</span>;
+<span class="k">import</span> java.sql.<span class="t">SQLException</span>;
+<span class="k">import</span> java.sql.<span class="t">Statement</span>;
+<span class="k">import</span> java.time.<span class="t">LocalDate</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Optional</span>;
+
+<span class="c">/**
+ * The Derby version of {@link ShopStore}. All SQL in the shop is in this one class.
+ *
+ * &lt;p&gt;Stock is taken with {@code UPDATE product SET stock = stock - ? WHERE sku = ? AND stock &gt;= ?}. The
+ * check and the change are one statement, so two customers cannot both buy the last item. If the statement
+ * changes no row, the stock was not there, and the whole order is rolled back.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">JdbcShopStore</span> <span class="k">implements</span> <span class="t">ShopStore</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ConnectionProvider</span> provider;
+
+    <span class="k">public</span> <span class="t">JdbcShopStore</span>(<span class="t">ConnectionProvider</span> provider) {
+        <span class="k">this</span>.provider = provider;
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="k">void</span> addProduct(<span class="t">Product</span> p) {
+        <span class="k">try</span> (<span class="t">Connection</span> c = provider.open(); <span class="t">PreparedStatement</span> s = c.prepareStatement(
+                <span class="n">&quot;INSERT INTO product (sku, name, category, price, stock) VALUES (?, ?, ?, ?, ?)&quot;</span>)) {
+            s.setString(<span class="n">1</span>, p.sku());
+            s.setString(<span class="n">2</span>, p.name());
+            s.setString(<span class="n">3</span>, p.category().name());
+            s.setBigDecimal(<span class="n">4</span>, p.price());
+            s.setInt(<span class="n">5</span>, p.stock());
+            s.executeUpdate();
+        } <span class="k">catch</span> (<span class="t">SQLException</span> e) {
+            <span class="k">throw</span> translate(<span class="n">&quot;Adding a product&quot;</span>, e);
+        }
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">Optional</span>&lt;<span class="t">Product</span>&gt; findProduct(<span class="t">String</span> sku) {
+        <span class="k">return</span> queryProducts(<span class="n">&quot;SELECT sku, name, category, price, stock FROM product WHERE sku = ?&quot;</span>, sku).stream().findFirst();
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">Product</span>&gt; products() {
+        <span class="k">return</span> queryProducts(<span class="n">&quot;SELECT sku, name, category, price, stock FROM product ORDER BY sku&quot;</span>);
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">Customer</span> addCustomer(<span class="t">String</span> name, <span class="t">String</span> city) {
+        <span class="k">try</span> (<span class="t">Connection</span> c = provider.open(); <span class="t">PreparedStatement</span> s = c.prepareStatement(
+                <span class="n">&quot;INSERT INTO customer (name, city) VALUES (?, ?)&quot;</span>, <span class="t">Statement</span>.RETURN_GENERATED_KEYS)) {
+            s.setString(<span class="n">1</span>, name);
+            s.setString(<span class="n">2</span>, city);
+            s.executeUpdate();
+            <span class="k">try</span> (<span class="t">ResultSet</span> keys = s.getGeneratedKeys()) {
+                keys.next();
+                <span class="k">return</span> <span class="k">new</span> <span class="t">Customer</span>(keys.getInt(<span class="n">1</span>), name, city);
+            }
+        } <span class="k">catch</span> (<span class="t">SQLException</span> e) {
+            <span class="k">throw</span> translate(<span class="n">&quot;Adding a customer&quot;</span>, e);
+        }
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">Optional</span>&lt;<span class="t">Customer</span>&gt; findCustomer(<span class="k">int</span> id) {
+        <span class="k">try</span> (<span class="t">Connection</span> c = provider.open(); <span class="t">PreparedStatement</span> s = c.prepareStatement(
+                <span class="n">&quot;SELECT id, name, city FROM customer WHERE id = ?&quot;</span>)) {
+            s.setInt(<span class="n">1</span>, id);
+            <span class="k">try</span> (<span class="t">ResultSet</span> r = s.executeQuery()) {
+                <span class="k">return</span> r.next() ? <span class="t">Optional</span>.of(<span class="k">new</span> <span class="t">Customer</span>(r.getInt(<span class="n">1</span>), r.getString(<span class="n">2</span>), r.getString(<span class="n">3</span>))) : <span class="t">Optional</span>.empty();
+            }
+        } <span class="k">catch</span> (<span class="t">SQLException</span> e) {
+            <span class="k">throw</span> translate(<span class="n">&quot;Finding a customer&quot;</span>, e);
+        }
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">Order</span> placeOrder(<span class="k">int</span> customerId, <span class="t">List</span>&lt;<span class="t">OrderLine</span>&gt; lines, <span class="t">BigDecimal</span> discount, <span class="t">LocalDate</span> date) {
+        <span class="k">try</span> (<span class="t">Connection</span> c = provider.open()) {
+            c.setAutoCommit(<span class="k">false</span>);
+            <span class="k">try</span> {
+                <span class="k">for</span> (<span class="t">OrderLine</span> line : lines) {
+                    <span class="k">try</span> (<span class="t">PreparedStatement</span> s = c.prepareStatement(
+                            <span class="n">&quot;UPDATE product SET stock = stock - ? WHERE sku = ? AND stock &gt;= ?&quot;</span>)) {
+                        s.setInt(<span class="n">1</span>, line.quantity());
+                        s.setString(<span class="n">2</span>, line.sku());
+                        s.setInt(<span class="n">3</span>, line.quantity());
+                        <span class="k">if</span> (s.executeUpdate() == <span class="n">0</span>) {
+                            <span class="k">throw</span> <span class="k">new</span> <span class="t">OutOfStockException</span>(line.sku(), line.quantity());
+                        }
+                    }
+                }
+                <span class="t">BigDecimal</span> subtotal = lines.stream().map(<span class="t">OrderLine</span>::total).reduce(<span class="t">BigDecimal</span>.ZERO, <span class="t">BigDecimal</span>::add);
+                <span class="t">BigDecimal</span> total = subtotal.subtract(discount);
+                <span class="k">int</span> id;
+                <span class="k">try</span> (<span class="t">PreparedStatement</span> s = c.prepareStatement(
+                        <span class="n">&quot;INSERT INTO orders (customer_id, status, discount, total, placed_on) VALUES (?, ?, ?, ?, ?)&quot;</span>,
+                        <span class="t">Statement</span>.RETURN_GENERATED_KEYS)) {
+                    s.setInt(<span class="n">1</span>, customerId);
+                    s.setString(<span class="n">2</span>, <span class="t">OrderStatus</span>.NEW.name());
+                    s.setBigDecimal(<span class="n">3</span>, discount);
+                    s.setBigDecimal(<span class="n">4</span>, total);
+                    s.setDate(<span class="n">5</span>, <span class="t">Date</span>.valueOf(date));
+                    s.executeUpdate();
+                    <span class="k">try</span> (<span class="t">ResultSet</span> keys = s.getGeneratedKeys()) {
+                        keys.next();
+                        id = keys.getInt(<span class="n">1</span>);
+                    }
+                }
+                <span class="k">for</span> (<span class="t">OrderLine</span> line : lines) {
+                    <span class="k">try</span> (<span class="t">PreparedStatement</span> s = c.prepareStatement(
+                            <span class="n">&quot;INSERT INTO order_line (order_id, sku, quantity, unit_price) VALUES (?, ?, ?, ?)&quot;</span>)) {
+                        s.setInt(<span class="n">1</span>, id);
+                        s.setString(<span class="n">2</span>, line.sku());
+                        s.setInt(<span class="n">3</span>, line.quantity());
+                        s.setBigDecimal(<span class="n">4</span>, line.unitPrice());
+                        s.executeUpdate();
+                    }
+                }
+                c.commit();
+                <span class="k">return</span> <span class="k">new</span> <span class="t">Order</span>(id, customerId, <span class="t">OrderStatus</span>.NEW, lines, discount, total, date);
+            } <span class="k">catch</span> (<span class="t">SQLException</span> | <span class="t">RuntimeException</span> e) {
+                c.rollback();
+                <span class="k">if</span> (e <span class="k">instanceof</span> <span class="t">SQLException</span> sql) {
+                    <span class="k">throw</span> translate(<span class="n">&quot;Placing an order&quot;</span>, sql);
+                }
+                <span class="k">throw</span> (<span class="t">RuntimeException</span>) e;
+            }
+        } <span class="k">catch</span> (<span class="t">SQLException</span> e) {
+            <span class="k">throw</span> translate(<span class="n">&quot;Placing an order&quot;</span>, e);
+        }
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">Optional</span>&lt;<span class="t">Order</span>&gt; findOrder(<span class="k">int</span> id) {
+        <span class="k">return</span> queryOrders(<span class="n">&quot;SELECT id, customer_id, status, discount, total, placed_on FROM orders WHERE id = ?&quot;</span>, id)
+                .stream().findFirst();
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">Order</span>&gt; orders() {
+        <span class="k">return</span> queryOrders(<span class="n">&quot;SELECT id, customer_id, status, discount, total, placed_on FROM orders ORDER BY id&quot;</span>);
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="k">void</span> updateStatus(<span class="k">int</span> orderId, <span class="t">OrderStatus</span> status) {
+        <span class="k">try</span> (<span class="t">Connection</span> c = provider.open(); <span class="t">PreparedStatement</span> s = c.prepareStatement(
+                <span class="n">&quot;UPDATE orders SET status = ? WHERE id = ?&quot;</span>)) {
+            s.setString(<span class="n">1</span>, status.name());
+            s.setInt(<span class="n">2</span>, orderId);
+            s.executeUpdate();
+        } <span class="k">catch</span> (<span class="t">SQLException</span> e) {
+            <span class="k">throw</span> translate(<span class="n">&quot;Updating an order&quot;</span>, e);
+        }
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="k">void</span> cancelAndRestock(<span class="k">int</span> orderId) {
+        <span class="t">Order</span> order = findOrder(orderId).orElseThrow(() -&gt; <span class="k">new</span> <span class="t">ShopException</span>(<span class="n">&quot;No order with id &quot;</span> + orderId));
+        <span class="k">try</span> (<span class="t">Connection</span> c = provider.open()) {
+            c.setAutoCommit(<span class="k">false</span>);
+            <span class="k">try</span> {
+                <span class="k">for</span> (<span class="t">OrderLine</span> line : order.lines()) {
+                    <span class="k">try</span> (<span class="t">PreparedStatement</span> s = c.prepareStatement(<span class="n">&quot;UPDATE product SET stock = stock + ? WHERE sku = ?&quot;</span>)) {
+                        s.setInt(<span class="n">1</span>, line.quantity());
+                        s.setString(<span class="n">2</span>, line.sku());
+                        s.executeUpdate();
+                    }
+                }
+                <span class="k">try</span> (<span class="t">PreparedStatement</span> s = c.prepareStatement(<span class="n">&quot;UPDATE orders SET status = ? WHERE id = ?&quot;</span>)) {
+                    s.setString(<span class="n">1</span>, <span class="t">OrderStatus</span>.CANCELLED.name());
+                    s.setInt(<span class="n">2</span>, orderId);
+                    s.executeUpdate();
+                }
+                c.commit();
+            } <span class="k">catch</span> (<span class="t">SQLException</span> e) {
+                c.rollback();
+                <span class="k">throw</span> translate(<span class="n">&quot;Cancelling an order&quot;</span>, e);
+            }
+        } <span class="k">catch</span> (<span class="t">SQLException</span> e) {
+            <span class="k">throw</span> translate(<span class="n">&quot;Cancelling an order&quot;</span>, e);
+        }
+    }
+
+    <span class="k">private</span> <span class="t">List</span>&lt;<span class="t">Product</span>&gt; queryProducts(<span class="t">String</span> sql, <span class="t">Object</span>... params) {
+        <span class="k">try</span> (<span class="t">Connection</span> c = provider.open(); <span class="t">PreparedStatement</span> s = c.prepareStatement(sql)) {
+            bind(s, params);
+            <span class="k">try</span> (<span class="t">ResultSet</span> r = s.executeQuery()) {
+                <span class="t">List</span>&lt;<span class="t">Product</span>&gt; list = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+                <span class="k">while</span> (r.next()) {
+                    list.add(<span class="k">new</span> <span class="t">Product</span>(r.getString(<span class="n">1</span>), r.getString(<span class="n">2</span>), <span class="t">Category</span>.valueOf(r.getString(<span class="n">3</span>)),
+                            r.getBigDecimal(<span class="n">4</span>), r.getInt(<span class="n">5</span>)));
+                }
+                <span class="k">return</span> list;
+            }
+        } <span class="k">catch</span> (<span class="t">SQLException</span> e) {
+            <span class="k">throw</span> translate(<span class="n">&quot;Reading products&quot;</span>, e);
+        }
+    }
+
+    <span class="k">private</span> <span class="t">List</span>&lt;<span class="t">Order</span>&gt; queryOrders(<span class="t">String</span> sql, <span class="t">Object</span>... params) {
+        <span class="k">try</span> (<span class="t">Connection</span> c = provider.open(); <span class="t">PreparedStatement</span> s = c.prepareStatement(sql)) {
+            bind(s, params);
+            <span class="t">List</span>&lt;<span class="t">Order</span>&gt; list = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+            <span class="k">try</span> (<span class="t">ResultSet</span> r = s.executeQuery()) {
+                <span class="k">while</span> (r.next()) {
+                    list.add(<span class="k">new</span> <span class="t">Order</span>(r.getInt(<span class="n">1</span>), r.getInt(<span class="n">2</span>), <span class="t">OrderStatus</span>.valueOf(r.getString(<span class="n">3</span>)), <span class="t">List</span>.of(),
+                            r.getBigDecimal(<span class="n">4</span>), r.getBigDecimal(<span class="n">5</span>), r.getDate(<span class="n">6</span>).toLocalDate()));
+                }
+            }
+            <span class="t">List</span>&lt;<span class="t">Order</span>&gt; full = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+            <span class="k">for</span> (<span class="t">Order</span> o : list) {
+                full.add(<span class="k">new</span> <span class="t">Order</span>(o.id(), o.customerId(), o.status(), linesOf(c, o.id()), o.discount(), o.total(), o.placedOn()));
+            }
+            <span class="k">return</span> full;
+        } <span class="k">catch</span> (<span class="t">SQLException</span> e) {
+            <span class="k">throw</span> translate(<span class="n">&quot;Reading orders&quot;</span>, e);
+        }
+    }
+
+    <span class="k">private</span> <span class="t">List</span>&lt;<span class="t">OrderLine</span>&gt; linesOf(<span class="t">Connection</span> c, <span class="k">int</span> orderId) <span class="k">throws</span> <span class="t">SQLException</span> {
+        <span class="k">try</span> (<span class="t">PreparedStatement</span> s = c.prepareStatement(
+                <span class="n">&quot;SELECT sku, quantity, unit_price FROM order_line WHERE order_id = ? ORDER BY sku&quot;</span>)) {
+            s.setInt(<span class="n">1</span>, orderId);
+            <span class="k">try</span> (<span class="t">ResultSet</span> r = s.executeQuery()) {
+                <span class="t">List</span>&lt;<span class="t">OrderLine</span>&gt; lines = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+                <span class="k">while</span> (r.next()) {
+                    lines.add(<span class="k">new</span> <span class="t">OrderLine</span>(r.getString(<span class="n">1</span>), r.getInt(<span class="n">2</span>), r.getBigDecimal(<span class="n">3</span>)));
+                }
+                <span class="k">return</span> lines;
+            }
+        }
+    }
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> bind(<span class="t">PreparedStatement</span> s, <span class="t">Object</span>[] params) <span class="k">throws</span> <span class="t">SQLException</span> {
+        <span class="k">for</span> (<span class="k">int</span> i = <span class="n">0</span>; i &lt; params.length; i++) {
+            s.setObject(i + <span class="n">1</span>, params[i]);
+        }
+    }
+
+    <span class="c">/** 23505 is a duplicate key, 23513 a broken CHECK rule. */</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="t">ShopException</span> translate(<span class="t">String</span> action, <span class="t">SQLException</span> e) {
+        <span class="k">if</span> (<span class="n">&quot;23505&quot;</span>.equals(e.getSQLState())) {
+            <span class="k">return</span> <span class="k">new</span> <span class="t">ShopException</span>(action + <span class="n">&quot; failed: that already exists&quot;</span>);
+        }
+        <span class="k">return</span> <span class="k">new</span> <span class="t">ShopException</span>(action + <span class="n">&quot; failed (SQLState &quot;</span> + e.getSQLState() + <span class="n">&quot;): &quot;</span> + e.getMessage(), e);
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/shop/Reports.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.shop;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.util.<span class="t">EnumMap</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.<span class="t">TreeMap</span>;
+<span class="k">import</span> java.util.stream.<span class="t">Collectors</span>;
+
+<span class="c">/**
+ * Reports on a list of orders, written as streams. Each method is a pure function of its input: give it
+ * the same orders and it gives the same answer, which is what makes it easy to test.
+ */</span>
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> <span class="t">Reports</span> {
+
+    <span class="k">private</span> <span class="t">Reports</span>() {
+    }
+
+    <span class="c">/** Orders that count as sales: everything except cancelled ones. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">List</span>&lt;<span class="t">Order</span>&gt; sales(<span class="t">List</span>&lt;<span class="t">Order</span>&gt; orders) {
+        <span class="k">return</span> orders.stream().filter(o -&gt; o.status() != <span class="t">OrderStatus</span>.CANCELLED).toList();
+    }
+
+    <span class="c">/** How many orders are in each status. Every status appears, even with zero. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">Map</span>&lt;<span class="t">OrderStatus</span>, <span class="t">Long</span>&gt; countByStatus(<span class="t">List</span>&lt;<span class="t">Order</span>&gt; orders) {
+        <span class="t">Map</span>&lt;<span class="t">OrderStatus</span>, <span class="t">Long</span>&gt; counts = <span class="k">new</span> <span class="t">EnumMap</span>&lt;&gt;(<span class="t">OrderStatus</span>.<span class="k">class</span>);
+        <span class="k">for</span> (<span class="t">OrderStatus</span> status : <span class="t">OrderStatus</span>.values()) {
+            counts.put(status, <span class="n">0</span>L);
+        }
+        orders.forEach(o -&gt; counts.merge(o.status(), <span class="n">1</span>L, <span class="t">Long</span>::sum));
+        <span class="k">return</span> counts;
+    }
+
+    <span class="c">/** Revenue per category, from line totals of sales only. Categories come out in the order they are declared in {@link Category}. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">Map</span>&lt;<span class="t">Category</span>, <span class="t">BigDecimal</span>&gt; revenueByCategory(<span class="t">List</span>&lt;<span class="t">Order</span>&gt; orders, <span class="t">List</span>&lt;<span class="t">Product</span>&gt; catalogue) {
+        <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Category</span>&gt; categoryOf = catalogue.stream().collect(<span class="t">Collectors</span>.toMap(<span class="t">Product</span>::sku, <span class="t">Product</span>::category));
+        <span class="k">return</span> sales(orders).stream()
+                .flatMap(o -&gt; o.lines().stream())
+                .collect(<span class="t">Collectors</span>.groupingBy(line -&gt; categoryOf.get(line.sku()),
+                        () -&gt; <span class="k">new</span> <span class="t">TreeMap</span>&lt;&gt;(),
+                        <span class="t">Collectors</span>.reducing(<span class="t">BigDecimal</span>.ZERO.setScale(<span class="n">2</span>), <span class="t">OrderLine</span>::total, <span class="t">BigDecimal</span>::add)));
+    }
+
+    <span class="c">/** Units sold per product, best seller first; ties go to the lower sku. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">List</span>&lt;<span class="t">Map</span>.<span class="t">Entry</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt;&gt; bestSellers(<span class="t">List</span>&lt;<span class="t">Order</span>&gt; orders, <span class="k">int</span> limit) {
+        <span class="k">return</span> sales(orders).stream()
+                .flatMap(o -&gt; o.lines().stream())
+                .collect(<span class="t">Collectors</span>.groupingBy(<span class="t">OrderLine</span>::sku, <span class="t">TreeMap</span>::<span class="k">new</span>, <span class="t">Collectors</span>.summingInt(<span class="t">OrderLine</span>::quantity)))
+                .entrySet().stream()
+                .sorted(<span class="t">Map</span>.<span class="t">Entry</span>.&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt;comparingByValue().reversed().thenComparing(<span class="t">Map</span>.<span class="t">Entry</span>.comparingByKey()))
+                .limit(limit)
+                .toList();
+    }
+
+    <span class="c">/** What each customer has spent on sales, biggest spender first; ties go to the lower id. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">List</span>&lt;<span class="t">Map</span>.<span class="t">Entry</span>&lt;<span class="t">Integer</span>, <span class="t">BigDecimal</span>&gt;&gt; topCustomers(<span class="t">List</span>&lt;<span class="t">Order</span>&gt; orders, <span class="k">int</span> limit) {
+        <span class="k">return</span> sales(orders).stream()
+                .collect(<span class="t">Collectors</span>.groupingBy(<span class="t">Order</span>::customerId, <span class="t">TreeMap</span>::<span class="k">new</span>,
+                        <span class="t">Collectors</span>.reducing(<span class="t">BigDecimal</span>.ZERO.setScale(<span class="n">2</span>), <span class="t">Order</span>::total, <span class="t">BigDecimal</span>::add)))
+                .entrySet().stream()
+                .sorted(<span class="t">Map</span>.<span class="t">Entry</span>.&lt;<span class="t">Integer</span>, <span class="t">BigDecimal</span>&gt;comparingByValue().reversed().thenComparing(<span class="t">Map</span>.<span class="t">Entry</span>.comparingByKey()))
+                .limit(limit)
+                .toList();
+    }
+
+    <span class="c">/** The mean order value over sales, or zero when there are none. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">BigDecimal</span> averageOrderValue(<span class="t">List</span>&lt;<span class="t">Order</span>&gt; orders) {
+        <span class="t">List</span>&lt;<span class="t">Order</span>&gt; sold = sales(orders);
+        <span class="k">if</span> (sold.isEmpty()) {
+            <span class="k">return</span> <span class="t">BigDecimal</span>.ZERO.setScale(<span class="n">2</span>);
+        }
+        <span class="t">BigDecimal</span> sum = sold.stream().map(<span class="t">Order</span>::total).reduce(<span class="t">BigDecimal</span>.ZERO, <span class="t">BigDecimal</span>::add);
+        <span class="k">return</span> sum.divide(<span class="t">BigDecimal</span>.valueOf(sold.size()), <span class="n">2</span>, java.math.<span class="t">RoundingMode</span>.HALF_UP);
+    }
+
+    <span class="c">/** Products with fewer than {@code threshold} units left, as sku to stock, sorted by sku. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; lowStock(<span class="t">List</span>&lt;<span class="t">Product</span>&gt; catalogue, <span class="k">int</span> threshold) {
+        <span class="k">return</span> catalogue.stream().filter(p -&gt; p.stock() &lt; threshold)
+                .collect(<span class="t">Collectors</span>.toMap(<span class="t">Product</span>::sku, <span class="t">Product</span>::stock, (a, b) -&gt; a, <span class="t">TreeMap</span>::<span class="k">new</span>));
+    }
+
+    <span class="c">/** The names of customers by city, sorted. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">List</span>&lt;<span class="t">String</span>&gt;&gt; customersByCity(<span class="t">List</span>&lt;<span class="t">Customer</span>&gt; customers) {
+        <span class="k">return</span> customers.stream().collect(<span class="t">Collectors</span>.groupingBy(<span class="t">Customer</span>::city, <span class="t">TreeMap</span>::<span class="k">new</span>,
+                <span class="t">Collectors</span>.mapping(<span class="t">Customer</span>::name, <span class="t">Collectors</span>.collectingAndThen(<span class="t">Collectors</span>.toList(),
+                        names -&gt; names.stream().sorted().toList()))));
+    }
+
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+== Catalogue
+  BK-101  Java Notebook        BOOKS           450.00  stock 40
+  EL-201  Wireless Mouse       ELECTRONICS     899.50  stock 15
+  EL-202  Mechanical Keyboard  ELECTRONICS    4200.00  stock  5
+  HM-301  Desk Lamp            HOME           1250.00  stock 12
+  TY-401  Puzzle Cube          TOYS            199.00  stock 60
+
+== Placing orders
+  Asha: 12 notebooks, 2 lamps: order 1, subtotal 7900.00, discount 935.00, total 6965.00
+  Bilal: 1 keyboard, 1 mouse, coupon WELCOME5: order 2, subtotal 5099.50, discount 509.96, total 4589.54
+  Chitra: 6 puzzle cubes, coupon FLAT100: order 3, subtotal 1194.00, discount 100.00, total 1094.00
+  Asha: 6 keyboards (only 4 left): refused, Not enough stock of EL-202 for 6
+  Bilal: 0 mice: refused, Quantity for EL-201 must be positive, but was 0
+  Nobody: 1 mouse: refused, No customer with id 99
+  Chitra: product ZZ-999: refused, No product ZZ-999
+  Chitra: 4 keyboards: order 4, subtotal 16800.00, discount 840.00, total 15960.00
+  -- orders after the orders
+  #1  customer 1  NEW       total   6965.00  lines [BK-101x12, HM-301x2]
+  #2  customer 2  NEW       total   4589.54  lines [EL-201x1, EL-202x1]
+  #3  customer 3  NEW       total   1094.00  lines [TY-401x6]
+  #4  customer 3  NEW       total  15960.00  lines [EL-202x4]
+
+== Order life
+  Pay order 1 with card 4111: done
+  Pay order 2 with card 0000: refused, Payment of 4589.54 was declined
+  Ship order 2 before it is paid: refused, Order 2 is NEW and cannot become SHIPPED
+  Pay order 2 with card 5500: done
+  Ship order 2: done
+  Deliver order 2: done
+  Cancel order 2 (delivered): refused, Order 2 is DELIVERED and cannot become CANCELLED
+  Pay order 3 with card 4111: done
+  Cancel order 3 (paid, stock goes back): done
+  Pay order 4 with card 4111: done
+  Ship order 1: done
+  -- orders after the order life
+  #1  customer 1  SHIPPED   total   6965.00  lines [BK-101x12, HM-301x2]
+  #2  customer 2  DELIVERED total   4589.54  lines [EL-201x1, EL-202x1]
+  #3  customer 3  CANCELLED total   1094.00  lines [TY-401x6]
+  #4  customer 3  PAID      total  15960.00  lines [EL-202x4]
+  -- stock after the order life (order 3 was cancelled, so its cubes are back)
+  BK-101  Java Notebook        stock 28
+  EL-201  Wireless Mouse       stock 14
+  EL-202  Mechanical Keyboard  stock  0
+  HM-301  Desk Lamp            stock 10
+  TY-401  Puzzle Cube          stock 60
+
+== Reports
+  Orders by status: {NEW=0, PAID=1, SHIPPED=1, DELIVERED=1, CANCELLED=1}
+  Revenue by category: {ELECTRONICS=21899.50, BOOKS=5400.00, HOME=2500.00}
+  Best sellers: [BK-101=12, EL-202=5, HM-301=2]
+  Top customers: [3=15960.00, 1=6965.00]
+  Average order value: 9171.51
+  Low stock (under 10): {EL-202=0}
+  Customers by city: {Mumbai=[Bilal Khan], Pune=[Asha Rao, Chitra Nair]}
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux, with the real Apache Derby 10.16.1.1 jars. The run is the same every time because the clock is fixed and the database lives in memory. The project's GitHub Actions run is the check on Java 21 and 25 with real Maven and the real JUnit jar. It has not yet been run on Windows or macOS. Run <span class="mono">./run.sh --test</span> for the JUnit tests.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a LOYALTY discount for orders of 2,000 or more.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Report sales per day.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">List customers with two or more sales.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add shipping under 1,000 and decide where it belongs.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Add a returned status, with the stock going back.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Wrap the gateway in one that retries once.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a stock check done in a separate step from the update, a stream used twice, and a record that lets its list be changed from outside. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">capstones/40-ecommerce-order-management</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer, and an internet connection for the first run (two small jars).</span></div>
+      </div>
+      <a class="navcard" href="program-41.html"><span class="k2">Next</span><span class="v">41 Employee Management System</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
