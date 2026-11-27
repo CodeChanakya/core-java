@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.codechanakya</groupId>
+  <artifactId>jdbc-banking</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <name>JDBC Banking Application</name>
+  <description>CodeChanakya Core Java, Program 37: JDBC, PreparedStatement and transactions on Apache Derby.</description>
+
+  <properties>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <derby.version>10.16.1.1</derby.version>
+  </properties>
+
+  <dependencies>
+    <!-- The JDBC driver. Default scope is "compile", which also means "needed when the program runs".
+         The code imports only java.sql.*, never an org.apache.derby class, so switching to another
+         database later means changing this block and the URL in Database.java. -->
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <version>${derby.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derbyshared</artifactId>
+      <version>${derby.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.5.0</version>
+        <configuration>
+          <mainClass>com.codechanakya.jdbcbank.Main</mainClass>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

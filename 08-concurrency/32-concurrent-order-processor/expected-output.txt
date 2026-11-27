@@ -1,0 +1,25 @@
+--- Two deposits of 10 into a balance of 100 ---
+  Right answer             : 120
+  Both read before writing : 110
+  With a synchronized block: 120
+
+--- 100 customers, 8 threads, 60 units on the shelf ---
+  synchronized   accepted 60, refused 40, left on shelf 0
+  ReentrantLock  accepted 60, refused 40, left on shelf 0
+  AtomicInteger  accepted 60, refused 40, left on shelf 0
+  Never oversold, whichever way the threads were scheduled.
+
+--- Counting 300 sales from 6 threads ---
+  {Bag=50, Notebook=100, Pen=150}
+
+--- 3 producers, 2 consumers, one queue of ten ---
+  Processed 300 orders worth 1197 rupees
+
+--- Telling a worker to stop ---
+  Worker did some work: true
+  Worker stopped: true
+
+--- Opposite transfers at the same time ---
+  Account 1: 1500
+  Account 2: 500
+  Total    : 2000 (it was 2000 before)

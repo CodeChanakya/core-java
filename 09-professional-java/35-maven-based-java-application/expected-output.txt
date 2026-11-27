@@ -1,0 +1,29 @@
+Catalog loaded from the classpath: 6 products
+
+Quote A
+  Notebook        x2  net    240.00  tax    12.00  gross    252.00
+  Pen Box         x3  net    136.50  tax     6.83  gross    143.33
+  Subtotal : 376.50
+  Discount : 0.00 (0%)
+  Tax      : 18.83
+  Total    : 395.33
+
+Quote B
+  Wireless Mouse  x1  net    719.10  tax   129.44  gross    848.54
+  Keyboard        x1  net   1349.10  tax   242.84  gross   1591.94
+  USB Cable       x2  net    538.20  tax    96.88  gross    635.08
+  Subtotal : 2896.00
+  Discount : 289.60 (10%)
+  Tax      : 469.16
+  Total    : 3075.56
+
+Quote C
+  Desk Lamp       x1  net    617.50  tax    74.10  gross    691.60
+  Notebook        x1  net    114.00  tax     5.70  gross    119.70
+  Subtotal : 770.00
+  Discount : 38.50 (5%)
+  Tax      : 79.80
+  Total    : 811.30
+
+Quote D
+  Rejected: Unknown product: X-999

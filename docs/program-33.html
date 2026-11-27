@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parallel Data Processing | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 08 · Concurrency · Program 33 of 43</p>
+    <h1>Parallel Data Processing</h1>
+    <div class="tags">
+      <span class="tag">Advanced</span>
+      <span class="chip" style="background:#fff">Future</span>
+      <span class="chip" style="background:#fff">Chunks</span>
+      <span class="chip" style="background:#fff">Thread safety</span>
+      <span class="chip" style="background:#fff">Parallel streams</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A million sensor readings must be summarised. One thread does it in one pass; with several cores the work can be cut into pieces done at the same time, and the small answers merged.</p>
+        <p>The better design shares nothing while working: each chunk builds its own immutable Stats and the main thread merges them. Every figure can be proved by arithmetic, so a wrong parallel answer cannot hide.</p>
+      </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-33.svg"><img src="flows/program-33.svg" alt="Flow of Program 33, Parallel Data Processing, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>Counting a stadium crowd: split it into sections, each counter counts its own, then add the sheets together.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Share nothing, merge at the end. Parallel is not always faster: splitting, starting and merging all cost time.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>One million readings</b> (input): A pattern with a known sum, so every answer can be proved.</li><li><b>Cut into fair chunks</b> (work): No gap and no overlap; the remainder goes to the first chunks.</li><li><b>Each worker makes its own Stats</b> (work): Nothing is shared while working, so there is nothing to lock.</li><li><b>Merge the small answers</b> (store): An immutable record with merge(), in any order.</li><li><b>Same answer for any chunk count</b> (result): Sum 499,500,000 whether cut in 1, 3, 7 or 16.</li></ol></details>
+      </section>
+<!--/flow-->
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Readings.java</b><span class="d">A pattern with a known sum.</span></span></li>
+          <li><span class="badge">2</span><span><b>Stats.java, Chunk.java</b><span class="d">An immutable record with merge, and fair splitting.</span></span></li>
+          <li><span class="badge">3</span><span><b>ParallelProcessor.java</b><span class="d">Tickets out, answers merged.</span></span></li>
+          <li><span class="badge">4</span><span><b>SharedTotals.java</b><span class="d">Three ways to total on four threads.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/parallel/Stats.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.parallel;
+
+<span class="c">/**
+ * What we want to know about a stretch of readings.
+ *
+ * &lt;p&gt;The record is immutable and has a {@link #merge} method that joins two answers into one. That
+ * pair of ideas is what makes parallel work easy: each thread builds its own {@code Stats} from
+ * its own part of the data, with nothing shared and nothing to lock, and the main thread merges
+ * the small results afterwards.
+ *
+ * @param count  how many readings were looked at
+ * @param sum    their total
+ * @param high   how many were above {@link #HIGH_LIMIT}
+ * @param max    the largest one
+ */</span>
+<span class="k">public</span> record <span class="t">Stats</span>(<span class="k">long</span> count, <span class="k">long</span> sum, <span class="k">long</span> high, <span class="k">int</span> max) {
+
+    <span class="c">/** A reading above this counts as &quot;high&quot;. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">final</span> <span class="k">int</span> HIGH_LIMIT = <span class="n">900</span>;
+
+    <span class="c">/** The answer for no readings at all. Merging it with anything changes nothing. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="k">final</span> <span class="t">Stats</span> EMPTY = <span class="k">new</span> <span class="t">Stats</span>(<span class="n">0</span>, <span class="n">0</span>, <span class="n">0</span>, <span class="t">Integer</span>.MIN_VALUE);
+
+    <span class="c">/**
+     * Works through {@code data[from, to)}.
+     *
+     * @throws IllegalStateException if a reading is negative, which no sensor should produce
+     */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">Stats</span> of(<span class="k">int</span>[] data, <span class="k">int</span> from, <span class="k">int</span> to) {
+        <span class="k">long</span> sum = <span class="n">0</span>;
+        <span class="k">long</span> high = <span class="n">0</span>;
+        <span class="k">int</span> max = <span class="t">Integer</span>.MIN_VALUE;
+        <span class="k">for</span> (<span class="k">int</span> i = from; i &lt; to; i++) {
+            <span class="k">int</span> reading = data[i];
+            <span class="k">if</span> (reading &lt; <span class="n">0</span>) {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="n">&quot;Bad reading &quot;</span> + reading + <span class="n">&quot; at position &quot;</span> + i);
+            }
+            sum += reading;
+            <span class="k">if</span> (reading &gt; HIGH_LIMIT) {
+                high++;
+            }
+            max = <span class="t">Math</span>.max(max, reading);
+        }
+        <span class="k">return</span> <span class="k">new</span> <span class="t">Stats</span>(to - from, sum, high, max);
+    }
+
+    <span class="c">/** Joins two answers. The order does not matter, which is why chunks may finish in any order. */</span>
+    <span class="k">public</span> <span class="t">Stats</span> merge(<span class="t">Stats</span> other) {
+        <span class="k">return</span> <span class="k">new</span> <span class="t">Stats</span>(count + other.count, sum + other.sum, high + other.high, <span class="t">Math</span>.max(max, other.max));
+    }
+
+    <span class="c">/** One line for the console. */</span>
+    <span class="k">public</span> <span class="t">String</span> describe() {
+        <span class="k">return</span> count + <span class="n">&quot; readings, sum &quot;</span> + sum + <span class="n">&quot;, &quot;</span> + high + <span class="n">&quot; above &quot;</span> + HIGH_LIMIT + <span class="n">&quot;, highest &quot;</span> + max;
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/parallel/ParallelProcessor.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.parallel;
+
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Callable</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ExecutionException</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ExecutorService</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executors</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Future</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+
+<span class="c">/**
+ * Splits the data into chunks, gives each chunk to a worker, and merges the answers.
+ *
+ * &lt;p&gt;This is the &quot;fork and join&quot; idea in its plainest form. It is safe without a single lock
+ * because of three habits:
+ * &lt;ol&gt;
+ *   &lt;li&gt;the data array is only &lt;em&gt;read&lt;/em&gt; once the workers have it;&lt;/li&gt;
+ *   &lt;li&gt;every worker builds its own {@link Stats} and shares nothing while it works;&lt;/li&gt;
+ *   &lt;li&gt;the results are combined on one thread, after the workers hand them back.&lt;/li&gt;
+ * &lt;/ol&gt;
+ */</span>
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> <span class="t">ParallelProcessor</span> <span class="k">implements</span> <span class="t">AutoCloseable</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ExecutorService</span> pool;
+
+    <span class="k">public</span> <span class="t">ParallelProcessor</span>(<span class="k">int</span> threads) {
+        <span class="k">this</span>.pool = <span class="t">Executors</span>.newFixedThreadPool(threads);
+    }
+
+    <span class="c">/** The plain loop on the calling thread. The answer everything else is compared with. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">Stats</span> sequential(<span class="k">int</span>[] data) {
+        <span class="k">return</span> <span class="t">Stats</span>.of(data, <span class="n">0</span>, data.length);
+    }
+
+    <span class="c">/** Hands out one task per chunk and returns the tickets without waiting. */</span>
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">Future</span>&lt;<span class="t">Stats</span>&gt;&gt; submit(<span class="k">int</span>[] data, <span class="k">int</span> chunks) {
+        <span class="t">List</span>&lt;<span class="t">Future</span>&lt;<span class="t">Stats</span>&gt;&gt; tickets = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">Chunk</span> chunk : <span class="t">Chunk</span>.split(data.length, chunks)) {
+            <span class="t">Callable</span>&lt;<span class="t">Stats</span>&gt; task = () -&gt; <span class="t">Stats</span>.of(data, chunk.from(), chunk.to());
+            tickets.add(pool.submit(task));
+        }
+        <span class="k">return</span> tickets;
+    }
+
+    <span class="c">/**
+     * Processes the data in {@code chunks} pieces and returns the merged answer.
+     *
+     * @throws ExecutionException if any chunk failed; the cause says why
+     */</span>
+    <span class="k">public</span> <span class="t">Stats</span> process(<span class="k">int</span>[] data, <span class="k">int</span> chunks) <span class="k">throws</span> <span class="t">InterruptedException</span>, <span class="t">ExecutionException</span> {
+        <span class="t">Stats</span> total = <span class="t">Stats</span>.EMPTY;
+        <span class="k">for</span> (<span class="t">Future</span>&lt;<span class="t">Stats</span>&gt; ticket : submit(data, chunks)) {
+            total = total.merge(ticket.get());                    <span class="c">// waits for this chunk, then folds it in</span>
+        }
+        <span class="k">return</span> total;
+    }
+
+    <span class="c">/** The pool, for the demonstration of waiting with a deadline. */</span>
+    <span class="t">ExecutorService</span> pool() {
+        <span class="k">return</span> pool;
+    }
+
+    <span class="k">@Override</span>
+    <span class="k">public</span> <span class="k">void</span> close() {
+        pool.shutdown();
+        <span class="k">try</span> {
+            <span class="k">if</span> (!pool.awaitTermination(<span class="n">5</span>, <span class="t">TimeUnit</span>.SECONDS)) {
+                pool.shutdownNow();
+            }
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            pool.shutdownNow();
+            <span class="t">Thread</span>.currentThread().interrupt();
+        }
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+--- The data ---
+  1000000 readings, the first five are [7, 38, 69, 100, 131]
+  Every block of 1000 holds each value from 0 to 999 once, so the sum should be 1000 x 499500.
+
+--- One thread, the plain loop ---
+  1000000 readings, sum 499500000, 99000 above 900, highest 999
+
+--- Cutting the work into chunks ---
+  1,000,000 in 4 : [Chunk[from=0, to=250000], Chunk[from=250000, to=500000], Chunk[from=500000, to=750000], Chunk[from=750000, to=1000000]]
+  10 in 3        : [Chunk[from=0, to=4], Chunk[from=4, to=7], Chunk[from=7, to=10]]   (the remainder goes to the first chunks)
+
+--- Four workers, four tickets ---
+  Tickets handed out: 4
+  Chunk 1: 250000 readings, sum 124875000, 24750 above 900, highest 999
+  Chunk 2: 250000 readings, sum 124875000, 24750 above 900, highest 999
+  Chunk 3: 250000 readings, sum 124875000, 24750 above 900, highest 999
+  Chunk 4: 250000 readings, sum 124875000, 24750 above 900, highest 999
+  Merged: 1000000 readings, sum 499500000, 99000 above 900, highest 999
+  Same as the single thread: true
+
+--- Does the number of chunks change the answer? ---
+   1 chunks: sum 499500000
+   2 chunks: sum 499500000
+   3 chunks: sum 499500000
+   7 chunks: sum 499500000
+  16 chunks: sum 499500000
+  Every answer equals the baseline: true
+
+--- Parallel streams do the chunking for you ---
+  parallel sum equals the baseline: true
+  Readings per band of 100: {0=100000, 1=100000, 2=100000, 3=100000, 4=100000, 5=100000, 6=100000, 7=100000, 8=100000, 9=100000}
+  The result is the same however the threads were scheduled; only the speed changes.
+
+--- Three ways to share a total ---
+  one AtomicLong  : 499500000
+  one LongAdder   : 499500000
+  private totals  : 499500000
+  All equal the baseline: true
+
+--- Waiting with a deadline ---
+  Gave up after 100 ms: TimeoutException
+  cancel(true) returned true
+
+--- One bad reading in the data ---
+  Chunk 1: ok, 250000 readings
+  Chunk 2: ok, 250000 readings
+  Chunk 3: failed. Bad reading -1 at position 600000
+  Chunk 4: ok, 250000 readings
+  Only the chunk that held the bad reading failed.
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Count readings above 950.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Find the smallest reading.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Print the average.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">A histogram from private arrays.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Cancel everything on the first failure.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Maximum with a RecursiveTask.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: adding to one <span class="mono">ArrayList</span> from many threads, a pool that starves itself, and unhandled <span class="mono">Future.get()</span> exceptions. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">08-concurrency/33-parallel-data-processing</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-34.html"><span class="k2">Next</span><span class="v">34 Asynchronous Payment Status Simulator</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

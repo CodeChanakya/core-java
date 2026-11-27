@@ -1,0 +1,30 @@
+== Hiring
+  #1 Asha Rao     asha@example.com     ENGINEERING    90000.00  hired 2021-04-12
+  #2 Bilal Khan   bilal@example.com    QA             60000.00  hired 2022-01-03
+  #3 Chitra Nair  chitra@example.com   QA             72000.50  hired 2020-09-21
+  #4 Dev Mehta    dev@example.com      SALES          48000.00  hired 2023-07-17
+  #5 Esha Iyer    esha@example.com     HR             55000.00  hired 2019-11-04
+  #6 Farhan Ali   farhan@example.com   ENGINEERING    84000.00  hired 2024-02-26
+
+== Rules that say no
+  Duplicate e-mail: E-mail already in use: ASHA@example.com
+  Low salary: Salary must be at least 15000.00, but was 9000.00
+  Bad e-mail: Not a valid e-mail address: hari-at-example
+  Future hire date: Hire date 2026-01-01 is in the future.
+  Raise too big: A raise must be above 0 and at most 20 percent, but was 35
+  Unknown employee: No employee with id 99
+
+== Changes
+  Raise 10% for #2    : 66000.00
+  Move #4 to ENGINEERING: ENGINEERING
+  Terminated #5, headcount now 5
+
+== Engineering team
+  #1 Asha Rao     asha@example.com     ENGINEERING    90000.00  hired 2021-04-12
+  #4 Dev Mehta    dev@example.com      ENGINEERING    48000.00  hired 2023-07-17
+  #6 Farhan Ali   farhan@example.com   ENGINEERING    84000.00  hired 2024-02-26
+
+== Department report
+  ENGINEERING  people 3  payroll  222000.00  average  74000.00  highest  90000.00
+  QA           people 2  payroll  138000.50  average  69000.25  highest  72000.50
+  Total payroll: 360000.50

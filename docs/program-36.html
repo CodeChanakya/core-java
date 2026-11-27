@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automated Business Logic Tests | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 09 · Professional Java · Program 36 of 43</p>
+    <h1>Automated Business Logic Tests</h1>
+    <div class="tags">
+      <span class="tag">Intermediate</span>
+      <span class="chip" style="background:#fff">JUnit 5</span>
+      <span class="chip" style="background:#fff">@ParameterizedTest</span>
+      <span class="chip" style="background:#fff">Boundaries</span>
+      <span class="chip" style="background:#fff">assertAll</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A shop prices orders with rules people argue about, and every rule has an edge. Is a subtotal of exactly 999 free? A person cannot re-check forty edges after every change. A computer can, in moments.</p>
+        <p>Shipping, coupons, tiers and tax are tested with JUnit 5: data tables with @CsvSource, grouped tests with @Nested, failures with assertThrows, and a boundary on both sides of every limit.</p>
+      </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-36.svg"><img src="flows/program-36.svg" alt="Flow of Program 36, Automated Business Logic Tests, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A pilot&#x27;s checklist: the same questions asked in the same order every time, so a mistake cannot slip by on a busy day.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>AAA structure, parameterised cases, @Nested grouping and assertAll. Boundary-value analysis finds the off-by-one mistakes that mid-range cases never see.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Business rules in plain words</b> (input): Shipping, coupons, tiers and tax, each with a limit.</li><li><b>Write tests with data tables</b> (work): One method, many rows: @CsvSource, @ValueSource, @MethodSource.</li><li><b>Test the edges on both sides</b> (check): Just under, exactly on and just over every limit.</li><li><b>Check failures too</b> (check): assertThrows proves bad input is refused with a clear message.</li><li><b>A green or red verdict</b> (result): All 39 tests pass, and a broken rule turns one of them red.</li></ol></details>
+      </section>
+<!--/flow-->
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>ShippingCalculator.java</b><span class="d">The first rule, with its boundaries.</span></span></li>
+          <li><span class="badge">2</span><span><b>ShippingCalculatorTest.java</b><span class="d">One method, seven cases.</span></span></li>
+          <li><span class="badge">3</span><span><b>CouponServiceTest.java</b><span class="d">@Nested groups and assertThrows.</span></span></li>
+          <li><span class="badge">4</span><span><b>OrderPricerTest.java</b><span class="d">assertAll, @MethodSource and @EnumSource.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/pricing/ShippingCalculator.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.pricing;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+
+<span class="c">/**
+ * Works out the delivery charge.
+ *
+ * &lt;p&gt;Standard delivery costs 40 plus 20 for every started kilogram, and is free when the
+ * subtotal is 999 or more. Express delivery adds a flat 100 and is never free.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">ShippingCalculator</span> {
+
+    <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> FREE_FROM = <span class="t">Money</span>.of(<span class="n">&quot;999&quot;</span>);
+    <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> BASE = <span class="t">Money</span>.of(<span class="n">&quot;40&quot;</span>);
+    <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> PER_KG = <span class="t">Money</span>.of(<span class="n">&quot;20&quot;</span>);
+    <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> EXPRESS_EXTRA = <span class="t">Money</span>.of(<span class="n">&quot;100&quot;</span>);
+
+    <span class="k">public</span> <span class="t">BigDecimal</span> cost(<span class="t">BigDecimal</span> subtotal, <span class="k">int</span> weightGrams, <span class="k">boolean</span> express) {
+        <span class="k">if</span> (weightGrams &lt;= <span class="n">0</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="n">&quot;Weight must be positive, but was &quot;</span> + weightGrams);
+        }
+        <span class="k">int</span> startedKilos = (weightGrams + <span class="n">999</span>) / <span class="n">1000</span>;
+        <span class="t">BigDecimal</span> standard = BASE.add(PER_KG.multiply(<span class="t">BigDecimal</span>.valueOf(startedKilos)));
+        <span class="k">if</span> (express) {
+            <span class="k">return</span> <span class="t">Money</span>.round(standard.add(EXPRESS_EXTRA));
+        }
+        <span class="k">return</span> subtotal.compareTo(FREE_FROM) &gt;= <span class="n">0</span> ? <span class="t">Money</span>.of(<span class="n">&quot;0&quot;</span>) : <span class="t">Money</span>.round(standard);
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/test/java/com/codechanakya/pricing/ShippingCalculatorTest.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.pricing;
+
+<span class="k">import</span> <span class="k">static</span> org.junit.jupiter.api.<span class="t">Assertions</span>.assertEquals;
+<span class="k">import</span> <span class="k">static</span> org.junit.jupiter.api.<span class="t">Assertions</span>.assertThrows;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> org.junit.jupiter.api.<span class="t">BeforeEach</span>;
+<span class="k">import</span> org.junit.jupiter.api.<span class="t">DisplayName</span>;
+<span class="k">import</span> org.junit.jupiter.api.<span class="t">Test</span>;
+<span class="k">import</span> org.junit.jupiter.params.<span class="t">ParameterizedTest</span>;
+<span class="k">import</span> org.junit.jupiter.params.provider.<span class="t">CsvSource</span>;
+<span class="k">import</span> org.junit.jupiter.params.provider.<span class="t">ValueSource</span>;
+
+<span class="k">@DisplayName</span>(<span class="n">&quot;ShippingCalculator&quot;</span>)
+<span class="k">class</span> <span class="t">ShippingCalculatorTest</span> {
+
+    <span class="k">private</span> <span class="t">ShippingCalculator</span> calculator;
+
+    <span class="k">@BeforeEach</span>
+    <span class="k">void</span> setUp() {
+        <span class="c">// JUnit creates a new test object for every test, so each test starts clean.</span>
+        calculator = <span class="k">new</span> <span class="t">ShippingCalculator</span>();
+    }
+
+    <span class="k">@ParameterizedTest</span>(name = <span class="n">&quot;standard, {1} g, subtotal {0} costs {2}&quot;</span>)
+    <span class="k">@CsvSource</span>({
+            <span class="c">// subtotal, grams, expected cost</span>
+            <span class="n">&quot;100.00,   1,    60.00&quot;</span>,   <span class="c">// 1 g still counts as a started kilogram</span>
+            <span class="n">&quot;100.00,   1000, 60.00&quot;</span>,   <span class="c">// exactly 1 kg is still one kilogram</span>
+            <span class="n">&quot;100.00,   1001, 80.00&quot;</span>,   <span class="c">// one gram over starts the second kilogram</span>
+            <span class="n">&quot;100.00,   2500, 100.00&quot;</span>,
+            <span class="n">&quot;998.99,   500,  60.00&quot;</span>,   <span class="c">// just under the free-shipping line</span>
+            <span class="n">&quot;999.00,   500,  0.00&quot;</span>,    <span class="c">// exactly on the line is free</span>
+            <span class="n">&quot;5000.00,  9000, 0.00&quot;</span>
+    })
+    <span class="k">@DisplayName</span>(<span class="n">&quot;standard delivery&quot;</span>)
+    <span class="k">void</span> standardDelivery(<span class="t">String</span> subtotal, <span class="k">int</span> grams, <span class="t">String</span> expected) {
+        assertEquals(<span class="k">new</span> <span class="t">BigDecimal</span>(expected), calculator.cost(<span class="k">new</span> <span class="t">BigDecimal</span>(subtotal), grams, <span class="k">false</span>));
+    }
+
+    <span class="k">@ParameterizedTest</span>
+    <span class="k">@CsvSource</span>({
+            <span class="n">&quot;100.00, 500,  160.00&quot;</span>,
+            <span class="n">&quot;5000.00, 500, 160.00&quot;</span>,    <span class="c">// express is never free</span>
+            <span class="n">&quot;100.00, 2500, 200.00&quot;</span>
+    })
+    <span class="k">@DisplayName</span>(<span class="n">&quot;express delivery adds a flat 100 and is never free&quot;</span>)
+    <span class="k">void</span> expressDelivery(<span class="t">String</span> subtotal, <span class="k">int</span> grams, <span class="t">String</span> expected) {
+        assertEquals(<span class="k">new</span> <span class="t">BigDecimal</span>(expected), calculator.cost(<span class="k">new</span> <span class="t">BigDecimal</span>(subtotal), grams, <span class="k">true</span>));
+    }
+
+    <span class="k">@ParameterizedTest</span>
+    <span class="k">@ValueSource</span>(ints = {<span class="n">0</span>, -<span class="n">1</span>, -<span class="n">500</span>})
+    <span class="k">@DisplayName</span>(<span class="n">&quot;a weight that is not positive is rejected&quot;</span>)
+    <span class="k">void</span> badWeights(<span class="k">int</span> grams) {
+        <span class="t">IllegalArgumentException</span> error = assertThrows(<span class="t">IllegalArgumentException</span>.<span class="k">class</span>,
+                () -&gt; calculator.cost(<span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;100&quot;</span>), grams, <span class="k">false</span>));
+        assertEquals(<span class="n">&quot;Weight must be positive, but was &quot;</span> + grams, error.getMessage());
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">@DisplayName</span>(<span class="n">&quot;the answer always has two decimals&quot;</span>)
+    <span class="k">void</span> twoDecimals() {
+        assertEquals(<span class="n">2</span>, calculator.cost(<span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;100&quot;</span>), <span class="n">500</span>, <span class="k">false</span>).scale());
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+Downloading junit-platform-console-standalone-1.11.4.jar (one time only)...
+...
+39 tests successful, 0 tests failed
+OK: all tests passed</pre>
+        </div>
+        <p class="small">The last two lines are what a passing run should end with. They are shown as expected, not as captured output: the real JUnit jar could not be downloaded where this program was written. The code was run on OpenJDK 21.0.13 on Linux, and the 39 tests passed on a stand-in for the JUnit 5 API written only for checking. They have not been run on real JUnit or Maven yet.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Test FLAT50 for a gold customer.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Test near-miss coupon codes.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Run one test class.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Write the test first for a 20 kg limit.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Rewrite a test with @MethodSource.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Break the code on purpose and see what the tests say.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a JUnit 4 import, <span class="mono">BigDecimal</span> scale in <span class="mono">assertEquals</span>, and tests that depend on each other. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">09-professional-java/36-automated-business-logic-tests</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer, and an internet connection for the first run (one jar).</span></div>
+      </div>
+      <a class="navcard" href="program-37.html"><span class="k2">Next</span><span class="v">37 JDBC Banking Application</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -16,10 +16,31 @@ jobs:
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
-      # Keeps the JUnit jar between runs so Maven Central is not hit every time.
+      # Keeps the downloaded jars between runs so Maven Central is not hit every time.
       - uses: actions/cache@v4
         with:
-          path: 03-object-oriented-programming/09-junit-starter-lab/lib
-          key: junit-console-1.11.4
+          path: |
+            03-object-oriented-programming/09-junit-starter-lab/lib
+            09-professional-java/*/lib
+          key: jars-junit-1.11.4-derby-10.16.1.1
       - name: Compile and check every program
         run: bash scripts/check-all.sh
+      - name: Run the tests of the Phase 9 project
+        run: bash 09-professional-java/38-employee-database-management/run.sh --test
+
+  maven:
+    # Builds the Phase 9 projects with real Maven, the way a team would.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+      - name: Build and test the Maven projects
+        run: |
+          for dir in 09-professional-java/3[5-8]-*/; do
+            echo "== $dir"
+            mvn -B -q -f "$dir/pom.xml" verify
+          done

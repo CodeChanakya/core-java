@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Coordinates: the three values that identify this project everywhere. -->
+  <groupId>com.codechanakya</groupId>
+  <artifactId>quote-calculator</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+
+  <name>Quote Calculator</name>
+  <description>CodeChanakya Core Java, Program 35: a small application built the Maven way.</description>
+
+  <properties>
+    <!-- One place to say which Java the project targets. -->
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <main.class>com.codechanakya.quotes.Main</main.class>
+  </properties>
+
+  <!-- This program has no dependencies on purpose. Program 36 adds JUnit and
+       Program 37 adds a database driver, and both show the <dependency> block. -->
+
+  <build>
+    <plugins>
+      <!-- Makes `mvn package` produce a jar that `java -jar` can start. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.2</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>${main.class}</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <!-- Lets you run the program with `mvn compile exec:java`. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.5.0</version>
+        <configuration>
+          <mainClass>${main.class}</mainClass>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
