@@ -1,0 +1,52 @@
+== Hiring
+  Hired Asha Rao as employee 1
+  Hired Bilal Khan as employee 2
+  Hired Chitra Nair as employee 3
+  Hired Dev Mehta as employee 4
+  Hiring Eva Joseph refused: The email address 'eva-at-example.com' is not valid.
+  Hiring Farid Ali refused: An employee must be at least 18 on the joining date, but would be 15.
+  Hiring Gita Rao refused: The joining date 2025-07-15 is in the future.
+  Hiring Asha Again refused: An employee with the email asha@example.com already exists
+
+== Dates
+  Asha Rao     joined 2020-02-29  tenure 5y 4m 1d  probation ends 2020-08-31 (MONDAY)
+  Bilal Khan   joined 2023-11-15  tenure 1y 7m 15d  probation ends 2024-05-15 (WEDNESDAY)
+  Chitra Nair  joined 2025-03-03  tenure 0y 3m 27d  probation ends 2025-09-03 (WEDNESDAY)
+  Dev Mehta    joined 2025-06-30  tenure 0y 0m 0d  probation ends 2025-12-30 (TUESDAY)
+  Birthdays in the next 30 days: [Asha Rao (2025-07-04), Dev Mehta (2025-07-10), Chitra Nair (2025-07-20)]
+  Bilal was born on 29 February; his next birthday is celebrated on 2026-02-28
+  Payday for 2025-06: 2025-06-30 (MONDAY)
+  Payday for 2025-08: 2025-08-29 (FRIDAY)
+  Payday for 2025-12: 2025-12-31 (WEDNESDAY)
+
+== Leave
+  Asha annual 11 to 15 Aug (15 Aug is a holiday): request 1, 4 working days
+  Asha annual 13 to 14 Aug: refused, That overlaps leave request 1 (2025-08-11 to 2025-08-15).
+  Asha annual all of September: refused, Only 14 ANNUAL days left in 2025, but 22 requested.
+  Asha annual Saturday and Sunday: refused, That range has no working days.
+  Bilal sick from 20 June (past): refused, Leave cannot start in the past (2025-06-20).
+  Bilal annual 5 July back to 1 July: refused, The leave ends (2025-07-01) before it starts (2025-07-05).
+  Bilal annual 30 Dec to 2 Jan: refused, Leave cannot run across two years. Please make two requests.
+  Chitra unpaid 14 to 18 July: request 2, 5 working days
+  Dev annual 21 to 22 July: request 3, 2 working days
+  Asha annual days left in 2025 (before approval): 14
+  Approve leave 1: done
+  Approve leave 1 again: refused, Leave request 1 is already APPROVED.
+  Approve leave 2: done
+
+== Changes
+  Raise Bilal to 52000: done
+  Set Bilal's salary to -1: refused, The salary must be positive.
+  Move Chitra to ENGINEERING: done
+  Terminate Dev: done
+  Terminate Dev again: refused, Dev Mehta no longer works here.
+  Raise Dev after leaving: refused, Dev Mehta no longer works here.
+  Dev's leave after leaving: [REJECTED]
+  Active in ENGINEERING: [Asha Rao, Chitra Nair]
+  Active in HR: []
+
+== Payslips for July 2025 (23 working days)
+  Asha Rao     gross  85000.00  unpaid days 0  deduction     0.00  tax  8500.00  net  76500.00
+  Bilal Khan   gross  52000.00  unpaid days 0  deduction     0.00  tax  5200.00  net  46800.00
+  Chitra Nair  gross  38000.00  unpaid days 5  deduction  8260.87  tax  1486.96  net  28252.17
+  Dev Mehta    gross  52000.00  unpaid days 0  deduction     0.00  tax  5200.00  net  46800.00

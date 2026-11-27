@@ -1,0 +1,54 @@
+== Catalogue
+  BK-101  Java Notebook        BOOKS           450.00  stock 40
+  EL-201  Wireless Mouse       ELECTRONICS     899.50  stock 15
+  EL-202  Mechanical Keyboard  ELECTRONICS    4200.00  stock  5
+  HM-301  Desk Lamp            HOME           1250.00  stock 12
+  TY-401  Puzzle Cube          TOYS            199.00  stock 60
+
+== Placing orders
+  Asha: 12 notebooks, 2 lamps: order 1, subtotal 7900.00, discount 935.00, total 6965.00
+  Bilal: 1 keyboard, 1 mouse, coupon WELCOME5: order 2, subtotal 5099.50, discount 509.96, total 4589.54
+  Chitra: 6 puzzle cubes, coupon FLAT100: order 3, subtotal 1194.00, discount 100.00, total 1094.00
+  Asha: 6 keyboards (only 4 left): refused, Not enough stock of EL-202 for 6
+  Bilal: 0 mice: refused, Quantity for EL-201 must be positive, but was 0
+  Nobody: 1 mouse: refused, No customer with id 99
+  Chitra: product ZZ-999: refused, No product ZZ-999
+  Chitra: 4 keyboards: order 4, subtotal 16800.00, discount 840.00, total 15960.00
+  -- orders after the orders
+  #1  customer 1  NEW       total   6965.00  lines [BK-101x12, HM-301x2]
+  #2  customer 2  NEW       total   4589.54  lines [EL-201x1, EL-202x1]
+  #3  customer 3  NEW       total   1094.00  lines [TY-401x6]
+  #4  customer 3  NEW       total  15960.00  lines [EL-202x4]
+
+== Order life
+  Pay order 1 with card 4111: done
+  Pay order 2 with card 0000: refused, Payment of 4589.54 was declined
+  Ship order 2 before it is paid: refused, Order 2 is NEW and cannot become SHIPPED
+  Pay order 2 with card 5500: done
+  Ship order 2: done
+  Deliver order 2: done
+  Cancel order 2 (delivered): refused, Order 2 is DELIVERED and cannot become CANCELLED
+  Pay order 3 with card 4111: done
+  Cancel order 3 (paid, stock goes back): done
+  Pay order 4 with card 4111: done
+  Ship order 1: done
+  -- orders after the order life
+  #1  customer 1  SHIPPED   total   6965.00  lines [BK-101x12, HM-301x2]
+  #2  customer 2  DELIVERED total   4589.54  lines [EL-201x1, EL-202x1]
+  #3  customer 3  CANCELLED total   1094.00  lines [TY-401x6]
+  #4  customer 3  PAID      total  15960.00  lines [EL-202x4]
+  -- stock after the order life (order 3 was cancelled, so its cubes are back)
+  BK-101  Java Notebook        stock 28
+  EL-201  Wireless Mouse       stock 14
+  EL-202  Mechanical Keyboard  stock  0
+  HM-301  Desk Lamp            stock 10
+  TY-401  Puzzle Cube          stock 60
+
+== Reports
+  Orders by status: {NEW=0, PAID=1, SHIPPED=1, DELIVERED=1, CANCELLED=1}
+  Revenue by category: {ELECTRONICS=21899.50, BOOKS=5400.00, HOME=2500.00}
+  Best sellers: [BK-101=12, EL-202=5, HM-301=2]
+  Top customers: [3=15960.00, 1=6965.00]
+  Average order value: 9171.51
+  Low stock (under 10): {EL-202=0}
+  Customers by city: {Mumbai=[Bilal Khan], Pune=[Asha Rao, Chitra Nair]}

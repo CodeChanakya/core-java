@@ -62,9 +62,9 @@
     P(36, 9, 'Automated Business Logic Tests', ['JUnit 5', 'Parameterized tests'], false, true, 'program-36.html'),
     P(37, 9, 'JDBC Banking Application', ['PreparedStatement', 'Transactions'], false, true, 'program-37.html'),
     P(38, 9, 'Employee Database Management', ['CRUD', 'SOLID', 'Git'], true, true, 'program-38.html'),
-    P(39, 10, 'Enterprise Banking System', ['JDBC', 'Collections', 'Tests']),
-    P(40, 10, 'E-commerce Order Management', ['Streams', 'Interfaces', 'Database']),
-    P(41, 10, 'Employee Management System', ['CRUD', 'Date and time', 'JUnit']),
+    P(39, 10, 'Enterprise Banking System', ['JDBC', 'Collections', 'Tests'], true, true, 'program-39.html'),
+    P(40, 10, 'E-commerce Order Management', ['Streams', 'Interfaces', 'Database'], true, true, 'program-40.html'),
+    P(41, 10, 'Employee Management System', ['CRUD', 'Date and time', 'JUnit'], true, true, 'program-41.html'),
     P(42, 10, 'Concurrent Order Processing System', ['CompletableFuture', 'Thread safety']),
     P(43, 10, 'Library Management System', ['Solo build', 'Grading rubric'])
   ];

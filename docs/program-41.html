@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Employee Management System | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 10 · Capstones · Program 41 of 43</p>
+    <h1>Employee Management System</h1>
+    <div class="tags">
+      <span class="tag">Capstone</span>
+      <span class="chip" style="background:#fff">CRUD</span>
+      <span class="chip" style="background:#fff">LocalDate</span>
+      <span class="chip" style="background:#fff">Period</span>
+      <span class="chip" style="background:#fff">YearMonth</span>
+      <span class="chip" style="background:#fff">JUnit 5</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>HR questions sound simple and are full of corner cases. A week with a public holiday has four leave days, not five. Someone born on 29 February has a birthday every year. Payday is the last working day of the month, so it moves back from a weekend.</p>
+        <p>All the date arithmetic sits in one pure class, WorkCalendar, with no database and no clock, so most of the tests are about dates. The rest is create, read and update on Derby, a soft delete for people who leave, and payslips with unpaid leave split across months.</p>
+      </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-41.svg"><img src="flows/program-41.svg" alt="Flow of Program 41, Employee Management System, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A staff office with a wall calendar: every question is really a question about dates, and the calendar clerk answers them all.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Put date maths in one pure class and test its edges: 29 February, a holiday on payday, an 18th birthday on the joining day.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Hire people and ask for leave</b> (input): Names, dates of birth, joining dates and leave ranges.</li><li><b>The service checks the HR rules</b> (check): Age on the joining day, overlap, allowance, no leave across two years.</li><li><b>WorkCalendar does the date arithmetic</b> (work): Working days, paydays, next birthday and probation end, with no database.</li><li><b>The store keeps people and leave</b> (store): Create, read and update on Derby; a person who leaves is marked inactive.</li><li><b>Payslips for the month</b> (result): Unpaid working days come off the salary, then tax, with leave split across months.</li></ol></details>
+      </section>
+<!--/flow-->
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>WorkCalendar.java</b><span class="d">Working days, paydays, birthdays and probation. Study this one.</span></span></li>
+          <li><span class="badge">2</span><span><b>HrService.java</b><span class="d">Hiring rules, leave rules and payslips.</span></span></li>
+          <li><span class="badge">3</span><span><b>JdbcEmployeeStore.java</b><span class="d">Dates travel as java.sql.Date and return as LocalDate.</span></span></li>
+          <li><span class="badge">4</span><span><b>WorkCalendarTest.java</b><span class="d">The date edges, with no database.</span></span></li>
+          <li><span class="badge">5</span><span><b>HrServiceTest.java</b><span class="d">Nested groups of rules.</span></span></li>
+          <li><span class="badge">6</span><span><b>Main.java</b><span class="d">Four hires, nine leave requests, July payslips.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/hr/WorkCalendar.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.hr;
+
+<span class="k">import</span> java.time.<span class="t">DayOfWeek</span>;
+<span class="k">import</span> java.time.<span class="t">LocalDate</span>;
+<span class="k">import</span> java.time.<span class="t">Month</span>;
+<span class="k">import</span> java.time.<span class="t">MonthDay</span>;
+<span class="k">import</span> java.time.<span class="t">YearMonth</span>;
+<span class="k">import</span> java.util.<span class="t">Set</span>;
+<span class="k">import</span> java.util.<span class="t">TreeSet</span>;
+
+<span class="c">/**
+ * Which days count as working days: Monday to Friday, except the listed public holidays.
+ * All the date arithmetic of the HR system lives here, so it can be tested without any database.
+ */</span>
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> <span class="t">WorkCalendar</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Set</span>&lt;<span class="t">LocalDate</span>&gt; holidays;
+
+    <span class="k">public</span> <span class="t">WorkCalendar</span>(<span class="t">Set</span>&lt;<span class="t">LocalDate</span>&gt; holidays) {
+        <span class="k">this</span>.holidays = <span class="k">new</span> <span class="t">TreeSet</span>&lt;&gt;(holidays);
+    }
+
+    <span class="k">public</span> <span class="k">boolean</span> isWorkingDay(<span class="t">LocalDate</span> date) {
+        <span class="t">DayOfWeek</span> day = date.getDayOfWeek();
+        <span class="k">return</span> day != <span class="t">DayOfWeek</span>.SATURDAY &amp;&amp; day != <span class="t">DayOfWeek</span>.SUNDAY &amp;&amp; !holidays.contains(date);
+    }
+
+    <span class="c">/** Working days from {@code from} to {@code to}, both included. Zero when {@code to} is before {@code from}. */</span>
+    <span class="k">public</span> <span class="k">int</span> workingDaysBetween(<span class="t">LocalDate</span> from, <span class="t">LocalDate</span> to) {
+        <span class="k">if</span> (to.isBefore(from)) {
+            <span class="k">return</span> <span class="n">0</span>;
+        }
+        <span class="k">return</span> (<span class="k">int</span>) from.datesUntil(to.plusDays(<span class="n">1</span>)).filter(<span class="k">this</span>::isWorkingDay).count();
+    }
+
+    <span class="k">public</span> <span class="k">int</span> workingDaysIn(<span class="t">YearMonth</span> month) {
+        <span class="k">return</span> workingDaysBetween(month.atDay(<span class="n">1</span>), month.atEndOfMonth());
+    }
+
+    <span class="c">/** The last working day of the month: payday. */</span>
+    <span class="k">public</span> <span class="t">LocalDate</span> lastWorkingDay(<span class="t">YearMonth</span> month) {
+        <span class="t">LocalDate</span> day = month.atEndOfMonth();
+        <span class="k">while</span> (!isWorkingDay(day)) {
+            day = day.minusDays(<span class="n">1</span>);
+        }
+        <span class="k">return</span> day;
+    }
+
+    <span class="c">/** The given date, or the next working day if it is a weekend or holiday. */</span>
+    <span class="k">public</span> <span class="t">LocalDate</span> onOrAfter(<span class="t">LocalDate</span> date) {
+        <span class="t">LocalDate</span> day = date;
+        <span class="k">while</span> (!isWorkingDay(day)) {
+            day = day.plusDays(<span class="n">1</span>);
+        }
+        <span class="k">return</span> day;
+    }
+
+    <span class="c">/**
+     * The next birthday on or after {@code today}. A 29 February birthday is celebrated on 28 February in
+     * years that have no 29 February.
+     */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">LocalDate</span> nextBirthday(<span class="t">LocalDate</span> birthDate, <span class="t">LocalDate</span> today) {
+        <span class="t">MonthDay</span> birthday = <span class="t">MonthDay</span>.from(birthDate);
+        <span class="t">LocalDate</span> thisYear = birthday.atYear(today.getYear());
+        <span class="k">return</span> thisYear.isBefore(today) ? birthday.atYear(today.getYear() + <span class="n">1</span>) : thisYear;
+    }
+
+    <span class="c">/** The last day of the probation period: six months after joining, moved to the next working day. */</span>
+    <span class="k">public</span> <span class="t">LocalDate</span> probationEnds(<span class="t">LocalDate</span> joinDate) {
+        <span class="k">return</span> onOrAfter(joinDate.plusMonths(<span class="n">6</span>));
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">boolean</span> isLeapDay(<span class="t">LocalDate</span> date) {
+        <span class="k">return</span> date.getMonth() == <span class="t">Month</span>.FEBRUARY &amp;&amp; date.getDayOfMonth() == <span class="n">29</span>;
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/test/java/com/codechanakya/hr/WorkCalendarTest.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.hr;
+
+<span class="k">import</span> <span class="k">static</span> org.junit.jupiter.api.<span class="t">Assertions</span>.assertEquals;
+<span class="k">import</span> <span class="k">static</span> org.junit.jupiter.api.<span class="t">Assertions</span>.assertFalse;
+<span class="k">import</span> <span class="k">static</span> org.junit.jupiter.api.<span class="t">Assertions</span>.assertTrue;
+
+<span class="k">import</span> java.time.<span class="t">LocalDate</span>;
+<span class="k">import</span> java.time.<span class="t">YearMonth</span>;
+<span class="k">import</span> java.util.<span class="t">Set</span>;
+<span class="k">import</span> org.junit.jupiter.api.<span class="t">DisplayName</span>;
+<span class="k">import</span> org.junit.jupiter.api.<span class="t">Test</span>;
+<span class="k">import</span> org.junit.jupiter.params.<span class="t">ParameterizedTest</span>;
+<span class="k">import</span> org.junit.jupiter.params.provider.<span class="t">CsvSource</span>;
+
+<span class="c">/** All the date arithmetic, with no database. */</span>
+<span class="k">class</span> <span class="t">WorkCalendarTest</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">WorkCalendar</span> calendar = <span class="k">new</span> <span class="t">WorkCalendar</span>(<span class="t">Set</span>.of(<span class="t">LocalDate</span>.of(<span class="n">2025</span>, <span class="n">8</span>, <span class="n">15</span>), <span class="t">LocalDate</span>.of(<span class="n">2025</span>, <span class="n">12</span>, <span class="n">25</span>)));
+
+    <span class="k">@Test</span>
+    <span class="k">@DisplayName</span>(<span class="n">&quot;weekends and listed holidays are not working days&quot;</span>)
+    <span class="k">void</span> workingDays() {
+        assertTrue(calendar.isWorkingDay(<span class="t">LocalDate</span>.of(<span class="n">2025</span>, <span class="n">6</span>, <span class="n">30</span>)));
+        assertFalse(calendar.isWorkingDay(<span class="t">LocalDate</span>.of(<span class="n">2025</span>, <span class="n">7</span>, <span class="n">5</span>)));
+        assertFalse(calendar.isWorkingDay(<span class="t">LocalDate</span>.of(<span class="n">2025</span>, <span class="n">7</span>, <span class="n">6</span>)));
+        assertFalse(calendar.isWorkingDay(<span class="t">LocalDate</span>.of(<span class="n">2025</span>, <span class="n">8</span>, <span class="n">15</span>)));
+    }
+
+    <span class="k">@ParameterizedTest</span>(name = <span class="n">&quot;{0} to {1} has {2} working days&quot;</span>)
+    <span class="k">@CsvSource</span>({
+            <span class="n">&quot;2025-08-11, 2025-08-15, 4&quot;</span>,
+            <span class="n">&quot;2025-08-11, 2025-08-11, 1&quot;</span>,
+            <span class="n">&quot;2025-07-05, 2025-07-06, 0&quot;</span>,
+            <span class="n">&quot;2025-07-04, 2025-07-07, 2&quot;</span>,
+            <span class="n">&quot;2025-07-07, 2025-07-04, 0&quot;</span>})
+    <span class="k">void</span> workingDaysBetween(<span class="t">String</span> from, <span class="t">String</span> to, <span class="k">int</span> expected) {
+        assertEquals(expected, calendar.workingDaysBetween(<span class="t">LocalDate</span>.parse(from), <span class="t">LocalDate</span>.parse(to)));
+    }
+
+    <span class="k">@ParameterizedTest</span>(name = <span class="n">&quot;{0} has {1} working days&quot;</span>)
+    <span class="k">@CsvSource</span>({<span class="n">&quot;2025-07, 23&quot;</span>, <span class="n">&quot;2025-08, 20&quot;</span>, <span class="n">&quot;2025-02, 20&quot;</span>, <span class="n">&quot;2025-12, 22&quot;</span>})
+    <span class="k">void</span> workingDaysInMonth(<span class="t">String</span> month, <span class="k">int</span> expected) {
+        assertEquals(expected, calendar.workingDaysIn(<span class="t">YearMonth</span>.parse(month)));
+    }
+
+    <span class="k">@ParameterizedTest</span>(name = <span class="n">&quot;payday for {0} is {1}&quot;</span>)
+    <span class="k">@CsvSource</span>({<span class="n">&quot;2025-06, 2025-06-30&quot;</span>, <span class="n">&quot;2025-08, 2025-08-29&quot;</span>, <span class="n">&quot;2025-11, 2025-11-28&quot;</span>, <span class="n">&quot;2025-12, 2025-12-31&quot;</span>})
+    <span class="k">void</span> lastWorkingDay(<span class="t">String</span> month, <span class="t">String</span> expected) {
+        assertEquals(<span class="t">LocalDate</span>.parse(expected), calendar.lastWorkingDay(<span class="t">YearMonth</span>.parse(month)));
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">@DisplayName</span>(<span class="n">&quot;when the last day is a holiday too, payday moves back past it&quot;</span>)
+    <span class="k">void</span> paydayBackPastHoliday() {
+        <span class="t">WorkCalendar</span> c = <span class="k">new</span> <span class="t">WorkCalendar</span>(<span class="t">Set</span>.of(<span class="t">LocalDate</span>.of(<span class="n">2025</span>, <span class="n">9</span>, <span class="n">30</span>)));
+        assertEquals(<span class="t">LocalDate</span>.of(<span class="n">2025</span>, <span class="n">9</span>, <span class="n">29</span>), c.lastWorkingDay(<span class="t">YearMonth</span>.of(<span class="n">2025</span>, <span class="n">9</span>)));
+    }
+
+    <span class="k">@ParameterizedTest</span>(name = <span class="n">&quot;born {0}, today {1}: next birthday {2}&quot;</span>)
+    <span class="k">@CsvSource</span>({
+            <span class="n">&quot;1992-07-04, 2025-06-30, 2025-07-04&quot;</span>,
+            <span class="n">&quot;1992-07-04, 2025-07-04, 2025-07-04&quot;</span>,
+            <span class="n">&quot;1992-07-04, 2025-07-05, 2026-07-04&quot;</span>,
+            <span class="n">&quot;1988-02-29, 2025-06-30, 2026-02-28&quot;</span>,
+            <span class="n">&quot;1988-02-29, 2027-12-31, 2028-02-29&quot;</span>,
+            <span class="n">&quot;1999-12-31, 2025-12-31, 2025-12-31&quot;</span>})
+    <span class="k">void</span> nextBirthday(<span class="t">String</span> born, <span class="t">String</span> today, <span class="t">String</span> expected) {
+        assertEquals(<span class="t">LocalDate</span>.parse(expected), <span class="t">WorkCalendar</span>.nextBirthday(<span class="t">LocalDate</span>.parse(born), <span class="t">LocalDate</span>.parse(today)));
+    }
+
+    <span class="k">@ParameterizedTest</span>(name = <span class="n">&quot;joined {0}: probation ends {1}&quot;</span>)
+    <span class="k">@CsvSource</span>({
+            <span class="n">&quot;2025-03-03, 2025-09-03&quot;</span>,
+            <span class="n">&quot;2020-02-29, 2020-08-31&quot;</span>,
+            <span class="n">&quot;2024-08-31, 2025-02-28&quot;</span>,
+            <span class="n">&quot;2025-06-30, 2025-12-30&quot;</span>})
+    <span class="k">void</span> probationEnds(<span class="t">String</span> joined, <span class="t">String</span> expected) {
+        assertEquals(<span class="t">LocalDate</span>.parse(expected), calendar.probationEnds(<span class="t">LocalDate</span>.parse(joined)));
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> probationMovesPastAHoliday() {
+        <span class="c">// 15 August 2025 is a Friday and a holiday; joining on 15 February gives 15 August, so it moves to Monday the 18th.</span>
+        assertEquals(<span class="t">LocalDate</span>.of(<span class="n">2025</span>, <span class="n">8</span>, <span class="n">18</span>), calendar.probationEnds(<span class="t">LocalDate</span>.of(<span class="n">2025</span>, <span class="n">2</span>, <span class="n">15</span>)));
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> leapDay() {
+        assertTrue(<span class="t">WorkCalendar</span>.isLeapDay(<span class="t">LocalDate</span>.of(<span class="n">2024</span>, <span class="n">2</span>, <span class="n">29</span>)));
+        assertFalse(<span class="t">WorkCalendar</span>.isLeapDay(<span class="t">LocalDate</span>.of(<span class="n">2024</span>, <span class="n">2</span>, <span class="n">28</span>)));
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+== Hiring
+  Hired Asha Rao as employee 1
+  Hired Bilal Khan as employee 2
+  Hired Chitra Nair as employee 3
+  Hired Dev Mehta as employee 4
+  Hiring Eva Joseph refused: The email address &#x27;eva-at-example.com&#x27; is not valid.
+  Hiring Farid Ali refused: An employee must be at least 18 on the joining date, but would be 15.
+  Hiring Gita Rao refused: The joining date 2025-07-15 is in the future.
+  Hiring Asha Again refused: An employee with the email asha@example.com already exists
+
+== Dates
+  Asha Rao     joined 2020-02-29  tenure 5y 4m 1d  probation ends 2020-08-31 (MONDAY)
+  Bilal Khan   joined 2023-11-15  tenure 1y 7m 15d  probation ends 2024-05-15 (WEDNESDAY)
+  Chitra Nair  joined 2025-03-03  tenure 0y 3m 27d  probation ends 2025-09-03 (WEDNESDAY)
+  Dev Mehta    joined 2025-06-30  tenure 0y 0m 0d  probation ends 2025-12-30 (TUESDAY)
+  Birthdays in the next 30 days: [Asha Rao (2025-07-04), Dev Mehta (2025-07-10), Chitra Nair (2025-07-20)]
+  Bilal was born on 29 February; his next birthday is celebrated on 2026-02-28
+  Payday for 2025-06: 2025-06-30 (MONDAY)
+  Payday for 2025-08: 2025-08-29 (FRIDAY)
+  Payday for 2025-12: 2025-12-31 (WEDNESDAY)
+
+== Leave
+  Asha annual 11 to 15 Aug (15 Aug is a holiday): request 1, 4 working days
+  Asha annual 13 to 14 Aug: refused, That overlaps leave request 1 (2025-08-11 to 2025-08-15).
+  Asha annual all of September: refused, Only 14 ANNUAL days left in 2025, but 22 requested.
+  Asha annual Saturday and Sunday: refused, That range has no working days.
+  Bilal sick from 20 June (past): refused, Leave cannot start in the past (2025-06-20).
+  Bilal annual 5 July back to 1 July: refused, The leave ends (2025-07-01) before it starts (2025-07-05).
+  Bilal annual 30 Dec to 2 Jan: refused, Leave cannot run across two years. Please make two requests.
+  Chitra unpaid 14 to 18 July: request 2, 5 working days
+  Dev annual 21 to 22 July: request 3, 2 working days
+  Asha annual days left in 2025 (before approval): 14
+  Approve leave 1: done
+  Approve leave 1 again: refused, Leave request 1 is already APPROVED.
+  Approve leave 2: done
+
+== Changes
+  Raise Bilal to 52000: done
+  Set Bilal&#x27;s salary to -1: refused, The salary must be positive.
+  Move Chitra to ENGINEERING: done
+  Terminate Dev: done
+  Terminate Dev again: refused, Dev Mehta no longer works here.
+  Raise Dev after leaving: refused, Dev Mehta no longer works here.
+  Dev&#x27;s leave after leaving: [REJECTED]
+  Active in ENGINEERING: [Asha Rao, Chitra Nair]
+  Active in HR: []
+
+== Payslips for July 2025 (23 working days)
+  Asha Rao     gross  85000.00  unpaid days 0  deduction     0.00  tax  8500.00  net  76500.00
+  Bilal Khan   gross  52000.00  unpaid days 0  deduction     0.00  tax  5200.00  net  46800.00
+  Chitra Nair  gross  38000.00  unpaid days 5  deduction  8260.87  tax  1486.96  net  28252.17
+  Dev Mehta    gross  52000.00  unpaid days 0  deduction     0.00  tax  5200.00  net  46800.00
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux, with the real Apache Derby 10.16.1.1 jars. The run is the same every time because the clock is fixed and the database lives in memory. The project's GitHub Actions run is the check on Java 21 and 25 with real Maven and the real JUnit jar. It has not yet been run on Windows or macOS. Run <span class="mono">./run.sh --test</span> for the JUnit tests.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add probation reminders for the next 30 days.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add work anniversaries for a month.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Allow half-day leave.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Make the weekend days a setting.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Give each employee a time zone and decide what &quot;today&quot; means.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Carry up to five annual days into the next year.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a date that does not exist, <span class="mono">Duration</span> against <span class="mono">Period</span> on the day the clocks change, and adding months one at a time. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">capstones/41-employee-management-system</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer, and an internet connection for the first run (two small jars).</span></div>
+      </div>
+      <a class="navcard" href="index.html#phase-10"><span class="k2">Next</span><span class="v">The last two capstones</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

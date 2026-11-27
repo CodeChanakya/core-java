@@ -181,7 +181,7 @@ Downloading junit-platform-console-standalone-1.11.4.jar (one time only)...
 39 tests successful, 0 tests failed
 OK: all tests passed</pre>
         </div>
-        <p class="small">The last two lines are what a passing run should end with. They are shown as expected, not as captured output: the real JUnit jar could not be downloaded where this program was written. The code was run on OpenJDK 21.0.13 on Linux, and the 39 tests passed on a stand-in for the JUnit 5 API written only for checking. They have not been run on real JUnit or Maven yet.</p>
+        <p class="small">A passing run ends with these two lines. GitHub Actions confirmed the program on Linux with Java 21 and 25, using real Maven and the real JUnit jar. It has not yet been run on Windows or macOS.</p>
       </section>
       <section>
         <h2>Try it yourself</h2>
