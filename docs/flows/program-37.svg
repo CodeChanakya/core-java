@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 894" width="880" height="894" role="img" aria-labelledby="t d">
+<title id="t">Program 37 flow: JDBC Banking Application</title><desc id="d">Flow of Program 37, JDBC Banking Application: 1. Accounts and transfer requests; 2. Tables hold the data; 3. PreparedStatement runs the SQL; 4. One transaction per transfer; 5. Balances, audit log, injection test</desc>
+<rect width="880" height="894" rx="18" fill="#F8FAFC"/>
+<clipPath id="c"><rect width="880" height="894" rx="18"/></clipPath>
+<g clip-path="url(#c)">
+<rect x="0" y="0" width="880" height="86" fill="#0E1726"/>
+<rect x="0" y="86" width="880" height="5" fill="#B83A0E"/>
+<text x="30" y="34" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#F4A582" letter-spacing="1.2">PHASE 09 · PROFESSIONAL JAVA · PROGRAM 37 OF 43</text>
+<text x="30" y="68" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="27" font-weight="700" fill="#FFFFFF">JDBC Banking Application</text>
+<rect x="30" y="112" width="820" height="76" rx="12" fill="#FFF7ED" stroke="#FDBA74"/>
+<text x="50" y="135" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#B83A0E" letter-spacing="1.1">IN EVERYDAY WORDS</text>
+<text x="50" y="158" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="15.5" font-style="italic" fill="#1E293B">A bank counter with a carbon-copy ledger: money leaves one account and reaches the other, or</text>
+<text x="50" y="179" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="15.5" font-style="italic" fill="#1E293B">neither moves at all.</text>
+<text x="30" y="214" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#475569" letter-spacing="1.1">HOW IT FLOWS, STEP BY STEP</text>
+<rect x="30" y="228" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="228" width="7" height="72" rx="3" fill="#334155"/>
+<circle cx="73" cy="264.0" r="17" fill="#334155"/>
+<text x="73" y="270.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="106" y="256" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Accounts and transfer requests</text>
+<text x="106" y="278" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">Owners, balances and amounts arrive as plain Java values.</text>
+<rect x="756" y="242" width="74" height="22" rx="11" fill="#334155" fill-opacity="0.12"/>
+<text x="793" y="257" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#334155" text-anchor="middle" letter-spacing="1">INPUT</text>
+<text x="830" y="284" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">Main.java</text>
+<path d="M73 303 L73 319 M67 313 L73 320 L79 313" stroke="#94A3B8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="324" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="324" width="7" height="72" rx="3" fill="#6D28D9"/>
+<circle cx="73" cy="360.0" r="17" fill="#6D28D9"/>
+<text x="73" y="366.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="106" y="352" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Tables hold the data</text>
+<text x="106" y="374" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">ACCOUNT and TRANSFER_LOG, with CHECK rules, inside an in-memory Derby.</text>
+<rect x="756" y="338" width="74" height="22" rx="11" fill="#6D28D9" fill-opacity="0.12"/>
+<text x="793" y="353" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#6D28D9" text-anchor="middle" letter-spacing="1">STORE</text>
+<text x="830" y="380" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">Database.java</text>
+<path d="M73 399 L73 415 M67 409 L73 416 L79 409" stroke="#94A3B8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="420" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="420" width="7" height="72" rx="3" fill="#0F766E"/>
+<circle cx="73" cy="456.0" r="17" fill="#0F766E"/>
+<text x="73" y="462.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="106" y="448" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">PreparedStatement runs the SQL</text>
+<text x="106" y="470" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">Values go in through ? holes, so text can never become SQL.</text>
+<rect x="756" y="434" width="74" height="22" rx="11" fill="#0F766E" fill-opacity="0.12"/>
+<text x="793" y="449" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#0F766E" text-anchor="middle" letter-spacing="1">WORK</text>
+<text x="830" y="476" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">AccountRepository.java</text>
+<path d="M73 495 L73 511 M67 505 L73 512 L79 505" stroke="#94A3B8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="516" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="516" width="7" height="72" rx="3" fill="#B45309"/>
+<circle cx="73" cy="552.0" r="17" fill="#B45309"/>
+<text x="73" y="558.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="106" y="544" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">One transaction per transfer</text>
+<text x="106" y="566" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">Withdraw, deposit, log, then commit. Any failure rolls back.</text>
+<rect x="756" y="530" width="74" height="22" rx="11" fill="#B45309" fill-opacity="0.12"/>
+<text x="793" y="545" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#B45309" text-anchor="middle" letter-spacing="1">CHECK</text>
+<text x="830" y="572" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">TransferService.java</text>
+<path d="M73 591 L73 607 M67 601 L73 608 L79 601" stroke="#94A3B8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="612" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="612" width="7" height="72" rx="3" fill="#B83A0E"/>
+<circle cx="73" cy="648.0" r="17" fill="#B83A0E"/>
+<text x="73" y="654.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">5</text>
+<text x="106" y="640" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Balances, audit log, injection test</text>
+<text x="106" y="662" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">Failed transfers change nothing, and the attack finds 0 rows.</text>
+<rect x="756" y="626" width="74" height="22" rx="11" fill="#B83A0E" fill-opacity="0.12"/>
+<text x="793" y="641" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#B83A0E" text-anchor="middle" letter-spacing="1">RESULT</text>
+<text x="830" y="668" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">expected-output.txt</text>
+<rect x="30" y="712" width="402" height="128" rx="12" fill="#FEF2F2" stroke="#FCA5A5"/>
+<text x="48" y="737" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#B91C1C" letter-spacing="1.1">IF IT GOES WRONG</text>
+<text x="48" y="760" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#450A0A">Auto-commit left on makes the first update</text>
+<text x="48" y="779" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#450A0A">permanent even when a later one fails, and reading</text>
+<text x="48" y="798" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#450A0A">a ResultSet before next() throws.</text>
+<rect x="448" y="712" width="402" height="128" rx="12" fill="#F0FDFA" stroke="#5EEAD4"/>
+<text x="466" y="737" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#0F766E" letter-spacing="1.1">FOR EXPERTS</text>
+<text x="466" y="760" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#042F2E">Check-and-update in one statement avoids a lost</text>
+<text x="466" y="779" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#042F2E">update. Failures are logged in a second</text>
+<text x="466" y="798" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#042F2E">transaction because the first one, and its log</text>
+<text x="466" y="817" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#042F2E">row, rolled back.</text>
+<circle cx="36" cy="866" r="6" fill="#334155"/>
+<text x="48" y="870" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Input</text>
+<circle cx="136" cy="866" r="6" fill="#0F766E"/>
+<text x="148" y="870" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Work</text>
+<circle cx="236" cy="866" r="6" fill="#B45309"/>
+<text x="248" y="870" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Check</text>
+<circle cx="336" cy="866" r="6" fill="#6D28D9"/>
+<text x="348" y="870" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Store</text>
+<circle cx="436" cy="866" r="6" fill="#B83A0E"/>
+<text x="448" y="870" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Result</text>
+<text x="850" y="870" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="600" fill="#64748B" text-anchor="end">CodeChanakya · Core Java</text>
+</g>
+<rect x="0.5" y="0.5" width="879" height="893" rx="18" fill="none" stroke="#CBD5E1"/>
+</svg>

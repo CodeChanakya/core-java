@@ -1,0 +1,7 @@
+sku,name,unitPrice,taxRate
+P-100,Notebook,120.00,0.05
+P-200,Pen Box,45.50,0.05
+E-100,USB Cable,299.00,0.18
+E-200,Wireless Mouse,799.00,0.18
+E-300,Keyboard,1499.00,0.18
+F-100,Desk Lamp,650.00,0.12

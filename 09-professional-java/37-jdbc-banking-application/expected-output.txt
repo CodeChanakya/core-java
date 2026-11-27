@@ -1,0 +1,35 @@
+== Opening accounts
+  1  Asha      1000.00
+  2  Bilal      250.00
+  3  Chitra     100.00
+  4  Dev        100.00
+  5  Anita      100.00
+
+== Search by owner prefix "A" (placeholder)
+  1  Asha      1000.00
+  5  Anita      100.00
+
+== Transfers
+  1 -> 2  300.00  done
+  2 -> 3  5000.00  refused: Account 2 cannot pay 5000.00
+  1 -> 99  50.00  refused: No account with id 99
+  4 -> 4  10.00  refused: Cannot transfer to the same account
+  3 -> 4  -5.00  refused: A transfer must be for a positive amount, but was -5.00
+
+== Balances afterwards (the failed transfers changed nothing)
+  1  Asha       700.00
+  2  Bilal      550.00
+  3  Chitra     100.00
+  4  Dev        100.00
+  5  Anita      100.00
+Total money in the bank: 1550.00
+
+== Audit log
+  #1 1 -> 2  300.00  SUCCESS
+  #2 2 -> 3  5000.00  FAILED  (Account 2 cannot pay 5000.00)
+  #3 1 -> 99  50.00  FAILED  (No account with id 99)
+
+== SQL injection
+Input text           : nobody' OR '1'='1
+Glued into the SQL   : 5 rows leaked
+Through a placeholder: 0 rows

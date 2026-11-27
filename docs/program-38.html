@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Employee Database Management | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 09 · Professional Java · Program 38 of 43</p>
+    <h1>Employee Database Management</h1>
+    <div class="tags">
+      <span class="tag">Advanced</span>
+      <span class="chip" style="background:#fff">CRUD</span>
+      <span class="chip" style="background:#fff">SOLID</span>
+      <span class="chip" style="background:#fff">Dependency injection</span>
+      <span class="chip" style="background:#fff">Git</span>
+      <span class="chip" style="background:#fff">Phase project</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>This Phase 9 project joins Maven, JUnit and JDBC, and adds design. Hire, look up, raise, move and remove employees, with real rules, stored in a table. The goal is code a team can change for years without breaking it.</p>
+        <p>A service holds the rules, a repository interface hides the storage, and Main wires it together. One contract test runs against both the in-memory and the database repository, and a fixed Clock keeps date rules repeatable.</p>
+      </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-38.svg"><img src="flows/program-38.svg" alt="Flow of Program 38, Employee Database Management, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A staff register with a clerk, a filing cabinet and a rule book, each doing one job and never reaching into the others.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Dependency injection of repository and Clock. One contract test class runs against every repository, which is Liskov substitution as an executable specification.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Hire, raise, move, terminate</b> (input): The service receives plain requests from Main.</li><li><b>The rule book says yes or no</b> (check): Name, e-mail, minimum pay, raise cap, no future dates.</li><li><b>The repository stores the facts</b> (store): An interface with two implementations: a map and Derby.</li><li><b>SQL does the counting</b> (work): GROUP BY gives headcount, payroll and highest pay per department.</li><li><b>Department report and total payroll</b> (result): The same on every run, because the clock is fixed.</li></ol></details>
+      </section>
+<!--/flow-->
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>EmployeeRepository.java</b><span class="d">The interface. Its comments are promises.</span></span></li>
+          <li><span class="badge">2</span><span><b>JdbcEmployeeRepository.java</b><span class="d">The same promises, kept with SQL.</span></span></li>
+          <li><span class="badge">3</span><span><b>EmployeeService.java</b><span class="d">The rules. The file to study.</span></span></li>
+          <li><span class="badge">4</span><span><b>EmployeeRepositoryContract.java</b><span class="d">The tests every repository must pass.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/empdb/EmployeeService.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.empdb;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.math.<span class="t">RoundingMode</span>;
+<span class="k">import</span> java.time.<span class="t">Clock</span>;
+<span class="k">import</span> java.time.<span class="t">LocalDate</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.regex.<span class="t">Pattern</span>;
+
+<span class="c">/**
+ * The business rules. Knows nothing about SQL: it talks to an {@link EmployeeRepository} and to a {@link Clock}.
+ *
+ * &lt;p&gt;Both are handed in through the constructor (dependency injection). A test passes an in-memory
+ * repository and a clock frozen on one day, and the rules can be checked without a database or a calendar.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">EmployeeService</span> {
+
+    <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> MINIMUM_SALARY = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;15000.00&quot;</span>);
+    <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> MAXIMUM_RAISE_PERCENT = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;20&quot;</span>);
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">Pattern</span> EMAIL = <span class="t">Pattern</span>.compile(<span class="n">&quot;^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$&quot;</span>);
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">EmployeeRepository</span> repository;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Clock</span> clock;
+
+    <span class="k">public</span> <span class="t">EmployeeService</span>(<span class="t">EmployeeRepository</span> repository, <span class="t">Clock</span> clock) {
+        <span class="k">this</span>.repository = repository;
+        <span class="k">this</span>.clock = clock;
+    }
+
+    <span class="k">public</span> <span class="t">Employee</span> hire(<span class="t">String</span> name, <span class="t">String</span> email, <span class="t">Department</span> department, <span class="t">BigDecimal</span> salary, <span class="t">LocalDate</span> hired) {
+        <span class="k">if</span> (name == <span class="k">null</span> || name.isBlank()) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">ValidationException</span>(<span class="n">&quot;Name is required.&quot;</span>);
+        }
+        <span class="k">if</span> (email == <span class="k">null</span> || !EMAIL.matcher(email).matches()) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">ValidationException</span>(<span class="n">&quot;Not a valid e-mail address: &quot;</span> + email);
+        }
+        <span class="k">if</span> (salary.compareTo(MINIMUM_SALARY) &lt; <span class="n">0</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">ValidationException</span>(<span class="n">&quot;Salary must be at least &quot;</span> + MINIMUM_SALARY.toPlainString() + <span class="n">&quot;, but was &quot;</span>
+                    + salary.setScale(<span class="n">2</span>, <span class="t">RoundingMode</span>.HALF_UP).toPlainString());
+        }
+        <span class="k">if</span> (hired.isAfter(<span class="t">LocalDate</span>.now(clock))) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">ValidationException</span>(<span class="n">&quot;Hire date &quot;</span> + hired + <span class="n">&quot; is in the future.&quot;</span>);
+        }
+        <span class="k">if</span> (repository.existsByEmail(email)) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">DuplicateEmailException</span>(email);
+        }
+        <span class="k">return</span> repository.insert(<span class="t">Employee</span>.draft(name.trim(), email.trim(), department, salary, hired));
+    }
+
+    <span class="k">public</span> <span class="t">Employee</span> giveRaise(<span class="k">int</span> id, <span class="t">BigDecimal</span> percent) {
+        <span class="k">if</span> (percent.signum() &lt;= <span class="n">0</span> || percent.compareTo(MAXIMUM_RAISE_PERCENT) &gt; <span class="n">0</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">ValidationException</span>(<span class="n">&quot;A raise must be above 0 and at most &quot;</span> + MAXIMUM_RAISE_PERCENT + <span class="n">&quot; percent, but was &quot;</span>
+                    + percent.toPlainString());
+        }
+        <span class="t">Employee</span> current = get(id);
+        <span class="t">BigDecimal</span> factor = <span class="t">BigDecimal</span>.ONE.add(percent.movePointLeft(<span class="n">2</span>));
+        <span class="t">Employee</span> raised = current.withSalary(current.salary().multiply(factor));
+        repository.update(raised);
+        <span class="k">return</span> raised;
+    }
+
+    <span class="k">public</span> <span class="t">Employee</span> moveTo(<span class="k">int</span> id, <span class="t">Department</span> department) {
+        <span class="t">Employee</span> moved = get(id).withDepartment(department);
+        repository.update(moved);
+        <span class="k">return</span> moved;
+    }
+
+    <span class="k">public</span> <span class="k">void</span> terminate(<span class="k">int</span> id) {
+        <span class="k">if</span> (!repository.delete(id)) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">EmployeeNotFoundException</span>(id);
+        }
+    }
+
+    <span class="k">public</span> <span class="t">Employee</span> get(<span class="k">int</span> id) {
+        <span class="k">return</span> repository.findById(id).orElseThrow(() -&gt; <span class="k">new</span> <span class="t">EmployeeNotFoundException</span>(id));
+    }
+
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">Employee</span>&gt; everyone() {
+        <span class="k">return</span> repository.findAll();
+    }
+
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">Employee</span>&gt; inDepartment(<span class="t">Department</span> department) {
+        <span class="k">return</span> repository.findByDepartment(department);
+    }
+
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">Department</span>, <span class="t">DepartmentStats</span>&gt; departmentReport() {
+        <span class="k">return</span> repository.statsByDepartment();
+    }
+
+    <span class="k">public</span> <span class="t">BigDecimal</span> totalPayroll() {
+        <span class="k">return</span> repository.statsByDepartment().values().stream()
+                .map(<span class="t">DepartmentStats</span>::payroll).reduce(<span class="t">BigDecimal</span>.ZERO.setScale(<span class="n">2</span>), <span class="t">BigDecimal</span>::add);
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/test/java/com/codechanakya/empdb/EmployeeRepositoryContract.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.empdb;
+
+<span class="k">import</span> <span class="k">static</span> org.junit.jupiter.api.<span class="t">Assertions</span>.assertEquals;
+<span class="k">import</span> <span class="k">static</span> org.junit.jupiter.api.<span class="t">Assertions</span>.assertFalse;
+<span class="k">import</span> <span class="k">static</span> org.junit.jupiter.api.<span class="t">Assertions</span>.assertThrows;
+<span class="k">import</span> <span class="k">static</span> org.junit.jupiter.api.<span class="t">Assertions</span>.assertTrue;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.time.<span class="t">LocalDate</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> org.junit.jupiter.api.<span class="t">BeforeEach</span>;
+<span class="k">import</span> org.junit.jupiter.api.<span class="t">Test</span>;
+
+<span class="c">/**
+ * The promises every {@link EmployeeRepository} must keep. Each implementation gets a small subclass
+ * that only says how to create one; the tests below are inherited and run against both. If a new
+ * implementation breaks a promise, one of these tests says so (the L in SOLID: any implementation
+ * can stand in for the interface).
+ */</span>
+<span class="k">abstract</span> <span class="k">class</span> <span class="t">EmployeeRepositoryContract</span> {
+
+    <span class="k">protected</span> <span class="t">EmployeeRepository</span> repository;
+
+    <span class="c">/** Builds a fresh, empty repository. */</span>
+    <span class="k">protected</span> <span class="k">abstract</span> <span class="t">EmployeeRepository</span> create();
+
+    <span class="k">@BeforeEach</span>
+    <span class="k">void</span> setUpRepository() {
+        repository = create();
+    }
+
+    <span class="k">static</span> <span class="t">Employee</span> draft(<span class="t">String</span> name, <span class="t">String</span> email, <span class="t">Department</span> department, <span class="t">String</span> salary) {
+        <span class="k">return</span> <span class="t">Employee</span>.draft(name, email, department, <span class="k">new</span> <span class="t">BigDecimal</span>(salary), <span class="t">LocalDate</span>.of(<span class="n">2024</span>, <span class="n">5</span>, <span class="n">20</span>));
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> insertGivesEachEmployeeAnIdStartingAtOne() {
+        <span class="t">Employee</span> first = repository.insert(draft(<span class="n">&quot;Asha&quot;</span>, <span class="n">&quot;asha@example.com&quot;</span>, <span class="t">Department</span>.QA, <span class="n">&quot;50000&quot;</span>));
+        <span class="t">Employee</span> second = repository.insert(draft(<span class="n">&quot;Bilal&quot;</span>, <span class="n">&quot;bilal@example.com&quot;</span>, <span class="t">Department</span>.QA, <span class="n">&quot;51000&quot;</span>));
+        assertEquals(<span class="n">1</span>, first.id());
+        assertEquals(<span class="n">2</span>, second.id());
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> whatYouStoreIsWhatYouGetBack() {
+        <span class="t">Employee</span> stored = repository.insert(draft(<span class="n">&quot;Asha&quot;</span>, <span class="n">&quot;asha@example.com&quot;</span>, <span class="t">Department</span>.HR, <span class="n">&quot;50000.5&quot;</span>));
+        assertEquals(stored, repository.findById(stored.id()).orElseThrow());
+        assertEquals(<span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;50000.50&quot;</span>), stored.salary());
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> findByIdOfAMissingEmployeeIsEmpty() {
+        assertTrue(repository.findById(<span class="n">42</span>).isEmpty());
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> findAllIsOrderedById() {
+        repository.insert(draft(<span class="n">&quot;Cara&quot;</span>, <span class="n">&quot;c@example.com&quot;</span>, <span class="t">Department</span>.SALES, <span class="n">&quot;40000&quot;</span>));
+        repository.insert(draft(<span class="n">&quot;Abe&quot;</span>, <span class="n">&quot;a@example.com&quot;</span>, <span class="t">Department</span>.SALES, <span class="n">&quot;41000&quot;</span>));
+        <span class="t">List</span>&lt;<span class="t">Employee</span>&gt; all = repository.findAll();
+        assertEquals(<span class="t">List</span>.of(<span class="n">&quot;Cara&quot;</span>, <span class="n">&quot;Abe&quot;</span>), all.stream().map(<span class="t">Employee</span>::name).toList());
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> findByDepartmentReturnsOnlyThatDepartment() {
+        repository.insert(draft(<span class="n">&quot;A&quot;</span>, <span class="n">&quot;a@example.com&quot;</span>, <span class="t">Department</span>.QA, <span class="n">&quot;40000&quot;</span>));
+        repository.insert(draft(<span class="n">&quot;B&quot;</span>, <span class="n">&quot;b@example.com&quot;</span>, <span class="t">Department</span>.HR, <span class="n">&quot;41000&quot;</span>));
+        repository.insert(draft(<span class="n">&quot;C&quot;</span>, <span class="n">&quot;c@example.com&quot;</span>, <span class="t">Department</span>.QA, <span class="n">&quot;42000&quot;</span>));
+        assertEquals(<span class="t">List</span>.of(<span class="n">&quot;A&quot;</span>, <span class="n">&quot;C&quot;</span>), repository.findByDepartment(<span class="t">Department</span>.QA).stream().map(<span class="t">Employee</span>::name).toList());
+        assertTrue(repository.findByDepartment(<span class="t">Department</span>.SALES).isEmpty());
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> updateReplacesTheStoredData() {
+        <span class="t">Employee</span> stored = repository.insert(draft(<span class="n">&quot;Asha&quot;</span>, <span class="n">&quot;asha@example.com&quot;</span>, <span class="t">Department</span>.QA, <span class="n">&quot;50000&quot;</span>));
+        repository.update(stored.withSalary(<span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;55000&quot;</span>)).withDepartment(<span class="t">Department</span>.HR));
+        <span class="t">Employee</span> reloaded = repository.findById(stored.id()).orElseThrow();
+        assertEquals(<span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;55000.00&quot;</span>), reloaded.salary());
+        assertEquals(<span class="t">Department</span>.HR, reloaded.department());
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> updateOfAMissingEmployeeFails() {
+        <span class="t">Employee</span> ghost = <span class="k">new</span> <span class="t">Employee</span>(<span class="n">77</span>, <span class="n">&quot;Ghost&quot;</span>, <span class="n">&quot;g@example.com&quot;</span>, <span class="t">Department</span>.HR, <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;40000&quot;</span>), <span class="t">LocalDate</span>.of(<span class="n">2024</span>, <span class="n">1</span>, <span class="n">1</span>));
+        assertThrows(<span class="t">EmployeeNotFoundException</span>.<span class="k">class</span>, () -&gt; repository.update(ghost));
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> deleteReportsWhetherAnythingWasRemoved() {
+        <span class="t">Employee</span> stored = repository.insert(draft(<span class="n">&quot;Asha&quot;</span>, <span class="n">&quot;asha@example.com&quot;</span>, <span class="t">Department</span>.QA, <span class="n">&quot;50000&quot;</span>));
+        assertTrue(repository.delete(stored.id()));
+        assertFalse(repository.delete(stored.id()));
+        assertTrue(repository.findAll().isEmpty());
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> anEmailCanBeUsedOnlyOnce() {
+        repository.insert(draft(<span class="n">&quot;Asha&quot;</span>, <span class="n">&quot;asha@example.com&quot;</span>, <span class="t">Department</span>.QA, <span class="n">&quot;50000&quot;</span>));
+        assertThrows(<span class="t">DuplicateEmailException</span>.<span class="k">class</span>,
+                () -&gt; repository.insert(draft(<span class="n">&quot;Other&quot;</span>, <span class="n">&quot;asha@example.com&quot;</span>, <span class="t">Department</span>.HR, <span class="n">&quot;50000&quot;</span>)));
+        assertEquals(<span class="n">1</span>, repository.findAll().size());
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> existsByEmailIgnoresCase() {
+        repository.insert(draft(<span class="n">&quot;Asha&quot;</span>, <span class="n">&quot;Asha@Example.com&quot;</span>, <span class="t">Department</span>.QA, <span class="n">&quot;50000&quot;</span>));
+        assertTrue(repository.existsByEmail(<span class="n">&quot;asha@example.com&quot;</span>));
+        assertFalse(repository.existsByEmail(<span class="n">&quot;nobody@example.com&quot;</span>));
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> statsCoverEveryDepartmentThatHasPeople() {
+        repository.insert(draft(<span class="n">&quot;A&quot;</span>, <span class="n">&quot;a@example.com&quot;</span>, <span class="t">Department</span>.QA, <span class="n">&quot;40000&quot;</span>));
+        repository.insert(draft(<span class="n">&quot;B&quot;</span>, <span class="n">&quot;b@example.com&quot;</span>, <span class="t">Department</span>.QA, <span class="n">&quot;50000.50&quot;</span>));
+        repository.insert(draft(<span class="n">&quot;C&quot;</span>, <span class="n">&quot;c@example.com&quot;</span>, <span class="t">Department</span>.HR, <span class="n">&quot;30000&quot;</span>));
+
+        <span class="t">Map</span>&lt;<span class="t">Department</span>, <span class="t">DepartmentStats</span>&gt; stats = repository.statsByDepartment();
+
+        assertEquals(<span class="t">List</span>.of(<span class="t">Department</span>.QA, <span class="t">Department</span>.HR), <span class="t">List</span>.copyOf(stats.keySet()));
+        assertEquals(<span class="k">new</span> <span class="t">DepartmentStats</span>(<span class="n">2</span>, <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;90000.50&quot;</span>), <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;50000.50&quot;</span>)), stats.get(<span class="t">Department</span>.QA));
+        assertEquals(<span class="k">new</span> <span class="t">DepartmentStats</span>(<span class="n">1</span>, <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;30000.00&quot;</span>), <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;30000.00&quot;</span>)), stats.get(<span class="t">Department</span>.HR));
+    }
+
+    <span class="k">@Test</span>
+    <span class="k">void</span> statsOfAnEmptyRepositoryAreEmpty() {
+        assertTrue(repository.statsByDepartment().isEmpty());
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+== Hiring
+  #1 Asha Rao     asha@example.com     ENGINEERING    90000.00  hired 2021-04-12
+  #2 Bilal Khan   bilal@example.com    QA             60000.00  hired 2022-01-03
+  #3 Chitra Nair  chitra@example.com   QA             72000.50  hired 2020-09-21
+  #4 Dev Mehta    dev@example.com      SALES          48000.00  hired 2023-07-17
+  #5 Esha Iyer    esha@example.com     HR             55000.00  hired 2019-11-04
+  #6 Farhan Ali   farhan@example.com   ENGINEERING    84000.00  hired 2024-02-26
+
+== Rules that say no
+  Duplicate e-mail: E-mail already in use: ASHA@example.com
+  Low salary: Salary must be at least 15000.00, but was 9000.00
+  Bad e-mail: Not a valid e-mail address: hari-at-example
+  Future hire date: Hire date 2026-01-01 is in the future.
+  Raise too big: A raise must be above 0 and at most 20 percent, but was 35
+  Unknown employee: No employee with id 99
+
+== Changes
+  Raise 10% for #2    : 66000.00
+  Move #4 to ENGINEERING: ENGINEERING
+  Terminated #5, headcount now 5
+
+== Engineering team
+  #1 Asha Rao     asha@example.com     ENGINEERING    90000.00  hired 2021-04-12
+  #4 Dev Mehta    dev@example.com      ENGINEERING    48000.00  hired 2023-07-17
+  #6 Farhan Ali   farhan@example.com   ENGINEERING    84000.00  hired 2024-02-26
+
+== Department report
+  ENGINEERING  people 3  payroll  222000.00  average  74000.00  highest  90000.00
+  QA           people 2  payroll  138000.50  average  69000.25  highest  72000.50
+  Total payroll: 360000.50
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. It was run against the real Apache Derby 10.16.1.1 jars. The pom.xml is well-formed, but Maven itself has not been run on this program yet. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a department and hire into it.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add a search by name prefix.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Change the clock and predict the failures.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add an average salary per department.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Cap a raise by a maximum salary, test first.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Write a counting decorator without changing any class.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a duplicate in a <span class="mono">UNIQUE</span> column, a salary the <span class="mono">CHECK</span> rule refuses, and assigning to a record field. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">09-professional-java/38-employee-database-management</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer, and an internet connection for the first run (two small jars).</span></div>
+      </div>
+      <a class="navcard" href="index.html#phase-10"><span class="k2">Next</span><span class="v">The capstones</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

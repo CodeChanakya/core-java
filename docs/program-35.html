@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maven-based Java Application | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 09 · Professional Java · Program 35 of 43</p>
+    <h1>Maven-based Java Application</h1>
+    <div class="tags">
+      <span class="tag">Intermediate</span>
+      <span class="chip" style="background:#fff">Maven</span>
+      <span class="chip" style="background:#fff">pom.xml</span>
+      <span class="chip" style="background:#fff">Resources</span>
+      <span class="chip" style="background:#fff">Lifecycle</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A folder of .java files and a script works for ten files. A real project has data files that must travel with the code, libraries from other people and teammates who all need to build it the same way.</p>
+        <p>Maven answers with a convention: every project has the same layout and one description file, pom.xml. This program is a small quote calculator, simple on purpose, so the project around it is what you study.</p>
+      </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-35.svg"><img src="flows/program-35.svg" alt="Flow of Program 35, Maven-based Java Application, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A recipe card that every kitchen understands: same boxes, same labels, so anyone can cook the dish without a tour.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Convention over configuration: standard layout, coordinates, lifecycle phases. Resources are read from the classpath so IDE, mvn and java -jar behave the same.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>pom.xml describes the project</b> (input): Name, version, Java release and plugins, in one file.</li><li><b>Data travels with the code</b> (store): catalog.csv sits in src/main/resources and is copied next to the classes.</li><li><b>Load the catalog from the classpath</b> (work): getResourceAsStream finds the file wherever the program runs.</li><li><b>Price the basket with the rules</b> (check): Discount by subtotal tier, then tax on what is left, in BigDecimal.</li><li><b>Print the quotes</b> (result): Four quotes, one of them refused for an unknown product.</li></ol></details>
+      </section>
+<!--/flow-->
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>pom.xml</b><span class="d">Coordinates, the Java release and two plugins.</span></span></li>
+          <li><span class="badge">2</span><span><b>catalog.csv, CatalogLoader.java</b><span class="d">Data in src/main/resources, read from the classpath.</span></span></li>
+          <li><span class="badge">3</span><span><b>QuoteCalculator.java</b><span class="d">Discount first, then tax, in BigDecimal.</span></span></li>
+          <li><span class="badge">4</span><span><b>Main.java</b><span class="d">Four quotes, one refused.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/quotes/QuoteCalculator.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.quotes;
+
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.math.<span class="t">RoundingMode</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="c">/**
+ * Prices a list of items.
+ *
+ * &lt;p&gt;Rules: a subtotal of 1000 or more earns 10 percent off, 500 or more earns 5 percent off.
+ * The discount is applied to every line first, and tax is worked out on the discounted amount,
+ * because that is the amount the customer actually pays for.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">QuoteCalculator</span> {
+
+    <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> TEN_PERCENT_FROM = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;1000&quot;</span>);
+    <span class="k">static</span> <span class="k">final</span> <span class="t">BigDecimal</span> FIVE_PERCENT_FROM = <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;500&quot;</span>);
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Catalog</span> catalog;
+
+    <span class="k">public</span> <span class="t">QuoteCalculator</span>(<span class="t">Catalog</span> catalog) {
+        <span class="k">this</span>.catalog = catalog;
+    }
+
+    <span class="k">public</span> <span class="t">Quote</span> price(<span class="t">List</span>&lt;<span class="t">QuoteItem</span>&gt; items) {
+        <span class="k">if</span> (items.isEmpty()) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="n">&quot;A quote needs at least one item.&quot;</span>);
+        }
+        <span class="t">BigDecimal</span> subtotal = <span class="t">BigDecimal</span>.ZERO;
+        <span class="k">for</span> (<span class="t">QuoteItem</span> item : items) {
+            <span class="t">Product</span> product = catalog.get(item.sku());
+            subtotal = subtotal.add(product.unitPrice().multiply(<span class="t">BigDecimal</span>.valueOf(item.quantity())));
+        }
+        <span class="t">BigDecimal</span> rate = discountRateFor(subtotal);
+
+        <span class="t">List</span>&lt;<span class="t">QuoteLine</span>&gt; lines = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">QuoteItem</span> item : items) {
+            <span class="t">Product</span> product = catalog.get(item.sku());
+            <span class="t">BigDecimal</span> full = product.unitPrice().multiply(<span class="t">BigDecimal</span>.valueOf(item.quantity()));
+            <span class="t">BigDecimal</span> net = money(full.multiply(<span class="t">BigDecimal</span>.ONE.subtract(rate)));
+            <span class="t">BigDecimal</span> tax = money(net.multiply(product.taxRate()));
+            lines.add(<span class="k">new</span> <span class="t">QuoteLine</span>(product, item.quantity(), net, tax));
+        }
+        <span class="k">return</span> <span class="k">new</span> <span class="t">Quote</span>(lines, money(subtotal), rate, money(subtotal.multiply(rate)));
+    }
+
+    <span class="k">static</span> <span class="t">BigDecimal</span> discountRateFor(<span class="t">BigDecimal</span> subtotal) {
+        <span class="k">if</span> (subtotal.compareTo(TEN_PERCENT_FROM) &gt;= <span class="n">0</span>) {
+            <span class="k">return</span> <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;0.10&quot;</span>);
+        }
+        <span class="k">if</span> (subtotal.compareTo(FIVE_PERCENT_FROM) &gt;= <span class="n">0</span>) {
+            <span class="k">return</span> <span class="k">new</span> <span class="t">BigDecimal</span>(<span class="n">&quot;0.05&quot;</span>);
+        }
+        <span class="k">return</span> <span class="t">BigDecimal</span>.ZERO;
+    }
+
+    <span class="k">private</span> <span class="k">static</span> <span class="t">BigDecimal</span> money(<span class="t">BigDecimal</span> value) {
+        <span class="k">return</span> value.setScale(<span class="n">2</span>, <span class="t">RoundingMode</span>.HALF_UP);
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/quotes/CatalogLoader.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.quotes;
+
+<span class="k">import</span> java.io.<span class="t">BufferedReader</span>;
+<span class="k">import</span> java.io.<span class="t">IOException</span>;
+<span class="k">import</span> java.io.<span class="t">InputStream</span>;
+<span class="k">import</span> java.io.<span class="t">InputStreamReader</span>;
+<span class="k">import</span> java.math.<span class="t">BigDecimal</span>;
+<span class="k">import</span> java.nio.charset.<span class="t">StandardCharsets</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="c">/**
+ * Reads the product catalog from a file on the classpath.
+ *
+ * &lt;p&gt;The file lives in {@code src/main/resources}. Maven copies everything in that folder
+ * next to the compiled classes, so the code finds it with {@code getResourceAsStream}
+ * and never needs to know where the project sits on disk. That is why the program works
+ * the same from an IDE, from {@code mvn}, and from a packaged jar.
+ */</span>
+<span class="k">public</span> <span class="k">final</span> <span class="k">class</span> <span class="t">CatalogLoader</span> {
+
+    <span class="k">private</span> <span class="t">CatalogLoader</span>() {
+    }
+
+    <span class="c">/** Loads a catalog from a classpath resource such as {@code /catalog.csv}. */</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="t">Catalog</span> fromResource(<span class="t">String</span> resourceName) {
+        <span class="k">try</span> (<span class="t">InputStream</span> in = <span class="t">CatalogLoader</span>.<span class="k">class</span>.getResourceAsStream(resourceName)) {
+            <span class="k">if</span> (in == <span class="k">null</span>) {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="n">&quot;Resource not found on the classpath: &quot;</span> + resourceName
+                        + <span class="n">&quot; (is src/main/resources on the classpath?)&quot;</span>);
+            }
+            <span class="k">return</span> read(<span class="k">new</span> <span class="t">BufferedReader</span>(<span class="k">new</span> <span class="t">InputStreamReader</span>(in, <span class="t">StandardCharsets</span>.UTF_8)));
+        } <span class="k">catch</span> (<span class="t">IOException</span> e) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="n">&quot;Could not read &quot;</span> + resourceName, e);
+        }
+    }
+
+    <span class="k">static</span> <span class="t">Catalog</span> read(<span class="t">BufferedReader</span> reader) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="t">List</span>&lt;<span class="t">Product</span>&gt; products = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="t">String</span> line;
+        <span class="k">int</span> lineNumber = <span class="n">0</span>;
+        <span class="k">while</span> ((line = reader.readLine()) != <span class="k">null</span>) {
+            lineNumber++;
+            <span class="k">if</span> (lineNumber == <span class="n">1</span> || line.isBlank()) {
+                <span class="k">continue</span>; <span class="c">// header and empty lines</span>
+            }
+            <span class="t">String</span>[] cells = line.split(<span class="n">&quot;,&quot;</span>, -<span class="n">1</span>); <span class="c">// -1 keeps empty cells at the end of a line</span>
+            <span class="k">if</span> (cells.length != <span class="n">4</span>) {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="n">&quot;Line &quot;</span> + lineNumber + <span class="n">&quot;: expected 4 columns but found &quot;</span> + cells.length);
+            }
+            <span class="k">try</span> {
+                products.add(<span class="k">new</span> <span class="t">Product</span>(cells[<span class="n">0</span>].trim(), cells[<span class="n">1</span>].trim(),
+                        <span class="k">new</span> <span class="t">BigDecimal</span>(cells[<span class="n">2</span>].trim()), <span class="k">new</span> <span class="t">BigDecimal</span>(cells[<span class="n">3</span>].trim())));
+            } <span class="k">catch</span> (<span class="t">NumberFormatException</span> e) {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="n">&quot;Line &quot;</span> + lineNumber + <span class="n">&quot;: price or tax is not a number&quot;</span>, e);
+            }
+        }
+        <span class="k">return</span> <span class="k">new</span> <span class="t">Catalog</span>(products);
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+Catalog loaded from the classpath: 6 products
+
+Quote A
+  Notebook        x2  net    240.00  tax    12.00  gross    252.00
+  Pen Box         x3  net    136.50  tax     6.83  gross    143.33
+  Subtotal : 376.50
+  Discount : 0.00 (0%)
+  Tax      : 18.83
+  Total    : 395.33
+
+Quote B
+  Wireless Mouse  x1  net    719.10  tax   129.44  gross    848.54
+  Keyboard        x1  net   1349.10  tax   242.84  gross   1591.94
+  USB Cable       x2  net    538.20  tax    96.88  gross    635.08
+  Subtotal : 2896.00
+  Discount : 289.60 (10%)
+  Tax      : 469.16
+  Total    : 3075.56
+
+Quote C
+  Desk Lamp       x1  net    617.50  tax    74.10  gross    691.60
+  Notebook        x1  net    114.00  tax     5.70  gross    119.70
+  Subtotal : 770.00
+  Discount : 38.50 (5%)
+  Tax      : 79.80
+  Total    : 811.30
+
+Quote D
+  Rejected: Unknown product: X-999
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. The pom.xml is well-formed, but Maven itself has not been run on this program yet. It has not yet been run on Java 25, Windows or macOS.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a Stapler to catalog.csv and quote four.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Add a 15 percent tier from 3000.</span></li>
+          <li><span class="lv">Beginner</span><span class="tx">Predict the jar name after changing the version.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Add Catalog.byPrice().</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Refuse a quantity above 100.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Look inside the jar and filter a version into the output (needs Maven).</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a resource name without the leading slash, money in a <span class="mono">double</span>, and <span class="mono">split(",")</span> dropping empty cells. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">09-professional-java/35-maven-based-java-application</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer.</span></div>
+      </div>
+      <a class="navcard" href="program-36.html"><span class="k2">Next</span><span class="v">36 Automated Business Logic Tests</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
