@@ -65,7 +65,7 @@
     P(39, 10, 'Enterprise Banking System', ['JDBC', 'Collections', 'Tests'], true, true, 'program-39.html'),
     P(40, 10, 'E-commerce Order Management', ['Streams', 'Interfaces', 'Database'], true, true, 'program-40.html'),
     P(41, 10, 'Employee Management System', ['CRUD', 'Date and time', 'JUnit'], true, true, 'program-41.html'),
-    P(42, 10, 'Concurrent Order Processing System', ['CompletableFuture', 'Thread safety']),
+    P(42, 10, 'Concurrent Order Processing System', ['CompletableFuture', 'Thread safety'], true, true, 'program-42.html'),
     P(43, 10, 'Library Management System', ['Solo build', 'Grading rubric'])
   ];
 

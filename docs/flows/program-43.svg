@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 911" width="880" height="911" role="img" aria-labelledby="t d">
+<title id="t">Program 43 flow: Library Management System</title><desc id="d">Flow of Program 43, Library Management System: 1. Read the brief and the tests; 2. Write the rules, one group at a time; 3. Run the grader after every step; 4. Add your own tests; 5. Marked by the rubric</desc>
+<rect width="880" height="911" rx="18" fill="#F8FAFC"/>
+<clipPath id="c"><rect width="880" height="911" rx="18"/></clipPath>
+<g clip-path="url(#c)">
+<rect x="0" y="0" width="880" height="86" fill="#0E1726"/>
+<rect x="0" y="86" width="880" height="5" fill="#B83A0E"/>
+<text x="30" y="34" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13" font-weight="600" fill="#F4A582" letter-spacing="1.2">PHASE 10 · CAPSTONES · PROGRAM 43 OF 43</text>
+<text x="30" y="68" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="27" font-weight="700" fill="#FFFFFF">Library Management System</text>
+<rect x="30" y="112" width="820" height="76" rx="12" fill="#FFF7ED" stroke="#FDBA74"/>
+<text x="50" y="135" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#B83A0E" letter-spacing="1.1">IN EVERYDAY WORDS</text>
+<text x="50" y="158" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="15.5" font-style="italic" fill="#1E293B">A college library desk where the rules are on a card by the till, and the librarian wants a</text>
+<text x="50" y="179" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="15.5" font-style="italic" fill="#1E293B">program that follows them every time.</text>
+<text x="30" y="214" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#475569" letter-spacing="1.1">HOW IT FLOWS, STEP BY STEP</text>
+<rect x="30" y="228" width="820" height="90" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="228" width="7" height="90" rx="3" fill="#334155"/>
+<circle cx="73" cy="273.0" r="17" fill="#334155"/>
+<text x="73" y="279.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">1</text>
+<text x="106" y="256" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Read the brief and the tests</text>
+<text x="106" y="278" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">The Javadoc of LibraryService and 48 acceptance tests are the</text>
+<text x="106" y="296" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">specification.</text>
+<rect x="756" y="242" width="74" height="22" rx="11" fill="#334155" fill-opacity="0.12"/>
+<text x="793" y="257" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#334155" text-anchor="middle" letter-spacing="1">INPUT</text>
+<text x="830" y="302" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">LibraryService.java</text>
+<path d="M73 321 L73 337 M67 331 L73 338 L79 331" stroke="#94A3B8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="342" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="342" width="7" height="72" rx="3" fill="#0F766E"/>
+<circle cx="73" cy="378.0" r="17" fill="#0F766E"/>
+<text x="73" y="384.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">2</text>
+<text x="106" y="370" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Write the rules, one group at a time</text>
+<text x="106" y="392" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">Catalogue, borrowing, returns and fines, renewals, reservations, reports.</text>
+<rect x="756" y="356" width="74" height="22" rx="11" fill="#0F766E" fill-opacity="0.12"/>
+<text x="793" y="371" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#0F766E" text-anchor="middle" letter-spacing="1">WORK</text>
+<text x="830" y="398" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">LibraryService.java</text>
+<path d="M73 417 L73 433 M67 427 L73 434 L79 427" stroke="#94A3B8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="438" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="438" width="7" height="72" rx="3" fill="#B45309"/>
+<circle cx="73" cy="474.0" r="17" fill="#B45309"/>
+<text x="73" y="480.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">3</text>
+<text x="106" y="466" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Run the grader after every step</text>
+<text x="106" y="488" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">bash run.sh --grade prints how many of 48 pass and your automatic points.</text>
+<rect x="756" y="452" width="74" height="22" rx="11" fill="#B45309" fill-opacity="0.12"/>
+<text x="793" y="467" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#B45309" text-anchor="middle" letter-spacing="1">CHECK</text>
+<text x="830" y="494" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">run.sh</text>
+<path d="M73 513 L73 529 M67 523 L73 530 L79 523" stroke="#94A3B8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="534" width="820" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="534" width="7" height="72" rx="3" fill="#6D28D9"/>
+<circle cx="73" cy="570.0" r="17" fill="#6D28D9"/>
+<text x="73" y="576.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">4</text>
+<text x="106" y="562" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Add your own tests</text>
+<text x="106" y="584" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">At least ten, on cases the given tests do not cover.</text>
+<rect x="756" y="548" width="74" height="22" rx="11" fill="#6D28D9" fill-opacity="0.12"/>
+<text x="793" y="563" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#6D28D9" text-anchor="middle" letter-spacing="1">STORE</text>
+<text x="830" y="590" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">src/test</text>
+<path d="M73 609 L73 625 M67 619 L73 626 L79 619" stroke="#94A3B8" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="30" y="630" width="820" height="90" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+<rect x="30" y="630" width="7" height="90" rx="3" fill="#B83A0E"/>
+<circle cx="73" cy="675.0" r="17" fill="#B83A0E"/>
+<text x="73" y="681.0" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="17" font-weight="700" fill="#FFFFFF" text-anchor="middle">5</text>
+<text x="106" y="658" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="16.5" font-weight="700" fill="#0F172A">Marked by the rubric</text>
+<text x="106" y="680" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">40 points from the machine, 60 from a reader: design, tests, quality,</text>
+<text x="106" y="698" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.5" fill="#475569">errors, docs.</text>
+<rect x="756" y="644" width="74" height="22" rx="11" fill="#B83A0E" fill-opacity="0.12"/>
+<text x="793" y="659" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11" font-weight="700" fill="#B83A0E" text-anchor="middle" letter-spacing="1">RESULT</text>
+<text x="830" y="704" font-family="'SFMono-Regular',Consolas,'Liberation Mono',monospace" font-size="11" fill="#64748B" text-anchor="end">RUBRIC.md</text>
+<rect x="30" y="748" width="402" height="109" rx="12" fill="#FEF2F2" stroke="#FCA5A5"/>
+<text x="48" y="773" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#B91C1C" letter-spacing="1.1">IF IT GOES WRONG</text>
+<text x="48" y="796" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#450A0A">Removing from a list inside a for-each, comparing</text>
+<text x="48" y="815" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#450A0A">ISBNs with ==, and subtracting dates the wrong way</text>
+<text x="48" y="834" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#450A0A">round all look fine until the first real case.</text>
+<rect x="448" y="748" width="402" height="109" rx="12" fill="#F0FDFA" stroke="#5EEAD4"/>
+<text x="466" y="773" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="11.5" font-weight="700" fill="#0F766E" letter-spacing="1.1">FOR EXPERTS</text>
+<text x="466" y="796" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#042F2E">Let the tests tell you the next rule, and write</text>
+<text x="466" y="815" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="13.2" fill="#042F2E">your own test before you trust a rule.</text>
+<circle cx="36" cy="883" r="6" fill="#334155"/>
+<text x="48" y="887" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Input</text>
+<circle cx="136" cy="883" r="6" fill="#0F766E"/>
+<text x="148" y="887" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Work</text>
+<circle cx="236" cy="883" r="6" fill="#B45309"/>
+<text x="248" y="887" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Check</text>
+<circle cx="336" cy="883" r="6" fill="#6D28D9"/>
+<text x="348" y="887" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Store</text>
+<circle cx="436" cy="883" r="6" fill="#B83A0E"/>
+<text x="448" y="887" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#475569">Result</text>
+<text x="850" y="887" font-family="'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" font-weight="600" fill="#64748B" text-anchor="end">CodeChanakya · Core Java</text>
+</g>
+<rect x="0.5" y="0.5" width="879" height="910" rx="18" fill="none" stroke="#CBD5E1"/>
+</svg>

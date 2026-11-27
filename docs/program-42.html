@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concurrent Order Processing System | Core Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="brace">{</span><span>Core Java</span><span class="brace">}</span><span class="by">by CodeChanakya</span></a>
+    <span class="navlinks"><a class="text-link" href="flows.html">Flow gallery</a><a class="text-link" href="index.html#programs">All programs</a></span>
+  </div>
+</header>
+
+<main>
+<section class="hero program-hero">
+  <div class="wrap">
+    <p class="crumbs">Phase 10 · Capstones · Program 42 of 43</p>
+    <h1>Concurrent Order Processing System</h1>
+    <div class="tags">
+      <span class="tag">Capstone</span>
+      <span class="chip" style="background:#fff">CompletableFuture</span>
+      <span class="chip" style="background:#fff">Thread safety</span>
+      <span class="chip" style="background:#fff">AtomicInteger</span>
+      <span class="chip" style="background:#fff">JUnit 5</span>
+      <span class="chip" style="background:#fff">Java 21 or newer</span>
+    </div>
+  </div>
+</section>
+
+<section class="program-body">
+  <div class="wrap">
+    <div class="program-main">
+      <section>
+        <h2>The problem</h2>
+        <p>A shop gets many orders at the same moment. Each one must reserve stock, charge a card that is sometimes slow or broken, and send a confirmation. Doing them one after another makes everyone wait behind the slowest card. Doing them all at once is fast, and it is where the bugs live.</p>
+        <p>The system keeps five promises while hundreds of orders run together: never oversell, never lose stock, never wait for ever, give every order exactly one answer, and do not undo a paid order because an email failed. Stock is taken with compareAndSet and the payment chain is built from CompletableFuture.</p>
+      </section>
+<!--flow-->
+      <section id="flow">
+        <h2>See the flow</h2>
+        <p>The whole program as one picture. Read it top to bottom; the colour of each card says what kind of step it is.</p>
+        <figure class="flow-fig">
+          <a href="flows/program-42.svg"><img src="flows/program-42.svg" alt="Flow of Program 42, Concurrent Order Processing System, in 5 steps. The steps are listed in text below the picture." loading="lazy"></a>
+          <figcaption>Click the picture to open it full size.</figcaption>
+        </figure>
+        <div class="layers">
+          <div class="card"><h3>If you are new to coding</h3><p>A busy shop counter with a stock cupboard that has one key, a card machine that is sometimes slow, and a clerk who sends the receipts.</p></div>
+          <div class="card"><h3>If you are learning</h3><p>Follow the numbered cards from top to bottom. Open the file named on each card, run the program, and match its output to the last card.</p></div>
+          <div class="card"><h3>If you are experienced</h3><p>Make the check and the change one atomic step, and give every chain an ending that handles failure.</p></div>
+        </div>
+        <details class="flow-text"><summary>Text version of the flow</summary><ol><li><b>Many orders arrive at the same moment</b> (input): Eight named orders, then a burst of forty buyers for three keyboards.</li><li><b>Reserve the stock without a lock</b> (work): compareAndSet on an AtomicInteger: two threads cannot both take the last item.</li><li><b>Charge the card, but not for ever</b> (check): The gateway returns a future, and orTimeout cuts off one that never answers.</li><li><b>Give the stock back when anything fails</b> (store): Declined, error or timeout: the reservation is released, so sold plus left is constant.</li><li><b>One result per order, in order</b> (result): A failed email does not undo a paid order; the output is sorted so it never changes.</li></ol></details>
+      </section>
+<!--/flow-->
+      <section>
+        <h2>Read in this order</h2>
+        <ol class="files">
+          <li><span class="badge">1</span><span><b>Inventory.java</b><span class="d">Stock as ConcurrentHashMap of AtomicInteger, taken with a compareAndSet loop.</span></span></li>
+          <li><span class="badge">2</span><span><b>PaymentGateway.java, FakeGateway.java</b><span class="d">The slow, declined and broken cards, made on purpose.</span></span></li>
+          <li><span class="badge">3</span><span><b>OrderProcessor.java</b><span class="d">reserve, charge with a timeout, then confirm or give the stock back.</span></span></li>
+          <li><span class="badge">4</span><span><b>Notifier.java</b><span class="d">Confirmations; one address always fails.</span></span></li>
+          <li><span class="badge">5</span><span><b>InventoryTest.java</b><span class="d">Including 200 threads fighting for 50 items, 50 times.</span></span></li>
+          <li><span class="badge">6</span><span><b>Main.java</b><span class="d">Eight orders, then forty buyers for three keyboards.</span></span></li>
+        </ol>
+      </section>
+      <section>
+        <h2>The code</h2>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/orders/Inventory.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.orders;
+
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.<span class="t">TreeMap</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ConcurrentHashMap</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+
+<span class="c">/**
+ * Stock levels that many threads can change at the same time.
+ *
+ * &lt;p&gt;Each product has an {@link AtomicInteger}. {@link #reserve} reads the level, checks it, and tries to
+ * swap in the lower level with {@code compareAndSet}. If another thread got there first the swap fails and
+ * the loop tries again with the fresh value. So the check and the change act as one step, and stock can
+ * never go below zero, without locking anything.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">Inventory</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">AtomicInteger</span>&gt; stock = <span class="k">new</span> <span class="t">ConcurrentHashMap</span>&lt;&gt;();
+
+    <span class="k">public</span> <span class="t">Inventory</span>(<span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; initial) {
+        initial.forEach((sku, quantity) -&gt; stock.put(sku, <span class="k">new</span> <span class="t">AtomicInteger</span>(quantity)));
+    }
+
+    <span class="c">/** Takes {@code quantity} units if all of them are there. Returns false, changing nothing, if not. */</span>
+    <span class="k">public</span> <span class="k">boolean</span> reserve(<span class="t">String</span> sku, <span class="k">int</span> quantity) {
+        <span class="t">AtomicInteger</span> level = stock.get(sku);
+        <span class="k">if</span> (level == <span class="k">null</span> || quantity &lt;= <span class="n">0</span>) {
+            <span class="k">return</span> <span class="k">false</span>;
+        }
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="k">int</span> current = level.get();
+            <span class="k">if</span> (current &lt; quantity) {
+                <span class="k">return</span> <span class="k">false</span>;
+            }
+            <span class="k">if</span> (level.compareAndSet(current, current - quantity)) {
+                <span class="k">return</span> <span class="k">true</span>;
+            }
+        }
+    }
+
+    <span class="c">/** Puts units back, for an order that was reserved and then did not go through. */</span>
+    <span class="k">public</span> <span class="k">void</span> release(<span class="t">String</span> sku, <span class="k">int</span> quantity) {
+        stock.get(sku).addAndGet(quantity);
+    }
+
+    <span class="k">public</span> <span class="k">int</span> available(<span class="t">String</span> sku) {
+        <span class="t">AtomicInteger</span> level = stock.get(sku);
+        <span class="k">return</span> level == <span class="k">null</span> ? <span class="n">0</span> : level.get();
+    }
+
+    <span class="c">/** A sorted copy of all levels. A copy, so the caller cannot change the inventory by accident. */</span>
+    <span class="k">public</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; snapshot() {
+        <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; copy = <span class="k">new</span> <span class="t">TreeMap</span>&lt;&gt;();
+        stock.forEach((sku, level) -&gt; copy.put(sku, level.get()));
+        <span class="k">return</span> copy;
+    }
+}</pre>
+</div>
+<div class="code-panel flat">
+<div class="code-head"><b>src/main/java/com/codechanakya/orders/OrderProcessor.java</b></div>
+<pre class="code"><span class="k">package</span> com.codechanakya.orders;
+
+<span class="k">import</span> java.time.<span class="t">Duration</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CompletableFuture</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CompletionException</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ExecutionException</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeoutException</span>;
+
+<span class="c">/**
+ * Processes orders without blocking: reserve stock, charge the card, send the confirmation. Each step starts
+ * when the one before it finishes, and no thread waits in between.
+ *
+ * &lt;p&gt;Rules that keep it safe: stock is reserved first, because it is the scarce thing; it is given back on every
+ * path that does not complete; a payment that takes too long times out; a failing confirmation never undoes a
+ * paid order; and every order ends with exactly one {@link OrderResult}, whatever goes wrong.
+ */</span>
+<span class="k">public</span> <span class="k">class</span> <span class="t">OrderProcessor</span> {
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Inventory</span> inventory;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">PaymentGateway</span> gateway;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Notifier</span> notifier;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Duration</span> paymentTimeout;
+
+    <span class="k">public</span> <span class="t">OrderProcessor</span>(<span class="t">Inventory</span> inventory, <span class="t">PaymentGateway</span> gateway, <span class="t">Notifier</span> notifier, <span class="t">Duration</span> paymentTimeout) {
+        <span class="k">this</span>.inventory = inventory;
+        <span class="k">this</span>.gateway = gateway;
+        <span class="k">this</span>.notifier = notifier;
+        <span class="k">this</span>.paymentTimeout = paymentTimeout;
+    }
+
+    <span class="k">public</span> <span class="t">CompletableFuture</span>&lt;<span class="t">OrderResult</span>&gt; process(<span class="t">Order</span> order) {
+        <span class="k">if</span> (!inventory.reserve(order.sku(), order.quantity())) {
+            <span class="k">return</span> <span class="t">CompletableFuture</span>.completedFuture(<span class="k">new</span> <span class="t">OrderResult</span>(order.id(), <span class="t">OrderStatus</span>.OUT_OF_STOCK,
+                    <span class="n">&quot;not enough stock of &quot;</span> + order.sku()));
+        }
+        <span class="k">return</span> gateway.charge(order.card())
+                .orTimeout(paymentTimeout.toMillis(), <span class="t">TimeUnit</span>.MILLISECONDS)
+                .thenCompose(accepted -&gt; accepted ? confirm(order) : declined(order))
+                .exceptionally(error -&gt; failed(order, error));
+    }
+
+    <span class="c">/** Processes every order at once and returns the results in the same order as the orders. */</span>
+    <span class="k">public</span> <span class="t">CompletableFuture</span>&lt;<span class="t">List</span>&lt;<span class="t">OrderResult</span>&gt;&gt; processAll(<span class="t">List</span>&lt;<span class="t">Order</span>&gt; orders) {
+        <span class="t">List</span>&lt;<span class="t">CompletableFuture</span>&lt;<span class="t">OrderResult</span>&gt;&gt; futures = orders.stream().map(<span class="k">this</span>::process).toList();
+        <span class="k">return</span> <span class="t">CompletableFuture</span>.allOf(futures.toArray(<span class="k">new</span> <span class="t">CompletableFuture</span>[<span class="n">0</span>]))
+                .thenApply(done -&gt; futures.stream().map(<span class="t">CompletableFuture</span>::join).toList());
+    }
+
+    <span class="k">private</span> <span class="t">CompletableFuture</span>&lt;<span class="t">OrderResult</span>&gt; confirm(<span class="t">Order</span> order) {
+        <span class="k">return</span> notifier.send(order.email(), <span class="n">&quot;order &quot;</span> + order.id() + <span class="n">&quot; confirmed&quot;</span>)
+                .handle((nothing, error) -&gt; <span class="k">new</span> <span class="t">OrderResult</span>(order.id(), <span class="t">OrderStatus</span>.COMPLETED,
+                        error == <span class="k">null</span> ? <span class="n">&quot;paid and confirmed&quot;</span> : <span class="n">&quot;paid, but the confirmation failed&quot;</span>));
+    }
+
+    <span class="k">private</span> <span class="t">CompletableFuture</span>&lt;<span class="t">OrderResult</span>&gt; declined(<span class="t">Order</span> order) {
+        inventory.release(order.sku(), order.quantity());
+        <span class="k">return</span> <span class="t">CompletableFuture</span>.completedFuture(<span class="k">new</span> <span class="t">OrderResult</span>(order.id(), <span class="t">OrderStatus</span>.DECLINED, <span class="n">&quot;card declined&quot;</span>));
+    }
+
+    <span class="k">private</span> <span class="t">OrderResult</span> failed(<span class="t">Order</span> order, <span class="t">Throwable</span> error) {
+        inventory.release(order.sku(), order.quantity());
+        <span class="t">Throwable</span> cause = unwrap(error);
+        <span class="k">if</span> (cause <span class="k">instanceof</span> <span class="t">TimeoutException</span>) {
+            <span class="k">return</span> <span class="k">new</span> <span class="t">OrderResult</span>(order.id(), <span class="t">OrderStatus</span>.TIMED_OUT, <span class="n">&quot;no answer from the payment gateway&quot;</span>);
+        }
+        <span class="k">return</span> <span class="k">new</span> <span class="t">OrderResult</span>(order.id(), <span class="t">OrderStatus</span>.FAILED, cause.getMessage());
+    }
+
+    <span class="c">/** A failure passed down a chain arrives wrapped in a CompletionException. This finds the real one. */</span>
+    <span class="k">static</span> <span class="t">Throwable</span> unwrap(<span class="t">Throwable</span> error) {
+        <span class="t">Throwable</span> current = error;
+        <span class="k">while</span> ((current <span class="k">instanceof</span> <span class="t">CompletionException</span> || current <span class="k">instanceof</span> <span class="t">ExecutionException</span>) &amp;&amp; current.getCause() != <span class="k">null</span>) {
+            current = current.getCause();
+        }
+        <span class="k">return</span> current;
+    }
+}</pre>
+</div>
+<p class="small">Only the key files are shown. The rest are in the repository.</p>
+      </section>
+      <section>
+        <h2>Run it</h2>
+        <div class="code-panel flat">
+<pre class="code"><span class="p">$</span> ./run.sh --check
+== Orders, all processed at the same time
+  order 1: COMPLETED    paid and confirmed
+  order 2: COMPLETED    paid and confirmed
+  order 3: DECLINED     card declined
+  order 4: FAILED       gateway unavailable
+  order 5: TIMED_OUT    no answer from the payment gateway
+  order 6: OUT_OF_STOCK not enough stock of TY-401
+  order 7: COMPLETED    paid, but the confirmation failed
+  order 8: OUT_OF_STOCK not enough stock of ZZ-999
+
+== Confirmations sent for those orders (sorted, because threads finish in no fixed order)
+  asha@example.com: order 1 confirmed
+  bilal@example.com: order 2 confirmed
+
+== Burst: 40 buyers for the last 3 keyboards
+  {COMPLETED=3, OUT_OF_STOCK=37}  (which three buyers won is not fixed, but the count always is)
+
+== Stock at the end (every failed order gave its stock back)
+  BK-101  15
+  EL-202   0
+  HM-301   4
+  TY-401   7
+OK: output matches expected-output.txt</pre>
+        </div>
+        <p class="small">This is the real output from OpenJDK 21.0.13 on Linux. The output was identical on eight runs in a row, because it prints only what does not change: sorted lines and counts. The project's GitHub Actions run is the check on Java 21 and 25 with real Maven and the real JUnit jar. It has not yet been run on Windows or macOS. Run <span class="mono">./run.sh --test</span> for the JUnit tests.</p>
+      </section>
+      <section>
+        <h2>Try it yourself</h2>
+        <ol class="tasks">
+          <li><span class="lv">Beginner</span><span class="tx">Add a new result for an invalid order.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Write a gateway that retries once.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Summarise the results by status.</span></li>
+          <li><span class="lv mid">Intermediate</span><span class="tx">Limit how many orders run at once.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Add a second warehouse and reserve from both.</span></li>
+          <li><span class="lv hard">Challenge</span><span class="tx">Replace the pool with virtual threads and compare.</span></li>
+        </ol>
+        <p class="small">Hints and solutions are in the exercises and solutions folders. Try first.</p>
+      </section>
+      <section>
+        <h2>Break it on purpose</h2>
+        <p>Three files: a lost update, a thread pool that waits for itself, and a failure nobody sees. The README in the broken folder explains each one.</p>
+      </section>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <h3>In this program</h3>
+        <div class="kv"><span class="k2">Folder</span><span class="v mono">capstones/42-concurrent-order-processing</span></div>
+        <div class="kv"><span class="k2">Run</span><span class="v mono">./run.sh --check</span></div>
+        <div class="kv"><span class="k2">Needs</span><span class="v">A JDK, version 21 or newer. This program needs no database. Only the tests download one small jar.</span></div>
+      </div>
+      <a class="navcard" href="program-43.html"><span class="k2">Next</span><span class="v">43 Library Management System</span></a>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>Core Java · built by CodeChanakya · <a href="https://codechanakya.github.io/">codechanakya.github.io</a></span>
+    <span class="mono"><a href="https://github.com/codechanakya">github.com/codechanakya</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

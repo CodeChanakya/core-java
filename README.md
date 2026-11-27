@@ -7,7 +7,7 @@
 
 <p align="center">
   <img alt="Java 21 or newer" src="https://img.shields.io/badge/Java-21%2B-B83A0E">
-  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-41%20of%2043-0F766E">
+  <img alt="Programs ready" src="https://img.shields.io/badge/programs%20ready-43%20of%2043-0F766E">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-0E1726">
   <a href="https://github.com/codechanakya/core-java/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/codechanakya/core-java/actions/workflows/ci.yml/badge.svg"></a>
 </p>
@@ -24,7 +24,7 @@
 
 It follows a fixed path: smallest building block first, then the next concept that depends on it, until you can design and test a small system yourself.
 
-> **Status:** Phases 1 to 9 and the first three capstones are ready (41 of 43 programs). Programs 9, 36 and 38 download the JUnit launcher, and Programs 37 to 41 download a small database driver, on their first run, so those need an internet connection once. The other programs are planned and appear below as they are built. Each ready program lists the Java version and platform it was run on.
+> **Status:** All 43 programs are ready. Programs 9, 36, 38, 42 and 43 download the JUnit launcher, and Programs 37 to 41 download a small database driver, on their first run, so those need an internet connection once. Each ready program lists the Java version and platform it was run on.
 
 ## Start here
 
@@ -132,6 +132,10 @@ Each ready program has a flow diagram in three layers: a story in everyday words
   <tr>
     <td align="center" valign="top"><a href="capstones/40-ecommerce-order-management"><img alt="Flow of Program 40, E-commerce Order Management, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-40.svg" width="290"></a><br><b>40 · E-commerce Order Management</b></td>
     <td align="center" valign="top"><a href="capstones/41-employee-management-system"><img alt="Flow of Program 41, Employee Management System, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-41.svg" width="290"></a><br><b>41 · Employee Management System</b></td>
+    <td align="center" valign="top"><a href="capstones/42-concurrent-order-processing"><img alt="Flow of Program 42, Concurrent Order Processing System, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-42.svg" width="290"></a><br><b>42 · Concurrent Order Processing System</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><a href="capstones/43-library-management-system"><img alt="Flow of Program 43, Library Management System, in 5 steps. The steps are listed in text below the picture." src="docs/flows/program-43.svg" width="290"></a><br><b>43 · Library Management System</b></td>
   </tr>
 </table>
 
@@ -258,8 +262,8 @@ Colour code: slate is input, teal is work, amber is a check, violet is stored da
 | 39 | [Enterprise Banking System](capstones/39-enterprise-banking-system) | JDBC, collections, tests | Ready |
 | 40 | [E-commerce Order Management](capstones/40-ecommerce-order-management) | streams, interfaces, database | Ready |
 | 41 | [Employee Management System](capstones/41-employee-management-system) | CRUD, date and time, JUnit | Ready |
-| 42 | Concurrent Order Processing System | `CompletableFuture`, thread safety | Planned |
-| 43 | Library Management System | built on your own, graded by a rubric | Planned |
+| 42 | [Concurrent Order Processing System](capstones/42-concurrent-order-processing) | `CompletableFuture`, thread safety | Ready |
+| 43 | [Library Management System](capstones/43-library-management-system) | built on your own, graded by a rubric | Ready |
 
 </details>
 
